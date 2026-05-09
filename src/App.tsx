@@ -38,13 +38,17 @@ const STYLE_MONO: React.CSSProperties = {
   lineHeight: '1.08',
 };
 
+const scrollToContact = () => {
+  document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+};
+
 // Reusable check icon components — rendered at 24px so the inner box equals 18px
 function CheckIcon() {
   return <img src="/CheckedBox.svg" alt="" className="shrink-0 size-[24px]" />;
 }
 
 function DashIcon() {
-  return <div className="shrink-0 size-[24px] rounded-[2px] border border-[#4d453b]" />;
+  return <img src="/EmptyCheckbox.svg" alt="" className="shrink-0 size-[24px]" />;
 }
 
 function CrossIcon() {
@@ -98,15 +102,30 @@ function SectionCard({ title, children, expanded = true }: { title: string; chil
 
 // --- NAV ---
 function Navbar() {
+  const [pastHero, setPastHero] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [btnHeight, setBtnHeight] = useState(46);
+
+  useEffect(() => {
+    const handleScroll = () => setPastHero(window.scrollY > window.innerHeight * 0.8);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    if (btnRef.current) setBtnHeight(btnRef.current.getBoundingClientRect().height);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <div className="sticky top-0 z-50 bg-[#ffedd7] flex items-start justify-between px-[30px] py-[20px] w-full border-b border-black/10">
-      <div className="bg-white flex items-start p-[6px]">
-        <div className="border-[1.1px] border-black flex items-center justify-center px-[16px] py-[12px] rounded-[6px]">
-          <img src="/TP_logo.svg" alt="TPRecruitment" className="h-[40px] w-auto" />
-        </div>
-      </div>
-      <div className="bg-white flex flex-col items-start p-[6px]">
-        <button className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer hover:bg-[#fb8349] transition-colors">
+    <div className="sticky top-0 z-50 bg-[#ffedd7] flex items-center justify-between px-[30px] py-[20px] w-full">
+      <img src="/TP_logo.svg" alt="TPRecruitment" className="w-auto" style={{ height: `${btnHeight}px` }} />
+      <div
+        className="flex flex-col items-start p-[6px] transition-colors duration-300"
+        style={{ backgroundColor: pastHero ? '#fb8349' : 'white' }}
+      >
+        <button
+          ref={btnRef}
+          onClick={scrollToContact}
+          className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer"
+        >
           <p className="text-[18px] text-black whitespace-nowrap leading-[20px]" style={STYLE_MONO}>
             Start a conversation
           </p>
@@ -135,12 +154,12 @@ function HeroSection() {
             <div className="bg-[#d1d1d1] flex flex-col flex-1 p-[10px]">
               <div className="flex items-start mb-[-1.372px]">
                 <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                  <p className="flex-1 text-[28px] text-black" style={STYLE_DISPLAY}>
+                  <p className="flex-1 text-[28px] text-black whitespace-nowrap" style={STYLE_DISPLAY}>
                     Usual process of recruitment:
                   </p>
                 </div>
               </div>
-              <div className="flex flex-1 items-start">
+              <div className="flex flex-1">
                 <div className="border-[1.372px] border-black flex flex-1 flex-col gap-[30px] items-center p-[20px] rounded-bl-[8px] rounded-br-[8px]">
                   <div className="flex flex-col gap-[20px] items-start w-full">
                     {[
@@ -149,7 +168,7 @@ function HeroSection() {
                       "You do the thinking.",
                     ].map((text) => (
                       <div key={text} className="flex gap-[14px] items-start w-full">
-                        <div className="shrink-0 size-[24px] rounded-[2px] border border-[#4d453b] mt-[1px]" />
+                        <img src="/EmptyCheckbox.svg" alt="" className="shrink-0 size-[24px] mt-[1px]" />
                         <p className="flex-1 text-[24px] text-black" style={STYLE_MONO}>
                           {text}
                         </p>
@@ -201,7 +220,10 @@ function HeroSection() {
                   <p>not a transaction.</p>
                 </div>
                 <div className="bg-[#fb8349] flex flex-col items-start p-[6px]">
-                  <button className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer hover:opacity-90 transition-opacity">
+                  <button
+                    onClick={scrollToContact}
+                    className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer hover:opacity-90 transition-opacity"
+                  >
                     <p className="text-[24px] text-black whitespace-nowrap" style={STYLE_MONO}>
                       Start working together
                     </p>
@@ -261,9 +283,10 @@ const WORKING_CARDS = [
   },
 ];
 
-// Scroll-driven: each card collapses as the user scrolls through the section.
-// Phase 0 → all expanded; phase N → first N cards collapsed.
-const PHASE_HEIGHT = 380; // px of scroll per card transition
+// Scroll-driven: phases control which cards are collapsed.
+// Phase 0: all 4 visible → Phase 1: first 2 collapse → Phase 2: 3rd collapses → Phase 3: 4th collapses
+const PHASE_HEIGHT = 320;
+const PHASE_COLLAPSED = [0, 2, 3, 4]; // how many cards are collapsed at each phase
 
 function WhatWorkingSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -274,11 +297,11 @@ function WhatWorkingSection() {
       if (!sectionRef.current) return;
       const top = sectionRef.current.getBoundingClientRect().top;
       const scrolled = Math.max(0, -top);
-      const count = Math.min(
+      const phase = Math.min(
         Math.floor(scrolled / PHASE_HEIGHT),
-        WORKING_CARDS.length - 1
+        PHASE_COLLAPSED.length - 1
       );
-      setCollapsedCount(count);
+      setCollapsedCount(PHASE_COLLAPSED[phase]);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
@@ -286,11 +309,10 @@ function WhatWorkingSection() {
   }, []);
 
   return (
-    // Extra paddingBottom gives room for the animation scroll phases
     <section
       ref={sectionRef}
       className="bg-[#ffedd7] w-full"
-      style={{ paddingBottom: `${PHASE_HEIGHT * (WORKING_CARDS.length - 1)}px` }}
+      style={{ paddingBottom: `${PHASE_HEIGHT * (PHASE_COLLAPSED.length - 1)}px` }}
     >
       <div style={{ position: "sticky", top: "80px" }}>
         <div
@@ -418,10 +440,10 @@ function RolesSection() {
           Roles that i hire for
         </p>
 
-        <div className="flex gap-[30px] items-stretch">
+        <div className="flex gap-[30px]">
           {roles.map((role) => (
-            <div key={role.title} className="flex flex-1">
-              <div className="bg-white flex flex-1 flex-col p-[10px]">
+            <div key={role.title} className="flex-1 basis-0 min-w-0">
+              <div className="bg-white flex flex-col h-full p-[10px]">
                 <div className="flex items-start mb-[-1.372px]">
                   <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
                     <p className="flex-1 text-[28px] text-black whitespace-pre-line" style={STYLE_DISPLAY}>
@@ -429,9 +451,9 @@ function RolesSection() {
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-1 items-start">
-                  <div className="border-[1.372px] border-black flex flex-1 h-full items-center p-[20px] rounded-bl-[8px] rounded-br-[8px]">
-                    <p className="text-[24px] text-black" style={STYLE_MONO}>
+                <div className="flex flex-1">
+                  <div className="border-[1.372px] border-black flex flex-1 items-start justify-center p-[20px] rounded-bl-[8px] rounded-br-[8px]">
+                    <p className="text-[24px] text-black text-center" style={STYLE_MONO}>
                       {role.description}
                     </p>
                   </div>
@@ -556,7 +578,7 @@ function TestimonialsSection() {
 // --- CTA / CONTACT SECTION ---
 function CTASection() {
   return (
-    <section className="bg-[#eaeae5] w-full overflow-hidden py-[60px]">
+    <section id="contact" className="bg-[#eaeae5] w-full overflow-hidden py-[60px]">
       <div className="max-w-[1440px] mx-auto px-[30px]">
         {/* Top row: headline + tagline */}
         <div className="flex gap-[35px] items-end mb-[60px]">
@@ -662,13 +684,13 @@ function CTASection() {
 function Footer() {
   return (
     <footer className="bg-[#4d453b] w-full overflow-hidden relative h-[400px]">
-      {/* Big TPRecruitment text */}
-      <p
-        className="absolute top-[30px] left-[30px] text-[#eaeae5]"
-        style={{ ...STYLE_DISPLAY, fontSize: "clamp(80px, 9.6vw, 138px)" }}
-      >
-        TPRecruitment
-      </p>
+      {/* Big TPRecruitment logo */}
+      <img
+        src="/TPRecruitment_FooterLogo.svg"
+        alt="TPRecruitment"
+        className="absolute left-[30px] right-[30px]"
+        style={{ top: '30px', width: 'calc(100% - 60px)', height: 'auto' }}
+      />
 
       {/* Bottom bar */}
       <div className="absolute bottom-[30px] left-[30px] right-[30px] flex items-end justify-between text-white">
@@ -686,19 +708,15 @@ function Footer() {
 // --- APP ---
 export default function App() {
   return (
-    <div className="flex flex-col items-center w-full">
-      <div className="w-full max-w-[1440px] mx-auto">
-        <Navbar />
-      </div>
-      <div className="w-full">
-        <HeroSection />
-        <WhatWorkingSection />
-        <PartnersSection />
-        <RolesSection />
-        <TestimonialsSection />
-        <CTASection />
-        <Footer />
-      </div>
+    <div className="flex flex-col w-full">
+      <Navbar />
+      <HeroSection />
+      <WhatWorkingSection />
+      <PartnersSection />
+      <RolesSection />
+      <TestimonialsSection />
+      <CTASection />
+      <Footer />
     </div>
   );
 }
