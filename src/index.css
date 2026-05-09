@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'GT Canon Trial';
+  src: url('/fonts/GT-Canon-S-Expanded-Regular-Trial.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GT Pressura Mono';
+  src: url('/fonts/GT-Pressura-Mono-Trial-VF.ttf') format('truetype'),
+       url('/fonts/GT-Pressura-Mono-Regular-Trial.otf') format('opentype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --color-peach: #ffedd7;
+    --color-orange: #fb8349;
+    --color-dark: #4d453b;
+    --color-gray-light: #eaeae5;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-peach);
+    color: #000;
+    overflow-x: hidden;
+  }
+
+  /* Font families */
+  .font-display {
+    font-family: 'GT Canon Trial', Georgia, 'Times New Roman', serif;
+  }
+
+  .font-mono-custom {
+    font-family: 'GT Pressura Mono', 'Courier New', Courier, monospace;
+  }
+
+  .font-script {
+    font-family: 'Seaweed Script', cursive;
+  }
+}
+
+/* Marquee animation for partners */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee-reverse {
+  animation: marquee 30s linear infinite reverse;
+}
