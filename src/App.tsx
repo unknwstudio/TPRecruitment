@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+
 // Image assets served from Figma MCP local server
 const imgImage30 = "http://localhost:3845/assets/727dc296dda1d75bd0cdc98681dcc08142ac496f.png";
 const imgImage31 = "http://localhost:3845/assets/f6a9ce2b039315aad435d4806f9e04ecc0200bcf.png";
@@ -27,9 +29,7 @@ const FONT_SCRIPT = "'Seaweed Script', cursive";
 
 // Reusable check icon components
 function CheckIcon() {
-  return (
-    <div className="shrink-0 size-[18px] rounded-[2px] bg-[#fb8349]" />
-  );
+  return <img src="/CheckedBox.svg" alt="" className="shrink-0 size-[18px]" />;
 }
 
 function DashIcon() {
@@ -39,9 +39,7 @@ function DashIcon() {
 }
 
 function CrossIcon() {
-  return (
-    <div className="shrink-0 size-[18px] rounded-[2px] bg-[#4d453b]" />
-  );
+  return <img src="/crossedBox.svg" alt="" className="shrink-0 size-[18px]" />;
 }
 
 function CheckItem({ text, icon = "check" }: { text: string; icon?: "check" | "dash" | "cross" }) {
@@ -57,18 +55,31 @@ function CheckItem({ text, icon = "check" }: { text: string; icon?: "check" | "d
   );
 }
 
-function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+function SectionCard({ title, children, expanded = true }: { title: string; children: React.ReactNode; expanded?: boolean }) {
   return (
     <div className="bg-white flex flex-col items-start p-[10px] w-full">
-      <div className="flex items-start mb-[-1.372px] w-full">
-        <div className="border-[1.372px] border-black flex flex-1 items-start p-[30px] rounded-tl-[8px] rounded-tr-[8px]">
+      <div className="flex items-start w-full" style={{ marginBottom: expanded ? '-1.372px' : '0' }}>
+        <div
+          className="border-[1.372px] border-black flex flex-1 items-start p-[30px] w-full"
+          style={{
+            borderRadius: expanded ? '8px 8px 0 0' : '8px',
+            transition: 'border-radius 0.05s',
+          }}
+        >
           <p className="leading-[1.08] text-[32px] text-black tracking-[-0.96px] whitespace-nowrap"
             style={{ fontFamily: FONT_DISPLAY }}>
             {title}
           </p>
         </div>
       </div>
-      <div className="flex flex-1 items-start w-full">
+      <div
+        className="w-full"
+        style={{
+          maxHeight: expanded ? '800px' : '0',
+          overflow: 'hidden',
+          transition: 'max-height 0.55s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
+      >
         <div className="border-[1.372px] border-black flex flex-1 flex-col items-start p-[30px] rounded-bl-[8px] rounded-br-[8px]">
           {children}
         </div>
@@ -83,11 +94,8 @@ function Navbar() {
     <div className="sticky top-0 z-50 bg-[#ffedd7] flex items-start justify-between px-[30px] py-[20px] w-full border-b border-black/10">
       <div className="bg-white flex items-start p-[6px]">
         <div className="flex items-start">
-          <div className="border-[1.1px] border-black flex items-center justify-center px-[5px] py-[16px] rounded-bl-[6px] rounded-tl-[6px] w-[200px]">
-            <p className="text-[22px] text-black tracking-[-0.5px] whitespace-nowrap"
-              style={{ fontFamily: FONT_DISPLAY }}>
-              TPRecruitment
-            </p>
+          <div className="border-[1.1px] border-black flex items-center justify-center px-[12px] py-[12px] rounded-bl-[6px] rounded-tl-[6px] w-[200px]">
+            <img src="/TP_logo.svg" alt="TPRecruitment" className="h-[36px] w-auto" />
           </div>
           <div className="flex items-start self-stretch w-[200px]">
             <div className="border-[1.1px] border-black flex flex-1 h-full items-center justify-center px-[9px] py-[5px] leading-[0]">
@@ -218,13 +226,76 @@ function HeroSection() {
 }
 
 // --- WHAT'S WORKING SECTION ---
+const WORKING_CARDS = [
+  {
+    title: "My standards",
+    icon: "check" as const,
+    items: [
+      "Personally understand and assess every candidate before sharing their name.",
+      "Hire through the lens of fast-moving company experience.",
+      "Only hand over work I can fully stand behind.",
+      "Treat candidates and hiring managers as people, not profiles or clients.",
+    ],
+  },
+  {
+    title: "Communication",
+    icon: "check" as const,
+    items: [
+      "Start with your reality, not just the brief.",
+      "Understand your culture, chaos level, stage, and what the right hire actually looks like.",
+      "Tell you what the market says, even when it is not what you want to hear.",
+      "Give honest feedback throughout.",
+    ],
+  },
+  {
+    title: "After the offer",
+    icon: "check" as const,
+    items: [
+      "Stay involved after placement.",
+      "Measure outcomes, not speed.",
+      "Prioritize people over pipeline.",
+      "Prioritize outcomes over optics.",
+    ],
+  },
+  {
+    title: "What I won't do",
+    icon: "cross" as const,
+    items: [
+      "Send 20 CVs by Friday just to fill a quota.",
+      "Drop names and disappear.",
+      "Place people who look right on paper but cannot survive the reality.",
+      "Write generic job descriptions.",
+      "Mistake activity for judgment.",
+    ],
+  },
+];
+
 function WhatWorkingSection() {
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const idx = cardRefs.current.findIndex((r) => r === entry.target);
+            if (idx !== -1) setActiveIndex(idx);
+          }
+        });
+      },
+      { rootMargin: "-25% 0px -25% 0px", threshold: 0 }
+    );
+    cardRefs.current.forEach((el) => el && observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className="bg-[#ffedd7] w-full overflow-hidden">
+    <section className="bg-[#ffedd7] w-full">
       <div className="max-w-[1440px] mx-auto">
         <div className="flex gap-0">
-          {/* Left: body text */}
-          <div className="flex flex-col gap-[40px] items-start p-[30px] w-[645px] shrink-0 self-start">
+          {/* Left: body text — sticky so it stays visible as cards scroll */}
+          <div className="flex flex-col gap-[40px] items-start p-[30px] w-[645px] shrink-0 self-start" style={{ position: 'sticky', top: '80px' }}>
             <div className="text-[52px] tracking-[-2.6px] text-black leading-[0]"
               style={{ fontFamily: FONT_DISPLAY }}>
               <p className="leading-[1.1] mb-0">What&apos;s working</p>
@@ -241,48 +312,23 @@ function WhatWorkingSection() {
             </div>
           </div>
 
-          {/* Right: card stack */}
+          {/* Right: animated card stack */}
           <div className="flex flex-col gap-[20px] items-end p-[30px] flex-1">
-            {/* My standards */}
-            <SectionCard title="My standards">
-              <div className="flex flex-col gap-[20px] items-start w-full">
-                <CheckItem text="Personally understand and assess every candidate before sharing their name." />
-                <CheckItem text="Hire through the lens of fast-moving company experience." />
-                <CheckItem text="Only hand over work I can fully stand behind." />
-                <CheckItem text="Treat candidates and hiring managers as people, not profiles or clients." />
+            {WORKING_CARDS.map((card, idx) => (
+              <div
+                key={card.title}
+                className="w-full"
+                ref={(el) => { cardRefs.current[idx] = el; }}
+              >
+                <SectionCard title={card.title} expanded={activeIndex === idx}>
+                  <div className="flex flex-col gap-[20px] items-start w-full">
+                    {card.items.map((text) => (
+                      <CheckItem key={text} icon={card.icon} text={text} />
+                    ))}
+                  </div>
+                </SectionCard>
               </div>
-            </SectionCard>
-
-            {/* Communication */}
-            <SectionCard title="Communication">
-              <div className="flex flex-col gap-[20px] items-start w-full">
-                <CheckItem text="Start with your reality, not just the brief." />
-                <CheckItem text="Understand your culture, chaos level, stage, and what the right hire actually looks like." />
-                <CheckItem text="Tell you what the market says, even when it is not what you want to hear." />
-                <CheckItem text="Give honest feedback throughout." />
-              </div>
-            </SectionCard>
-
-            {/* After the offer */}
-            <SectionCard title="After the offer">
-              <div className="flex flex-col gap-[20px] items-start w-full">
-                <CheckItem text="Stay involved after placement." />
-                <CheckItem text="Measure outcomes, not speed." />
-                <CheckItem text="Prioritize people over pipeline." />
-                <CheckItem text="Prioritize outcomes over optics." />
-              </div>
-            </SectionCard>
-
-            {/* What I won't do */}
-            <SectionCard title="What I won't do">
-              <div className="flex flex-col gap-[20px] items-start w-full">
-                <CheckItem icon="cross" text="Send 20 CVs by Friday just to fill a quota." />
-                <CheckItem icon="cross" text="Drop names and disappear." />
-                <CheckItem icon="cross" text="Place people who look right on paper but cannot survive the reality." />
-                <CheckItem icon="cross" text="Write generic job descriptions." />
-                <CheckItem icon="cross" text="Mistake activity for judgment." />
-              </div>
-            </SectionCard>
+            ))}
           </div>
         </div>
       </div>
