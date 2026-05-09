@@ -23,8 +23,8 @@ const imgImage15 = "http://localhost:3845/assets/b8e7921e6cb9a8c757d8fdc43aa3598
 const imgImage45 = "http://localhost:3845/assets/e3d64af76a1ad3a69f69cdd4a51390b3fcb13168.svg";
 const imgLinkedInIcon = "http://localhost:3845/assets/54c0a72beecaf4250c22a9d1fdb61d8eaf7bd115.svg";
 
-const FONT_DISPLAY = "'GT Canon Trial', Georgia, serif";
-const FONT_MONO = "'GT Pressura Mono', 'Courier New', monospace";
+const FONT_DISPLAY = "'GT Canon Trial'";
+const FONT_MONO = "'GT Pressura Mono'";
 const FONT_SCRIPT = "'Seaweed Script', cursive";
 
 const STYLE_DISPLAY: React.CSSProperties = {
@@ -420,15 +420,15 @@ function PartnersSection() {
 function RolesSection() {
   const roles = [
     {
-      title: "Commercial, Growth\n& Go-to-market",
+      title: "Commercial, Growth & Go-to-market",
       description: "Experienced leaders who drive ambitious revenue results — not just manage them.",
     },
     {
-      title: "Early-stage & First\nFunction Hires",
+      title: "Early-stage & First-Function Hires",
       description: "The entrepreneurial mindset isn't common. I find the person with it to build — not just execute even when the structure isn't there yet.",
     },
     {
-      title: "Marketing,\nCreative & Design",
+      title: "Marketing, Creative & Design",
       description: "Full-time and contract. The people who make what you're building impossible to ignore and support your growth.",
     },
   ];
@@ -453,7 +453,7 @@ function RolesSection() {
                 </div>
                 <div className="flex flex-1">
                   <div className="border-[1.372px] border-black flex flex-1 items-start justify-center p-[20px] rounded-bl-[8px] rounded-br-[8px]">
-                    <p className="text-[24px] text-black text-center" style={STYLE_MONO}>
+                    <p className="text-[24px] text-black text-left" style={STYLE_MONO}>
                       {role.description}
                     </p>
                   </div>
@@ -585,7 +585,8 @@ function CTASection() {
           <div className="shrink-0 w-[655px]">
             <div className="text-[52px] text-black" style={STYLE_DISPLAY}>
               <p>If you&apos;ve read</p>
-              <p>this far, we should probably talk</p>
+              <p>this far, we should</p>
+              <p>probably talk</p>
             </div>
           </div>
           <div className="text-[24px] text-black whitespace-nowrap" style={STYLE_MONO}>
@@ -617,7 +618,11 @@ function CTASection() {
               <div className="flex flex-col gap-[6px]">
                 <div className="flex gap-[6px] items-center">
                   <img src={imgLinkedInIcon} alt="LinkedIn" className="size-[16px]" />
-                  <p className="text-[16px]" style={STYLE_MONO}>Tiffany Philippou</p>
+                  <a className="text-[16px]" href="https://www.linkedin.com/in/tiffany-philippou/" target="_blank" style={STYLE_MONO}>Tiffany Philippou</a>
+                </div>
+                <div className="flex gap-[6px] items-center">
+                  <img src={imgLinkedInIcon} alt="LinkedIn" className="size-[16px]" />
+                  <a className="text-[16px]" href="https://www.linkedin.com/company/tp-recruitment/" target="_blank" style={STYLE_MONO}>TPRecruitment</a>
                 </div>
               </div>
             </div>
@@ -699,7 +704,7 @@ function Footer() {
           <span className="text-[28px]" style={STYLE_DISPLAY}>©</span>
           <span className="text-[20px]" style={STYLE_DISPLAY}>2026 TP Recruitment</span>
         </div>
-        <p className="text-[14px]" style={STYLE_DISPLAY}>brand &amp; website by UNKNW</p>
+        <a className="text-[14px]" href="https://www.unknw.com/" target="_blank" style={STYLE_DISPLAY}>brand &amp; website by UNKNW</a>
       </div>
     </footer>
   );

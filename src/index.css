@@ -43,11 +43,11 @@
 
   /* Font families */
   .font-display {
-    font-family: 'GT Canon Trial', Georgia, 'Times New Roman', serif;
+    font-family: 'GT Canon Trial';
   }
 
   .font-mono-custom {
-    font-family: 'GT Pressura Mono', 'Courier New', Courier, monospace;
+    font-family: 'GT Pressura Mono';
   }
 
   .font-script {
