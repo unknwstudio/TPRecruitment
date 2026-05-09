@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+
 // Image assets served from Figma MCP local server
 const imgImage30 = "http://localhost:3845/assets/727dc296dda1d75bd0cdc98681dcc08142ac496f.png";
 const imgImage31 = "http://localhost:3845/assets/f6a9ce2b039315aad435d4806f9e04ecc0200bcf.png";
@@ -25,50 +27,67 @@ const FONT_DISPLAY = "'GT Canon Trial', Georgia, serif";
 const FONT_MONO = "'GT Pressura Mono', 'Courier New', monospace";
 const FONT_SCRIPT = "'Seaweed Script', cursive";
 
-// Reusable check icon components
+const STYLE_DISPLAY: React.CSSProperties = {
+  fontFamily: FONT_DISPLAY,
+  letterSpacing: '-0.05em',
+  lineHeight: '1.1',
+};
+
+const STYLE_MONO: React.CSSProperties = {
+  fontFamily: FONT_MONO,
+  lineHeight: '1.08',
+};
+
+// Reusable check icon components — rendered at 24px so the inner box equals 18px
 function CheckIcon() {
-  return (
-    <div className="shrink-0 size-[18px] rounded-[2px] bg-[#fb8349]" />
-  );
+  return <img src="/CheckedBox.svg" alt="" className="shrink-0 size-[24px]" />;
 }
 
 function DashIcon() {
-  return (
-    <div className="shrink-0 size-[18px] rounded-[2px] border border-[#4d453b]" />
-  );
+  return <div className="shrink-0 size-[24px] rounded-[2px] border border-[#4d453b]" />;
 }
 
 function CrossIcon() {
-  return (
-    <div className="shrink-0 size-[18px] rounded-[2px] bg-[#4d453b]" />
-  );
+  return <img src="/crossedBox.svg" alt="" className="shrink-0 size-[24px]" />;
 }
 
 function CheckItem({ text, icon = "check" }: { text: string; icon?: "check" | "dash" | "cross" }) {
   return (
-    <div className="flex gap-5 items-start w-full">
-      <div className="flex items-center justify-center shrink-0 mt-[3px]">
+    <div className="flex gap-[14px] items-start w-full">
+      <div className="shrink-0 mt-[1px]">
         {icon === "check" ? <CheckIcon /> : icon === "cross" ? <CrossIcon /> : <DashIcon />}
       </div>
-      <p className="flex-1 leading-[1.1] text-black text-[20px]" style={{ fontFamily: FONT_MONO }}>
+      <p className="flex-1 text-black text-[20px]" style={STYLE_MONO}>
         {text}
       </p>
     </div>
   );
 }
 
-function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+function SectionCard({ title, children, expanded = true }: { title: string; children: React.ReactNode; expanded?: boolean }) {
   return (
     <div className="bg-white flex flex-col items-start p-[10px] w-full">
-      <div className="flex items-start mb-[-1.372px] w-full">
-        <div className="border-[1.372px] border-black flex flex-1 items-start p-[30px] rounded-tl-[8px] rounded-tr-[8px]">
-          <p className="leading-[1.08] text-[32px] text-black tracking-[-0.96px] whitespace-nowrap"
-            style={{ fontFamily: FONT_DISPLAY }}>
+      <div className="flex items-start w-full" style={{ marginBottom: expanded ? '-1.372px' : '0' }}>
+        <div
+          className="border-[1.372px] border-black flex flex-1 items-start p-[30px] w-full"
+          style={{
+            borderRadius: expanded ? '8px 8px 0 0' : '8px',
+            transition: 'border-radius 0.05s',
+          }}
+        >
+          <p className="text-[32px] text-black whitespace-nowrap" style={STYLE_DISPLAY}>
             {title}
           </p>
         </div>
       </div>
-      <div className="flex flex-1 items-start w-full">
+      <div
+        className="w-full"
+        style={{
+          maxHeight: expanded ? '800px' : '0',
+          overflow: 'hidden',
+          transition: 'max-height 0.55s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
+      >
         <div className="border-[1.372px] border-black flex flex-1 flex-col items-start p-[30px] rounded-bl-[8px] rounded-br-[8px]">
           {children}
         </div>
@@ -82,30 +101,13 @@ function Navbar() {
   return (
     <div className="sticky top-0 z-50 bg-[#ffedd7] flex items-start justify-between px-[30px] py-[20px] w-full border-b border-black/10">
       <div className="bg-white flex items-start p-[6px]">
-        <div className="flex items-start">
-          <div className="border-[1.1px] border-black flex items-center justify-center px-[5px] py-[16px] rounded-bl-[6px] rounded-tl-[6px] w-[200px]">
-            <p className="text-[22px] text-black tracking-[-0.5px] whitespace-nowrap"
-              style={{ fontFamily: FONT_DISPLAY }}>
-              TPRecruitment
-            </p>
-          </div>
-          <div className="flex items-start self-stretch w-[200px]">
-            <div className="border-[1.1px] border-black flex flex-1 h-full items-center justify-center px-[9px] py-[5px] leading-[0]">
-              <p className="flex-1 text-[10px] text-black leading-[1.1]" style={{ fontFamily: FONT_MONO }}>
-                The personal<br />recruitment standard.
-              </p>
-            </div>
-            <div className="border-[1.1px] border-black flex flex-1 h-full items-center justify-center p-[5px] rounded-br-[6px] rounded-tr-[6px]">
-              <p className="text-[15px] text-black whitespace-nowrap" style={{ fontFamily: FONT_SCRIPT }}>
-                Tiffany Philippou
-              </p>
-            </div>
-          </div>
+        <div className="border-[1.1px] border-black flex items-center justify-center px-[16px] py-[12px] rounded-[6px]">
+          <img src="/TP_logo.svg" alt="TPRecruitment" className="h-[40px] w-auto" />
         </div>
       </div>
       <div className="bg-white flex flex-col items-start p-[6px]">
         <button className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer hover:bg-[#fb8349] transition-colors">
-          <p className="text-[18px] text-black whitespace-nowrap leading-[20px]" style={{ fontFamily: FONT_MONO }}>
+          <p className="text-[18px] text-black whitespace-nowrap leading-[20px]" style={STYLE_MONO}>
             Start a conversation
           </p>
         </button>
@@ -121,8 +123,7 @@ function HeroSection() {
       <div className="max-w-[1440px] mx-auto px-[30px] pt-[100px] pb-[60px]">
         {/* Hero headline */}
         <div className="mb-[60px]">
-          <p className="text-[60px] leading-[1.1] tracking-[-3px] text-black max-w-[1155px]"
-            style={{ fontFamily: FONT_DISPLAY }}>
+          <p className="text-[60px] text-black max-w-[1155px]" style={STYLE_DISPLAY}>
             Recruitment is messy, human, and brutal. Most recruiters hide from that. I&nbsp;don&apos;t.
           </p>
         </div>
@@ -134,8 +135,7 @@ function HeroSection() {
             <div className="bg-[#d1d1d1] flex flex-col flex-1 p-[10px]">
               <div className="flex items-start mb-[-1.372px]">
                 <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                  <p className="flex-1 text-[28px] leading-[1.08] tracking-[-0.84px] text-black"
-                    style={{ fontFamily: FONT_DISPLAY }}>
+                  <p className="flex-1 text-[28px] text-black" style={STYLE_DISPLAY}>
                     Usual process of recruitment:
                   </p>
                 </div>
@@ -148,15 +148,15 @@ function HeroSection() {
                       "You get CVs.",
                       "You do the thinking.",
                     ].map((text) => (
-                      <div key={text} className="flex gap-5 items-start w-full">
-                        <div className="shrink-0 size-[18px] rounded-[2px] border border-[#4d453b] mt-[3px]" />
-                        <p className="flex-1 text-[24px] leading-[1.1] text-black" style={{ fontFamily: FONT_MONO }}>
+                      <div key={text} className="flex gap-[14px] items-start w-full">
+                        <div className="shrink-0 size-[24px] rounded-[2px] border border-[#4d453b] mt-[1px]" />
+                        <p className="flex-1 text-[24px] text-black" style={STYLE_MONO}>
                           {text}
                         </p>
                       </div>
                     ))}
                   </div>
-                  <p className="w-full text-[24px] leading-[1.1] text-black" style={{ fontFamily: FONT_MONO }}>
+                  <p className="w-full text-[24px] text-black" style={STYLE_MONO}>
                     Sound familiar?
                   </p>
                 </div>
@@ -168,8 +168,7 @@ function HeroSection() {
           <div className="bg-white flex flex-col flex-1 p-[10px]">
             <div className="flex items-start mb-[-1.372px]">
               <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px] h-[60px]">
-                <p className="flex-1 text-[28px] leading-[1.08] tracking-[-0.84px] text-black"
-                  style={{ fontFamily: FONT_DISPLAY }}>
+                <p className="flex-1 text-[28px] text-black" style={STYLE_DISPLAY}>
                   Working with me:
                 </p>
               </div>
@@ -177,33 +176,33 @@ function HeroSection() {
             <div className="flex items-end">
               <div className="border-[1.372px] border-black flex flex-1 flex-col gap-[40px] items-start p-[20px] rounded-bl-[8px] rounded-br-[8px]">
                 <div className="flex flex-col gap-[20px] items-start w-full">
-                  <div className="flex gap-5 items-start w-full">
-                    <CheckIcon />
-                    <p className="flex-1 text-[24px] leading-[1.1] text-black" style={{ fontFamily: FONT_MONO }}>
+                  <div className="flex gap-[14px] items-start w-full">
+                    <div className="shrink-0 mt-[1px]"><CheckIcon /></div>
+                    <p className="flex-1 text-[24px] text-black" style={STYLE_MONO}>
                       You have a conversation.
                     </p>
                   </div>
-                  <div className="flex gap-5 items-start w-full">
-                    <CheckIcon />
-                    <p className="flex-1 text-[24px] leading-[1.1] text-black" style={{ fontFamily: FONT_MONO }}>
+                  <div className="flex gap-[14px] items-start w-full">
+                    <div className="shrink-0 mt-[1px]"><CheckIcon /></div>
+                    <p className="flex-1 text-[24px] text-black" style={STYLE_MONO}>
                       You meet people I believe in.
                     </p>
                   </div>
-                  <div className="flex gap-5 items-start w-full">
-                    <CheckIcon />
-                    <div className="flex-1 text-[24px] leading-[1.1] text-black" style={{ fontFamily: FONT_MONO }}>
+                  <div className="flex gap-[14px] items-start w-full">
+                    <div className="shrink-0 mt-[1px]"><CheckIcon /></div>
+                    <div className="flex-1 text-[24px] text-black" style={STYLE_MONO}>
                       <p>The decision is up to you —</p>
                       <p>but you never carry that weight alone.</p>
                     </div>
                   </div>
                 </div>
-                <div className="text-[24px] leading-[1.1] text-black" style={{ fontFamily: FONT_MONO }}>
+                <div className="text-[24px] text-black" style={STYLE_MONO}>
                   <p>Good hiring is a collaboration,</p>
                   <p>not a transaction.</p>
                 </div>
                 <div className="bg-[#fb8349] flex flex-col items-start p-[6px]">
                   <button className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer hover:opacity-90 transition-opacity">
-                    <p className="text-[24px] leading-[20px] text-black whitespace-nowrap" style={{ fontFamily: FONT_MONO }}>
+                    <p className="text-[24px] text-black whitespace-nowrap" style={STYLE_MONO}>
                       Start working together
                     </p>
                   </button>
@@ -218,71 +217,121 @@ function HeroSection() {
 }
 
 // --- WHAT'S WORKING SECTION ---
+const WORKING_CARDS = [
+  {
+    title: "My standards",
+    icon: "check" as const,
+    items: [
+      "Personally understand and assess every candidate before sharing their name.",
+      "Hire through the lens of fast-moving company experience.",
+      "Only hand over work I can fully stand behind.",
+      "Treat candidates and hiring managers as people, not profiles or clients.",
+    ],
+  },
+  {
+    title: "Communication",
+    icon: "check" as const,
+    items: [
+      "Start with your reality, not just the brief.",
+      "Understand your culture, chaos level, stage, and what the right hire actually looks like.",
+      "Tell you what the market says, even when it is not what you want to hear.",
+      "Give honest feedback throughout.",
+    ],
+  },
+  {
+    title: "After the offer",
+    icon: "check" as const,
+    items: [
+      "Stay involved after placement.",
+      "Measure outcomes, not speed.",
+      "Prioritize people over pipeline.",
+      "Prioritize outcomes over optics.",
+    ],
+  },
+  {
+    title: "What I won't do",
+    icon: "cross" as const,
+    items: [
+      "Send 20 CVs by Friday just to fill a quota.",
+      "Drop names and disappear.",
+      "Place people who look right on paper but cannot survive the reality.",
+      "Write generic job descriptions.",
+      "Mistake activity for judgment.",
+    ],
+  },
+];
+
+// Scroll-driven: each card collapses as the user scrolls through the section.
+// Phase 0 → all expanded; phase N → first N cards collapsed.
+const PHASE_HEIGHT = 380; // px of scroll per card transition
+
 function WhatWorkingSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [collapsedCount, setCollapsedCount] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+      const top = sectionRef.current.getBoundingClientRect().top;
+      const scrolled = Math.max(0, -top);
+      const count = Math.min(
+        Math.floor(scrolled / PHASE_HEIGHT),
+        WORKING_CARDS.length - 1
+      );
+      setCollapsedCount(count);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <section className="bg-[#ffedd7] w-full overflow-hidden">
-      <div className="max-w-[1440px] mx-auto">
-        <div className="flex gap-0">
-          {/* Left: body text */}
-          <div className="flex flex-col gap-[40px] items-start p-[30px] w-[645px] shrink-0 self-start">
-            <div className="text-[52px] tracking-[-2.6px] text-black leading-[0]"
-              style={{ fontFamily: FONT_DISPLAY }}>
-              <p className="leading-[1.1] mb-0">What&apos;s working</p>
-              <p className="leading-[1.1]">with me looks like</p>
+    // Extra paddingBottom gives room for the animation scroll phases
+    <section
+      ref={sectionRef}
+      className="bg-[#ffedd7] w-full"
+      style={{ paddingBottom: `${PHASE_HEIGHT * (WORKING_CARDS.length - 1)}px` }}
+    >
+      <div style={{ position: "sticky", top: "80px" }}>
+        <div
+          className="max-w-[1440px] mx-auto flex"
+          style={{ gap: "61px", padding: "30px" }}
+        >
+          {/* Left: body text — 644px per Figma */}
+          <div
+            className="flex flex-col gap-[40px] items-start"
+            style={{ width: "644px", flexShrink: 0 }}
+          >
+            <div className="text-[52px] text-black" style={STYLE_DISPLAY}>
+              <p>What&apos;s working</p>
+              <p>with me looks like</p>
             </div>
-            <div className="text-[24px] text-black leading-[1.1]" style={{ fontFamily: FONT_MONO }}>
-              <p className="mb-[1.1em]">
+            <div className="text-[24px] text-black" style={STYLE_MONO}>
+              <p className="mb-[1.08em]">
                 I know that growth asks a lot of a company. The pace. The pressure. The decisions that shape what comes next. None of it works without the right people around the table.
               </p>
-              <p className="mb-[1.1em]">
+              <p className="mb-[1.08em]">
                 That&apos;s why I work in partnership with ambitious teams to find the people who can carry that responsibility, people who bring judgement, energy and ownership, people who understand what it takes to build inside a fast-moving company, people who can help shape the outcome.
               </p>
               <p>The strongest teams are built in collaboration.</p>
             </div>
           </div>
 
-          {/* Right: card stack */}
-          <div className="flex flex-col gap-[20px] items-end p-[30px] flex-1">
-            {/* My standards */}
-            <SectionCard title="My standards">
-              <div className="flex flex-col gap-[20px] items-start w-full">
-                <CheckItem text="Personally understand and assess every candidate before sharing their name." />
-                <CheckItem text="Hire through the lens of fast-moving company experience." />
-                <CheckItem text="Only hand over work I can fully stand behind." />
-                <CheckItem text="Treat candidates and hiring managers as people, not profiles or clients." />
-              </div>
-            </SectionCard>
-
-            {/* Communication */}
-            <SectionCard title="Communication">
-              <div className="flex flex-col gap-[20px] items-start w-full">
-                <CheckItem text="Start with your reality, not just the brief." />
-                <CheckItem text="Understand your culture, chaos level, stage, and what the right hire actually looks like." />
-                <CheckItem text="Tell you what the market says, even when it is not what you want to hear." />
-                <CheckItem text="Give honest feedback throughout." />
-              </div>
-            </SectionCard>
-
-            {/* After the offer */}
-            <SectionCard title="After the offer">
-              <div className="flex flex-col gap-[20px] items-start w-full">
-                <CheckItem text="Stay involved after placement." />
-                <CheckItem text="Measure outcomes, not speed." />
-                <CheckItem text="Prioritize people over pipeline." />
-                <CheckItem text="Prioritize outcomes over optics." />
-              </div>
-            </SectionCard>
-
-            {/* What I won't do */}
-            <SectionCard title="What I won't do">
-              <div className="flex flex-col gap-[20px] items-start w-full">
-                <CheckItem icon="cross" text="Send 20 CVs by Friday just to fill a quota." />
-                <CheckItem icon="cross" text="Drop names and disappear." />
-                <CheckItem icon="cross" text="Place people who look right on paper but cannot survive the reality." />
-                <CheckItem icon="cross" text="Write generic job descriptions." />
-                <CheckItem icon="cross" text="Mistake activity for judgment." />
-              </div>
-            </SectionCard>
+          {/* Right: animated card stack — 675px per Figma (flex-1 fills remaining space) */}
+          <div className="flex flex-col gap-[20px] flex-1">
+            {WORKING_CARDS.map((card, idx) => (
+              <SectionCard
+                key={card.title}
+                title={card.title}
+                expanded={idx >= collapsedCount}
+              >
+                <div className="flex flex-col gap-[20px] items-start w-full">
+                  {card.items.map((text) => (
+                    <CheckItem key={text} icon={card.icon} text={text} />
+                  ))}
+                </div>
+              </SectionCard>
+            ))}
           </div>
         </div>
       </div>
@@ -319,8 +368,7 @@ function PartnersSection() {
   return (
     <section className="bg-[#ffedd7] w-full overflow-hidden py-[30px]">
       <div className="max-w-[1440px] mx-auto px-[30px]">
-        <p className="text-[52px] leading-[1.08] tracking-[-2.6px] text-black mb-[60px]"
-          style={{ fontFamily: FONT_DISPLAY }}>
+        <p className="text-[52px] text-black mb-[60px]" style={STYLE_DISPLAY}>
           My partners &amp; collaborators
         </p>
       </div>
@@ -366,8 +414,7 @@ function RolesSection() {
   return (
     <section className="bg-[#ffedd7] w-full overflow-hidden py-[30px]">
       <div className="max-w-[1440px] mx-auto px-[30px]">
-        <p className="text-[52px] leading-[1.08] tracking-[-2.6px] text-black mb-[60px] whitespace-nowrap"
-          style={{ fontFamily: FONT_DISPLAY }}>
+        <p className="text-[52px] text-black mb-[60px] whitespace-nowrap" style={STYLE_DISPLAY}>
           Roles that i hire for
         </p>
 
@@ -377,15 +424,14 @@ function RolesSection() {
               <div className="bg-white flex flex-1 flex-col p-[10px]">
                 <div className="flex items-start mb-[-1.372px]">
                   <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                    <p className="flex-1 text-[28px] leading-[1.08] tracking-[-0.84px] text-black whitespace-pre-line"
-                      style={{ fontFamily: FONT_DISPLAY }}>
+                    <p className="flex-1 text-[28px] text-black whitespace-pre-line" style={STYLE_DISPLAY}>
                       {role.title}
                     </p>
                   </div>
                 </div>
                 <div className="flex flex-1 items-start">
                   <div className="border-[1.372px] border-black flex flex-1 h-full items-center p-[20px] rounded-bl-[8px] rounded-br-[8px]">
-                    <p className="text-[24px] leading-[1.1] text-black" style={{ fontFamily: FONT_MONO }}>
+                    <p className="text-[24px] text-black" style={STYLE_MONO}>
                       {role.description}
                     </p>
                   </div>
@@ -454,8 +500,7 @@ function TestimonialsSection() {
     <section className="bg-[#ffedd7] w-full overflow-hidden py-[30px]">
       <div className="max-w-[1440px] mx-auto px-[30px]">
         <div className="mb-[60px]">
-          <p className="text-[52px] leading-[1.08] tracking-[-2.6px] text-black whitespace-pre"
-            style={{ fontFamily: FONT_DISPLAY }}>
+          <p className="text-[52px] text-black whitespace-pre" style={STYLE_DISPLAY}>
             I could keep going.{"\n"}But they&apos;ll say it better.
           </p>
         </div>
@@ -478,14 +523,12 @@ function TestimonialsSection() {
                   {/* Name / title */}
                   <div className="flex flex-1 flex-col self-stretch">
                     <div className="border-[1.372px] border-black flex flex-1 items-center px-[30px] rounded-tr-[8px]">
-                      <p className="text-[32px] leading-[1.08] tracking-[-1.6px] text-black whitespace-nowrap"
-                        style={{ fontFamily: FONT_DISPLAY }}>
+                      <p className="text-[32px] text-black whitespace-nowrap" style={STYLE_DISPLAY}>
                         {t.name}
                       </p>
                     </div>
                     <div className="border-[1.372px] border-black flex flex-1 items-center px-[30px]">
-                      <p className="text-[32px] leading-[1.08] tracking-[-1.6px] text-black whitespace-nowrap"
-                        style={{ fontFamily: FONT_DISPLAY }}>
+                      <p className="text-[32px] text-black whitespace-nowrap" style={STYLE_DISPLAY}>
                         {t.title}
                       </p>
                     </div>
@@ -496,8 +539,7 @@ function TestimonialsSection() {
               <div className="px-[10px] pb-[10px]">
                 <div className="border border-black flex flex-col gap-[20px] p-[30px] rounded-bl-[8px] rounded-br-[8px]">
                   {t.text.map((para, i) => (
-                    <p key={i} className="text-[28px] leading-[1.1] text-black w-full"
-                      style={{ fontFamily: FONT_MONO }}>
+                    <p key={i} className="text-[28px] text-black w-full" style={STYLE_MONO}>
                       {para}
                     </p>
                   ))}
@@ -519,13 +561,12 @@ function CTASection() {
         {/* Top row: headline + tagline */}
         <div className="flex gap-[35px] items-end mb-[60px]">
           <div className="shrink-0 w-[655px]">
-            <div className="text-[52px] tracking-[-2.6px] text-black leading-[0]"
-              style={{ fontFamily: FONT_DISPLAY }}>
-              <p className="leading-[1.08] mb-0">If you&apos;ve read</p>
-              <p className="leading-[1.08]">this far, we should probably talk</p>
+            <div className="text-[52px] text-black" style={STYLE_DISPLAY}>
+              <p>If you&apos;ve read</p>
+              <p>this far, we should probably talk</p>
             </div>
           </div>
-          <div className="text-[24px] text-black leading-[1.1] whitespace-nowrap" style={{ fontFamily: FONT_MONO }}>
+          <div className="text-[24px] text-black whitespace-nowrap" style={STYLE_MONO}>
             <p>I&apos;d love to hear what you&apos;re building</p>
             <p>or just have a good conversation with you</p>
           </div>
@@ -536,33 +577,25 @@ function CTASection() {
           {/* Left: contacts */}
           <div className="flex flex-col gap-[30px] items-start shrink-0 w-[300px]">
             <div className="flex flex-col gap-[20px] items-start text-[16px] text-black">
-              <p className="leading-[1.08] tracking-[-0.8px]" style={{ fontFamily: FONT_DISPLAY }}>
-                Contacts
-              </p>
-              <div className="flex flex-col gap-[10px] leading-[1.1]" style={{ fontFamily: FONT_MONO }}>
+              <p className="text-[16px]" style={STYLE_DISPLAY}>Contacts</p>
+              <div className="flex flex-col gap-[10px] text-[16px]" style={STYLE_MONO}>
                 <p>tprecruitment.co</p>
                 <p>tiffany@tprecruitment.co</p>
               </div>
             </div>
             <div className="flex flex-col gap-[20px] items-start text-[16px] text-black">
-              <p className="leading-[1.08] tracking-[-0.8px]" style={{ fontFamily: FONT_DISPLAY }}>
-                Office
-              </p>
-              <p className="leading-[1.1]" style={{ fontFamily: FONT_MONO }}>
+              <p style={STYLE_DISPLAY}>Office</p>
+              <p style={STYLE_MONO}>
                 20-22 Wenlock Road<br />
                 London, England, N1 7GU
               </p>
             </div>
             <div className="flex flex-col gap-[20px] items-start text-[16px] text-black">
-              <p className="leading-[1.08] tracking-[-0.8px]" style={{ fontFamily: FONT_DISPLAY }}>
-                Socials
-              </p>
+              <p style={STYLE_DISPLAY}>Socials</p>
               <div className="flex flex-col gap-[6px]">
                 <div className="flex gap-[6px] items-center">
                   <img src={imgLinkedInIcon} alt="LinkedIn" className="size-[16px]" />
-                  <p className="text-[16px] leading-[1.1]" style={{ fontFamily: FONT_MONO }}>
-                    Tiffany Philippou
-                  </p>
+                  <p className="text-[16px]" style={STYLE_MONO}>Tiffany Philippou</p>
                 </div>
               </div>
             </div>
@@ -575,24 +608,24 @@ function CTASection() {
               <div className="flex gap-[30px]">
                 <div className="flex flex-col gap-[6px] flex-1">
                   <label className="text-[16px] tracking-[-0.8px] leading-[1.08]"
-                    style={{ fontFamily: FONT_DISPLAY }}>
+                    style={STYLE_DISPLAY}>
                     Your Name &amp; Surname
                   </label>
                   <input
                     type="text"
                     className="w-full h-[24px] border-b border-[#4d453b] bg-transparent outline-none text-[16px]"
-                    style={{ fontFamily: FONT_MONO }}
+                    style={STYLE_MONO}
                   />
                 </div>
                 <div className="flex flex-col gap-[6px] flex-1">
                   <label className="text-[16px] tracking-[-0.8px] leading-[1.08]"
-                    style={{ fontFamily: FONT_DISPLAY }}>
+                    style={STYLE_DISPLAY}>
                     Email
                   </label>
                   <input
                     type="email"
                     className="w-full h-[24px] border-b border-[#4d453b] bg-transparent outline-none text-[16px]"
-                    style={{ fontFamily: FONT_MONO }}
+                    style={STYLE_MONO}
                   />
                 </div>
               </div>
@@ -600,12 +633,12 @@ function CTASection() {
               {/* Textarea */}
               <div className="flex flex-col gap-[15px]">
                 <label className="text-[16px] tracking-[-0.8px] leading-[1.08]"
-                  style={{ fontFamily: FONT_DISPLAY }}>
+                  style={STYLE_DISPLAY}>
                   Tell me about you
                 </label>
                 <textarea
                   className="w-full h-[197px] border border-[#949494] rounded-[4px] bg-transparent outline-none p-[12px] text-[16px] resize-none"
-                  style={{ fontFamily: FONT_MONO }}
+                  style={STYLE_MONO}
                 />
               </div>
             </div>
@@ -613,7 +646,7 @@ function CTASection() {
             {/* Submit button */}
             <div className="bg-[#fb8349] flex flex-col items-start p-[6px] self-start">
               <button className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer hover:opacity-90 transition-opacity">
-                <p className="text-[20px] leading-[20px] text-black whitespace-nowrap" style={{ fontFamily: FONT_MONO }}>
+                <p className="text-[20px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
                   Let&apos;s talk
                 </p>
               </button>
@@ -630,25 +663,21 @@ function Footer() {
   return (
     <footer className="bg-[#4d453b] w-full overflow-hidden relative h-[400px]">
       {/* Big TPRecruitment text */}
-      <p className="absolute top-[30px] left-[30px] text-[#eaeae5] leading-normal tracking-[-2.77px]"
-        style={{ fontFamily: FONT_DISPLAY, fontSize: "clamp(80px, 9.6vw, 138px)" }}>
+      <p
+        className="absolute top-[30px] left-[30px] text-[#eaeae5]"
+        style={{ ...STYLE_DISPLAY, fontSize: "clamp(80px, 9.6vw, 138px)" }}
+      >
         TPRecruitment
       </p>
 
       {/* Bottom bar */}
       <div className="absolute bottom-[30px] left-[30px] right-[30px] flex items-end justify-between text-white">
-        <p className="text-[14px] leading-none tracking-[-0.42px]" style={{ fontFamily: FONT_DISPLAY }}>
-          All rights reserved.
-        </p>
+        <p className="text-[14px]" style={STYLE_DISPLAY}>All rights reserved.</p>
         <div className="flex gap-[6px] items-center">
-          <span className="text-[28px] leading-none" style={{ fontFamily: "Georgia, serif" }}>©</span>
-          <span className="text-[20px] leading-none tracking-[-1px]" style={{ fontFamily: FONT_DISPLAY }}>
-            2026 TP Recruitment
-          </span>
+          <span className="text-[28px]" style={STYLE_DISPLAY}>©</span>
+          <span className="text-[20px]" style={STYLE_DISPLAY}>2026 TP Recruitment</span>
         </div>
-        <p className="text-[14px] leading-none tracking-[-0.7px]" style={{ fontFamily: FONT_DISPLAY }}>
-          brand &amp; website by UNKNW
-        </p>
+        <p className="text-[14px]" style={STYLE_DISPLAY}>brand &amp; website by UNKNW</p>
       </div>
     </footer>
   );
