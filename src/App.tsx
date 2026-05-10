@@ -143,28 +143,31 @@ function HeroSection() {
           </p>
         </div>
 
-        {/* Two columns */}
-        <div className="flex gap-[30px] items-start">
+        {/* Two columns — equal width + equal height, matching Figma 174-1641 */}
+        <div className="flex gap-[30px] items-stretch">
           {/* Left: Usual process */}
-          <div className="flex flex-1">
-            <div className="bg-[#d1d1d1] flex flex-col flex-1 p-[10px]">
-              <div className="flex items-start mb-[-1.372px]">
+          <div className="flex flex-1 self-stretch">
+            <div className="bg-[#d1d1d1] flex flex-col h-full flex-1 p-[10px]">
+              {/* Header: full border, no overlap trick */}
+              <div className="flex items-start shrink-0 w-full">
                 <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                  <p className="flex-1 text-[28px] text-black whitespace-nowrap" style={STYLE_DISPLAY}>
+                  <p className="shrink-0 text-[28px] text-black whitespace-nowrap" style={STYLE_DISPLAY}>
                     Usual process of recruitment:
                   </p>
                 </div>
               </div>
-              <div className="flex flex-1">
-                <div className="border-[1.372px] border-black flex flex-1 flex-col gap-[30px] items-center p-[20px] rounded-bl-[8px] rounded-br-[8px]">
+              {/* Body: no top border (header bottom border acts as divider) */}
+              <div className="flex flex-1 items-start min-h-0">
+                <div className="border-b-[1.372px] border-l-[1.372px] border-r-[1.372px] border-black flex flex-1 flex-col gap-[30px] h-full items-center p-[20px] rounded-bl-[8px] rounded-br-[8px]">
                   <div className="flex flex-col gap-[20px] items-start w-full">
                     {[
                       "You fill out a brief.",
                       "You get CVs.",
                       "You do the thinking.",
                     ].map((text) => (
-                      <div key={text} className="flex gap-[14px] items-start w-full">
-                        <img src="/EmptyCheckbox.svg" alt="" className="shrink-0 size-[24px] mt-[1px]" />
+                      <div key={text} className="flex gap-[20px] items-start w-full">
+                        {/* Figma: empty bordered 18px square */}
+                        <div className="shrink-0 border border-[#4d453b] rounded-[2px] size-[18px] mt-[3px]" />
                         <p className="flex-1 text-[24px] text-black" style={STYLE_MONO}>
                           {text}
                         </p>
@@ -181,46 +184,48 @@ function HeroSection() {
 
           {/* Right: Working with me */}
           <div className="bg-white flex flex-col flex-1 p-[10px]">
-            <div className="flex items-start mb-[-1.372px]">
-              <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px] h-[60px]">
+            {/* Header: overlap trick (mb negative) */}
+            <div className="flex items-start shrink-0 w-full" style={{ marginBottom: '-1.372px' }}>
+              <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
                 <p className="flex-1 text-[28px] text-black" style={STYLE_DISPLAY}>
                   Working with me:
                 </p>
               </div>
             </div>
-            <div className="flex items-end">
+            <div className="flex items-start shrink-0 w-full">
               <div className="border-[1.372px] border-black flex flex-1 flex-col gap-[40px] items-start p-[20px] rounded-bl-[8px] rounded-br-[8px]">
                 <div className="flex flex-col gap-[20px] items-start w-full">
-                  <div className="flex gap-[14px] items-start w-full">
-                    <div className="shrink-0 mt-[1px]"><CheckIcon /></div>
+                  <div className="flex gap-[20px] items-start w-full">
+                    {/* Figma: filled orange 18px square */}
+                    <div className="shrink-0 bg-[#fb8349] rounded-[2px] size-[18px] mt-[3px]" />
                     <p className="flex-1 text-[24px] text-black" style={STYLE_MONO}>
                       You have a conversation.
                     </p>
                   </div>
-                  <div className="flex gap-[14px] items-start w-full">
-                    <div className="shrink-0 mt-[1px]"><CheckIcon /></div>
+                  <div className="flex gap-[20px] items-start w-full">
+                    <div className="shrink-0 bg-[#fb8349] rounded-[2px] size-[18px] mt-[3px]" />
                     <p className="flex-1 text-[24px] text-black" style={STYLE_MONO}>
                       You meet people I believe in.
                     </p>
                   </div>
-                  <div className="flex gap-[14px] items-start w-full">
-                    <div className="shrink-0 mt-[1px]"><CheckIcon /></div>
-                    <div className="flex-1 text-[24px] text-black" style={STYLE_MONO}>
+                  <div className="flex gap-[20px] items-start w-full">
+                    <div className="shrink-0 bg-[#fb8349] rounded-[2px] size-[18px] mt-[3px]" />
+                    <div className="flex-1 text-[24px] text-black" style={{ ...STYLE_MONO, lineHeight: '1.1' }}>
                       <p>The decision is up to you —</p>
                       <p>but you never carry that weight alone.</p>
                     </div>
                   </div>
                 </div>
-                <div className="text-[24px] text-black" style={STYLE_MONO}>
+                <div className="text-[24px] text-black" style={{ ...STYLE_MONO, lineHeight: '1.1' }}>
                   <p>Good hiring is a collaboration,</p>
                   <p>not a transaction.</p>
                 </div>
                 <div className="bg-[#fb8349] flex flex-col items-start p-[6px]">
                   <button
                     onClick={scrollToContact}
-                    className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer hover:opacity-90 transition-opacity"
+                    className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer"
                   >
-                    <p className="text-[24px] text-black whitespace-nowrap" style={STYLE_MONO}>
+                    <p className="text-[24px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
                       Start working together
                     </p>
                   </button>
@@ -281,7 +286,7 @@ const WORKING_CARDS = [
 
 const STACK_FIRST_TOP = 96;  // px from viewport top where first card sticks
 const STACK_STEP = 16;       // each subsequent card sticks this many px lower
-const STACK_GAP = 80;        // margin-top between cards (creates scroll space)
+const STACK_GAP = 40;        // margin-top between cards (creates scroll space)
 
 function WhatWorkingSection() {
   return (
@@ -621,107 +626,103 @@ function TestimonialsSection() {
 function CTASection() {
   return (
     <section id="contact" className="bg-[#eaeae5] w-full overflow-hidden py-[60px]">
-      <div className="max-w-[1440px] mx-auto px-[30px]">
-        {/* Top row: headline + tagline */}
-        <div className="flex gap-[35px] items-end mb-[60px]">
-          <div className="shrink-0 w-[655px]">
-            <div className="text-[52px] text-black" style={STYLE_DISPLAY}>
-              <p>If you&apos;ve read</p>
-              <p>this far, we should</p>
-              <p>probably talk</p>
-            </div>
-          </div>
-          <div className="text-[24px] text-black whitespace-nowrap" style={STYLE_MONO}>
-            <p>I&apos;d love to hear what you&apos;re building</p>
-            <p>or just have a good conversation with you</p>
-          </div>
-        </div>
+      <div className="max-w-[1440px] mx-auto px-[30px] flex gap-[35px] items-start">
 
-        {/* Bottom row: contacts + form */}
-        <div className="flex gap-[30px]">
-          {/* Left: contacts */}
-          <div className="flex flex-col gap-[30px] items-start shrink-0 w-[300px]">
-            <div className="flex flex-col gap-[20px] items-start text-[16px] text-black">
-              <p className="text-[16px]" style={STYLE_DISPLAY}>Contacts</p>
-              <div className="flex flex-col gap-[10px] text-[16px]" style={STYLE_MONO}>
+        {/* Left column: headline + contacts (655px, matching Figma) */}
+        <div className="shrink-0 w-[655px] flex flex-col gap-[60px]">
+          <div className="text-[52px] text-black" style={STYLE_DISPLAY}>
+            <p>If you&apos;ve read</p>
+            <p>this far, we should</p>
+            <p>probably talk</p>
+          </div>
+
+          <div className="flex flex-col gap-[30px] text-[16px] text-black">
+            <div className="flex flex-col gap-[20px]">
+              <p style={STYLE_DISPLAY}>Contacts</p>
+              <div className="flex flex-col gap-[10px]" style={STYLE_MONO}>
                 <p>tprecruitment.co</p>
                 <p>tiffany@tprecruitment.co</p>
               </div>
             </div>
-            <div className="flex flex-col gap-[20px] items-start text-[16px] text-black">
+            <div className="flex flex-col gap-[20px]">
               <p style={STYLE_DISPLAY}>Office</p>
               <p style={STYLE_MONO}>
                 20-22 Wenlock Road<br />
                 London, England, N1 7GU
               </p>
             </div>
-            <div className="flex flex-col gap-[20px] items-start text-[16px] text-black">
+            <div className="flex flex-col gap-[20px]">
               <p style={STYLE_DISPLAY}>Socials</p>
               <div className="flex flex-col gap-[6px]">
                 <div className="flex gap-[6px] items-center">
                   <img src={imgLinkedInIcon} alt="LinkedIn" className="size-[16px]" />
-                  <a className="text-[16px]" href="https://www.linkedin.com/in/tiffany-philippou/" target="_blank" style={STYLE_MONO}>Tiffany Philippou</a>
+                  <a className="text-[16px]" href="https://www.linkedin.com/company/tp-recruitment/" target="_blank" style={STYLE_MONO}>TP Recruitment</a>
                 </div>
                 <div className="flex gap-[6px] items-center">
                   <img src={imgLinkedInIcon} alt="LinkedIn" className="size-[16px]" />
-                  <a className="text-[16px]" href="https://www.linkedin.com/company/tp-recruitment/" target="_blank" style={STYLE_MONO}>TPRecruitment</a>
+                  <a className="text-[16px]" href="https://www.linkedin.com/in/tiffany-philippou/" target="_blank" style={STYLE_MONO}>Tiffany Philippou</a>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Right: form */}
-          <div className="flex flex-col gap-[30px] flex-1">
-            <div className="flex flex-col gap-[30px]">
-              {/* Name + Email row */}
-              <div className="flex gap-[30px]">
-                <div className="flex flex-col gap-[6px] flex-1">
-                  <label className="text-[16px] tracking-[-0.8px] leading-[1.08]"
-                    style={STYLE_DISPLAY}>
-                    Your Name &amp; Surname
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full h-[24px] border-b border-[#4d453b] bg-transparent outline-none text-[16px]"
-                    style={STYLE_MONO}
-                  />
-                </div>
-                <div className="flex flex-col gap-[6px] flex-1">
-                  <label className="text-[16px] tracking-[-0.8px] leading-[1.08]"
-                    style={STYLE_DISPLAY}>
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    className="w-full h-[24px] border-b border-[#4d453b] bg-transparent outline-none text-[16px]"
-                    style={STYLE_MONO}
-                  />
-                </div>
-              </div>
+        {/* Right column: tagline + form (aligned with left column top, starts at ~646px) */}
+        <div className="flex-1 flex flex-col gap-[30px]">
+          {/* Tagline */}
+          <div className="text-[24px] text-black" style={STYLE_MONO}>
+            <p>I&apos;d love to hear what you&apos;re building</p>
+            <p>or just have a good conversation with you</p>
+          </div>
 
-              {/* Textarea */}
-              <div className="flex flex-col gap-[15px]">
-                <label className="text-[16px] tracking-[-0.8px] leading-[1.08]"
-                  style={STYLE_DISPLAY}>
-                  Tell me about you
+          {/* Form */}
+          <div className="flex flex-col gap-[30px]">
+            {/* Name + Email row */}
+            <div className="flex gap-[30px] h-[53px]">
+              <div className="flex flex-col gap-[6px] flex-1">
+                <label className="text-[16px] leading-[1.08]" style={STYLE_DISPLAY}>
+                  Your Name &amp; Surname
                 </label>
-                <textarea
-                  className="w-full h-[197px] border border-[#949494] rounded-[4px] bg-transparent outline-none p-[12px] text-[16px] resize-none"
+                <input
+                  type="text"
+                  className="w-full border-b border-[#4d453b] bg-transparent outline-none text-[16px]"
+                  style={STYLE_MONO}
+                />
+              </div>
+              <div className="flex flex-col gap-[6px] flex-1">
+                <label className="text-[16px] leading-[1.08]" style={STYLE_DISPLAY}>
+                  Email
+                </label>
+                <input
+                  type="email"
+                  className="w-full border-b border-[#4d453b] bg-transparent outline-none text-[16px]"
                   style={STYLE_MONO}
                 />
               </div>
             </div>
 
-            {/* Submit button */}
-            <div className="bg-[#fb8349] flex flex-col items-start p-[6px] self-start">
-              <button className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer hover:opacity-90 transition-opacity">
-                <p className="text-[20px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
-                  Let&apos;s talk
-                </p>
-              </button>
+            {/* Textarea */}
+            <div className="flex flex-col gap-[15px]">
+              <label className="text-[16px] leading-[1.08]" style={STYLE_DISPLAY}>
+                Tell me about you
+              </label>
+              <textarea
+                className="w-full h-[197px] border border-[#949494] rounded-[4px] bg-transparent outline-none p-[12px] text-[16px] resize-none"
+                style={STYLE_MONO}
+              />
             </div>
           </div>
+
+          {/* Submit button */}
+          <div className="bg-[#fb8349] flex flex-col items-start p-[6px] self-start">
+            <button className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer">
+              <p className="text-[20px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
+                Let&apos;s talk
+              </p>
+            </button>
+          </div>
         </div>
+
       </div>
     </section>
   );
