@@ -436,23 +436,21 @@ function RolesSection() {
           Roles that i hire for
         </p>
 
-        <div className="flex gap-[30px]">
+        <div className="flex gap-[30px] items-start">
           {roles.map((role) => (
             <div key={role.title} className="flex-1 basis-0 min-w-0">
-              <div className="bg-white flex flex-col h-full p-[10px]">
+              <div className="bg-white flex flex-col p-[10px]">
                 <div className="flex items-start mb-[-1.372px]">
                   <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                    <p className="flex-1 text-[28px] text-black whitespace-pre-line" style={STYLE_DISPLAY}>
+                    <p className="flex-1 text-[28px] text-black" style={STYLE_DISPLAY}>
                       {role.title}
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-1">
-                  <div className="border-[1.372px] border-black flex flex-1 items-start justify-center p-[20px] rounded-bl-[8px] rounded-br-[8px]">
-                    <p className="text-[24px] text-black text-left" style={STYLE_MONO}>
-                      {role.description}
-                    </p>
-                  </div>
+                <div className="border-[1.372px] border-black flex items-start p-[20px] rounded-bl-[8px] rounded-br-[8px]">
+                  <p className="w-full text-[24px] text-black" style={STYLE_MONO}>
+                    {role.description}
+                  </p>
                 </div>
               </div>
             </div>
