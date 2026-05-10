@@ -144,7 +144,7 @@ function HeroSection() {
         </div>
 
         {/* Two columns */}
-        <div className="flex gap-[30px] items-stretch">
+        <div className="flex gap-[30px] items-start">
           {/* Left: Usual process */}
           <div className="flex flex-1">
             <div className="bg-[#d1d1d1] flex flex-col flex-1 p-[10px]">
@@ -279,78 +279,60 @@ const WORKING_CARDS = [
   },
 ];
 
-// Scroll-driven: phases control which cards are collapsed.
-// Phase 0: all 4 visible → Phase 1: first 2 collapse → Phase 2: 3rd collapses → Phase 3: 4th collapses
-const PHASE_HEIGHT = 320;
-const PHASE_COLLAPSED = [0, 2, 3, 4]; // how many cards are collapsed at each phase
+const STACK_FIRST_TOP = 96;  // px from viewport top where first card sticks
+const STACK_STEP = 16;       // each subsequent card sticks this many px lower
+const STACK_GAP = 80;        // margin-top between cards (creates scroll space)
 
 function WhatWorkingSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [collapsedCount, setCollapsedCount] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const top = sectionRef.current.getBoundingClientRect().top;
-      const scrolled = Math.max(0, -top);
-      const phase = Math.min(
-        Math.floor(scrolled / PHASE_HEIGHT),
-        PHASE_COLLAPSED.length - 1
-      );
-      setCollapsedCount(PHASE_COLLAPSED[phase]);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
-    <section
-      ref={sectionRef}
-      className="bg-[#ffedd7] w-full"
-      style={{ paddingBottom: `${PHASE_HEIGHT * (PHASE_COLLAPSED.length - 1)}px` }}
-    >
-      <div style={{ position: "sticky", top: "80px" }}>
+    <section className="bg-[#ffedd7] w-full">
+      <div
+        className="max-w-[1440px] mx-auto flex"
+        style={{ gap: '61px', padding: '30px', alignItems: 'flex-start' }}
+      >
+        {/* Left: sticky body text */}
         <div
-          className="max-w-[1440px] mx-auto flex"
-          style={{ gap: "61px", padding: "30px" }}
+          className="flex flex-col gap-[40px] items-start"
+          style={{ width: '644px', flexShrink: 0, position: 'sticky', top: `${STACK_FIRST_TOP}px` }}
         >
-          {/* Left: body text — 644px per Figma */}
-          <div
-            className="flex flex-col gap-[40px] items-start"
-            style={{ width: "644px", flexShrink: 0 }}
-          >
-            <div className="text-[52px] text-black" style={STYLE_DISPLAY}>
-              <p>What&apos;s working</p>
-              <p>with me looks like</p>
-            </div>
-            <div className="text-[24px] text-black" style={STYLE_MONO}>
-              <p className="mb-[1.08em]">
-                I know that growth asks a lot of a company. The pace. The pressure. The decisions that shape what comes next. None of it works without the right people around the table.
-              </p>
-              <p className="mb-[1.08em]">
-                That&apos;s why I work in partnership with ambitious teams to find the people who can carry that responsibility, people who bring judgement, energy and ownership, people who understand what it takes to build inside a fast-moving company, people who can help shape the outcome.
-              </p>
-              <p>The strongest teams are built in collaboration.</p>
-            </div>
+          <div className="text-[52px] text-black" style={STYLE_DISPLAY}>
+            <p>What&apos;s working</p>
+            <p>with me looks like</p>
           </div>
+          <div className="text-[24px] text-black" style={STYLE_MONO}>
+            <p className="mb-[1.08em]">
+              I know that growth asks a lot of a company. The pace. The pressure. The decisions that shape what comes next. None of it works without the right people around the table.
+            </p>
+            <p className="mb-[1.08em]">
+              That&apos;s why I work in partnership with ambitious teams to find the people who can carry that responsibility, people who bring judgement, energy and ownership, people who understand what it takes to build inside a fast-moving company, people who can help shape the outcome.
+            </p>
+            <p>The strongest teams are built in collaboration.</p>
+          </div>
+        </div>
 
-          {/* Right: animated card stack — 675px per Figma (flex-1 fills remaining space) */}
-          <div className="flex flex-col gap-[20px] flex-1">
-            {WORKING_CARDS.map((card, idx) => (
-              <SectionCard
-                key={card.title}
-                title={card.title}
-                expanded={idx >= collapsedCount}
-              >
+        {/* Right: sticky stacking cards — each card individually sticky */}
+        <div className="flex-1">
+          {WORKING_CARDS.map((card, idx) => (
+            <div
+              key={card.title}
+              style={{
+                position: 'sticky',
+                top: `${STACK_FIRST_TOP + idx * STACK_STEP}px`,
+                marginTop: idx === 0 ? 0 : `${STACK_GAP}px`,
+                zIndex: idx + 1,
+              }}
+            >
+              <SectionCard title={card.title} expanded={true}>
                 <div className="flex flex-col gap-[20px] items-start w-full">
                   {card.items.map((text) => (
                     <CheckItem key={text} icon={card.icon} text={text} />
                   ))}
                 </div>
               </SectionCard>
-            ))}
-          </div>
+            </div>
+          ))}
+          {/* Spacer keeps the final stacked state visible for a comfortable dwell */}
+          <div style={{ height: '600px' }} />
         </div>
       </div>
     </section>
@@ -433,13 +415,13 @@ function RolesSection() {
     <section className="bg-[#ffedd7] w-full overflow-hidden py-[30px]">
       <div className="max-w-[1440px] mx-auto px-[30px]">
         <p className="text-[52px] text-black mb-[60px] whitespace-nowrap" style={STYLE_DISPLAY}>
-          Roles that i hire for
+          Roles that I hire for
         </p>
 
-        <div className="flex gap-[30px] items-start">
+        <div className="flex gap-[30px]">
           {roles.map((role) => (
             <div key={role.title} className="flex-1 basis-0 min-w-0">
-              <div className="bg-white flex flex-col p-[10px]">
+              <div className="bg-white flex flex-col h-full p-[10px]">
                 <div className="flex items-start mb-[-1.372px]">
                   <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
                     <p className="flex-1 text-[28px] text-black" style={STYLE_DISPLAY}>
@@ -447,10 +429,12 @@ function RolesSection() {
                     </p>
                   </div>
                 </div>
-                <div className="border-[1.372px] border-black flex items-start p-[20px] rounded-bl-[8px] rounded-br-[8px]">
-                  <p className="w-full text-[24px] text-black" style={STYLE_MONO}>
-                    {role.description}
-                  </p>
+                <div className="flex flex-1">
+                  <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-bl-[8px] rounded-br-[8px]">
+                    <p className="w-full text-[24px] text-black" style={STYLE_MONO}>
+                      {role.description}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
