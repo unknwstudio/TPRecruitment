@@ -1,27 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 
-// Image assets served from Figma MCP local server
-const imgImage30 = "http://localhost:3845/assets/727dc296dda1d75bd0cdc98681dcc08142ac496f.png";
-const imgImage31 = "http://localhost:3845/assets/f6a9ce2b039315aad435d4806f9e04ecc0200bcf.png";
-const imgImage32 = "http://localhost:3845/assets/c4cdbcaeb862c8524e37b95b4b0b399737b7e33f.png";
-const imgImage33 = "http://localhost:3845/assets/84e7950346f9498caad6439efe5f829b7367d29e.png";
-const imgImage36 = "http://localhost:3845/assets/56279ec2e160d7849ecb6055c86d62aa6ec24a1c.png";
-const imgImage34 = "http://localhost:3845/assets/4e1e3949787afdf2b9e7910d0a21dd29b5aba124.png";
-const imgImage35 = "http://localhost:3845/assets/1694819d010494453060ceb1c5e1a82a83c99929.png";
-const imgImage37 = "http://localhost:3845/assets/df456b218d26e54c86d7b05063c2a42097d9d8f1.png";
-const imgImage38 = "http://localhost:3845/assets/60d6e5b0e4595603cd25085be7f24c27c728f1e0.png";
-const imgImage39 = "http://localhost:3845/assets/68e47cfc40084adb6895328d5ac24d1827f44302.png";
-const imgImage40 = "http://localhost:3845/assets/14afcb4fd41ec336e0587206844d115e43373d18.png";
-const imgImage41 = "http://localhost:3845/assets/081aa4e351c2e0169de059c2a06e912abb5974ad.png";
-const imgImage42 = "http://localhost:3845/assets/16e4361f02a28f0cd23c9a99b79dedfe3f3dbca4.png";
-const imgImage43 = "http://localhost:3845/assets/b1b231da64657e8a58908636e9f36217b737646d.png";
-const imgImage44 = "http://localhost:3845/assets/bc9c7fd2100358c6b03345f7fc4f5b53c183239e.png";
-const imgImage14 = "http://localhost:3845/assets/7208c93375929544241a249b6f44f1c7de9692b2.png";
-const imgImage16 = "http://localhost:3845/assets/693b966c6500b1d7cfa212bae255e396422ba02f.png";
-const imgImage17 = "http://localhost:3845/assets/35cf14732cfa3b6611a8004954a7964376d301d1.png";
-const imgImage15 = "http://localhost:3845/assets/b8e7921e6cb9a8c757d8fdc43aa359896fce36ed.png";
-const imgImage45 = "http://localhost:3845/assets/e3d64af76a1ad3a69f69cdd4a51390b3fcb13168.svg";
-const imgLinkedInIcon = "http://localhost:3845/assets/54c0a72beecaf4250c22a9d1fdb61d8eaf7bd115.svg";
+// Image assets (local copies in public/assets/)
+const imgImage30 = "/assets/imgImage30.png";
+const imgImage31 = "/assets/imgImage31.png";
+const imgImage32 = "/assets/imgImage32.png";
+const imgImage33 = "/assets/imgImage33.png";
+const imgImage36 = "/assets/imgImage36.png";
+const imgImage34 = "/assets/imgImage34.png";
+const imgImage35 = "/assets/imgImage35.png";
+const imgImage37 = "/assets/imgImage37.png";
+const imgImage38 = "/assets/imgImage38.png";
+const imgImage39 = "/assets/imgImage39.png";
+const imgImage40 = "/assets/imgImage40.png";
+const imgImage41 = "/assets/imgImage41.png";
+const imgImage42 = "/assets/imgImage42.png";
+const imgImage43 = "/assets/imgImage43.png";
+const imgImage44 = "/assets/imgImage44.png";
+const imgImage45 = "/assets/imgImage45.svg";
+const imgLinkedInIcon = "/assets/imgLinkedInIcon.svg";
 
 const FONT_DISPLAY = "'GT Canon Trial'";
 const FONT_MONO = "'GT Pressura Mono'";
@@ -440,23 +436,21 @@ function RolesSection() {
           Roles that i hire for
         </p>
 
-        <div className="flex gap-[30px]">
+        <div className="flex gap-[30px] items-start">
           {roles.map((role) => (
             <div key={role.title} className="flex-1 basis-0 min-w-0">
-              <div className="bg-white flex flex-col h-full p-[10px]">
+              <div className="bg-white flex flex-col p-[10px]">
                 <div className="flex items-start mb-[-1.372px]">
                   <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                    <p className="flex-1 text-[28px] text-black whitespace-pre-line" style={STYLE_DISPLAY}>
+                    <p className="flex-1 text-[28px] text-black" style={STYLE_DISPLAY}>
                       {role.title}
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-1">
-                  <div className="border-[1.372px] border-black flex flex-1 items-start justify-center p-[20px] rounded-bl-[8px] rounded-br-[8px]">
-                    <p className="text-[24px] text-black text-left" style={STYLE_MONO}>
-                      {role.description}
-                    </p>
-                  </div>
+                <div className="border-[1.372px] border-black flex items-start p-[20px] rounded-bl-[8px] rounded-br-[8px]">
+                  <p className="w-full text-[24px] text-black" style={STYLE_MONO}>
+                    {role.description}
+                  </p>
                 </div>
               </div>
             </div>
@@ -473,6 +467,7 @@ const testimonials = [
     name: "Gastón Tourn",
     title: "Co-founder, Curio",
     photo: "/photo_gaston.jpeg",
+    bg: "#c1c497",
     text: [
       "Tiffany's took the time to understand my interests and introduced the opportunity when she saw it was a perfect match.",
       "This refreshing approach builds trust and confidence. I was considering other opportunities at the time, but I chose the role at Curio partly because of the assurance Tiffany provided during the hiring process.",
@@ -483,6 +478,7 @@ const testimonials = [
     name: "Jonathan Canizales",
     title: "Chief of Staff, Mindgard",
     photo: "/photo_jonathan.jpeg",
+    bg: "#90b0bb",
     text: [
       "I had the pleasure of working with Tiffany as my recruiter, and I couldn't be more impressed, she has been the best by far. She did an outstanding job from start to finish. Tiffany was super communicative, keeping me informed at every step of the process.",
       "Her honesty and openness was refreshing and made me feel confident throughout the process. I always felt I could trust her, and I truly appreciated how she checked up on me throughout the process. Most importantly, the entire process was incredibly fast, which was a huge plus.",
@@ -493,6 +489,7 @@ const testimonials = [
     name: "Maria Monks",
     title: "IQ Capital",
     photo: "/photo_maria.jpeg",
+    bg: "#edead6",
     text: [
       "Tiffany has been instrumental in helping me with marketing leadership hires across the IQ Capital portfolio. I have enjoyed working with her for years —her passion and professionalism is outstanding.",
       "She also offers a great personalised service to both individual companies, and me, and I often seek her advice on everything recruitment, and building teams, related.",
@@ -502,6 +499,7 @@ const testimonials = [
     name: "Govind Balakrishnan",
     title: "Co-founder, Curio",
     photo: "/photo_govind.jpeg",
+    bg: "#ffffff",
     text: [
       "We've loved working with Tiffany over several years on multiple senior hires at Curio. Our requirements are often atypical, and she takes a very hands-on and considered approach.",
       "Thanks to our collaboration, we have a phenomenal tight-knit team, investment from tier 1 Silicon Valley investors and partnerships with top media outlets. We trust her fully and will work with her again.",
@@ -509,131 +507,127 @@ const testimonials = [
   },
 ];
 
-// Single testimonial card — Figma 204-178 layout
-function TestimonialCard({ t }: { t: typeof testimonials[0] }) {
-  return (
-    <div className="bg-white flex flex-col p-[10px] w-full">
-      {/* Header: photo + name/title */}
-      <div className="flex items-start w-full" style={{ marginBottom: '-1.372px' }}>
-        <div style={{
-          width: '222px', height: '195px', flexShrink: 0,
-          border: '1.372px solid black',
-          borderRadius: '8px 0 0 0',
-          overflow: 'hidden',
-        }}>
-          <img
-            src={t.photo}
-            alt={t.name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }}
-          />
-        </div>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignSelf: 'stretch' }}>
-          <div style={{
-            border: '1.372px solid black', borderRadius: '0 8px 0 0',
-            flex: 1, display: 'flex', alignItems: 'center', padding: '0 30px',
-            marginBottom: '-1.372px',
-          }}>
-            <p style={{ ...STYLE_DISPLAY, fontSize: '32px', color: 'black', whiteSpace: 'nowrap' }}>{t.name}</p>
-          </div>
-          <div style={{
-            border: '1.372px solid black',
-            flex: 1, display: 'flex', alignItems: 'center', padding: '0 30px',
-          }}>
-            <p style={{ ...STYLE_DISPLAY, fontSize: '32px', color: 'black', whiteSpace: 'nowrap' }}>{t.title}</p>
-          </div>
-        </div>
-      </div>
-      {/* Quote body */}
-      <div style={{
-        borderLeft: '1.37px solid black', borderRight: '1.37px solid black',
-        borderBottom: '1.37px solid black', borderRadius: '0 0 8px 8px',
-        padding: '30px', display: 'flex', flexDirection: 'column', gap: '20px',
-      }}>
-        {t.text.map((para, i) => (
-          <p key={i} style={{ ...STYLE_MONO, fontSize: '28px', color: 'black', width: '100%' }}>{para}</p>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-const TESTIMONIAL_PHASE = 450;
-
 function TestimonialsSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [activeIdx, setActiveIdx] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const top = sectionRef.current.getBoundingClientRect().top;
-      const scrolled = Math.max(0, -top);
-      setActiveIdx(Math.min(Math.floor(scrolled / TESTIMONIAL_PHASE), testimonials.length - 1));
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
   return (
-    <section
-      ref={sectionRef}
-      className="bg-[#ffedd7] w-full"
-      style={{ paddingBottom: `${TESTIMONIAL_PHASE * (testimonials.length - 1)}px` }}
-    >
-      <div style={{ position: 'sticky', top: '80px' }}>
-        <div style={{
-          maxWidth: '1440px', margin: '0 auto',
-          padding: '30px', display: 'flex', gap: '61px', alignItems: 'flex-start',
-        }}>
-          {/* Left: heading + progress dots */}
-          <div style={{ width: '644px', flexShrink: 0 }}>
-            <p style={{ ...STYLE_DISPLAY, fontSize: '52px', color: 'black', whiteSpace: 'pre' }}>
-              {`I could keep going.\nBut they'll say it better.`}
-            </p>
-            <div style={{ display: 'flex', gap: '8px', marginTop: '40px' }}>
-              {testimonials.map((_, i) => (
-                <div key={i} style={{
-                  height: '8px', borderRadius: '4px', backgroundColor: '#4d453b',
-                  opacity: i === activeIdx ? 1 : 0.25,
-                  width: i === activeIdx ? '32px' : '8px',
-                  transition: 'width 0.35s ease, opacity 0.35s ease',
-                }} />
-              ))}
-            </div>
-          </div>
+    <section className="bg-[#ffedd7] w-full overflow-hidden">
+      {/* Section heading */}
+      <div className="px-[30px] pt-[60px] pb-[40px]">
+        <p style={{ ...STYLE_DISPLAY, fontSize: '52px', color: 'black' }}>
+          I could keep going.<br />But they&apos;ll say it better.
+        </p>
+      </div>
 
-          {/* Right: scroll-driven card stack */}
-          <div style={{ flex: 1, position: 'relative' }}>
-            {testimonials.map((t, idx) => {
-              const offset = idx - activeIdx;
-              const isActive = offset === 0;
-              const isPast = offset < 0;
-              const isComing = offset > 0;
-              return (
-                <div
-                  key={t.name}
-                  style={{
-                    // Active card is in flow (sets container height); others absolute
-                    position: isActive ? 'relative' : 'absolute',
-                    top: 0, left: 0, right: 0,
-                    zIndex: testimonials.length - Math.abs(offset),
-                    transform: isActive
-                      ? 'translateY(0) scale(1)'
-                      : isPast
-                        ? 'translateY(-24px) scale(0.97)'
-                        : `translateY(${Math.min(offset * 18, 54)}px) scale(${Math.max(0.94, 0.97 - (offset - 1) * 0.015)})`,
-                    opacity: isActive ? 1 : offset === 1 ? 0.3 : 0,
-                    transition: 'transform 0.55s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease',
-                    pointerEvents: isActive ? 'auto' : 'none',
-                  }}
-                >
-                  <TestimonialCard t={t} />
+      {/* Horizontal accordion — full viewport width */}
+      <div
+        className="flex w-full"
+        style={{ height: '680px' }}
+        onMouseLeave={() => setHoveredIdx(null)}
+      >
+        {testimonials.map((t, idx) => {
+          const isHovered = hoveredIdx === idx;
+          const anyHovered = hoveredIdx !== null;
+
+          return (
+            <div
+              key={t.name}
+              onMouseEnter={() => setHoveredIdx(idx)}
+              style={{
+                flex: isHovered ? '3 0 0' : anyHovered ? '0.4 0 0' : '1 0 0',
+                backgroundColor: t.bg,
+                transition: 'flex 0.55s cubic-bezier(0.4, 0, 0.2, 1)',
+                overflow: 'hidden',
+                position: 'relative',
+                cursor: 'default',
+                borderRight: idx < testimonials.length - 1 ? '1.372px solid black' : 'none',
+                borderTop: '1.372px solid black',
+              }}
+            >
+              {/* Collapsed label — vertical name, fades out on hover */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+                paddingBottom: '30px',
+                opacity: isHovered ? 0 : 1,
+                transition: 'opacity 0.25s ease',
+                pointerEvents: 'none',
+              }}>
+                <p style={{
+                  ...STYLE_DISPLAY,
+                  fontSize: '20px',
+                  color: 'black',
+                  writingMode: 'vertical-rl',
+                  transform: 'rotate(180deg)',
+                  whiteSpace: 'nowrap',
+                  letterSpacing: '-0.02em',
+                }}>
+                  {t.name}
+                </p>
+              </div>
+
+              {/* Expanded content — fades in on hover */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                opacity: isHovered ? 1 : 0,
+                transition: 'opacity 0.35s ease 0.15s',
+                display: 'flex',
+                flexDirection: 'column',
+                padding: '10px',
+                minWidth: '600px', /* prevents reflow jank */
+              }}>
+                {/* Header row: photo + name/title */}
+                <div style={{ display: 'flex', alignItems: 'stretch', marginBottom: '-1.372px' }}>
+                  {/* Photo */}
+                  <div style={{
+                    width: '222px', height: '195px', flexShrink: 0,
+                    border: '1.372px solid black',
+                    borderRadius: '8px 0 0 0',
+                    overflow: 'hidden',
+                  }}>
+                    <img
+                      src={t.photo}
+                      alt={t.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }}
+                    />
+                  </div>
+                  {/* Name + Title */}
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <div style={{
+                      border: '1.372px solid black', borderRadius: '0 8px 0 0',
+                      flex: 1, display: 'flex', alignItems: 'center', padding: '0 30px',
+                      marginBottom: '-1.372px',
+                    }}>
+                      <p style={{ ...STYLE_DISPLAY, fontSize: '32px', color: 'black', whiteSpace: 'nowrap' }}>{t.name}</p>
+                    </div>
+                    <div style={{
+                      border: '1.372px solid black',
+                      flex: 1, display: 'flex', alignItems: 'center', padding: '0 30px',
+                    }}>
+                      <p style={{ ...STYLE_DISPLAY, fontSize: '24px', color: 'black', whiteSpace: 'nowrap' }}>{t.title}</p>
+                    </div>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
+                {/* Quote body */}
+                <div style={{
+                  flex: 1,
+                  border: '1.372px solid black',
+                  borderTop: 'none',
+                  borderRadius: '0 0 8px 8px',
+                  padding: '30px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '16px',
+                  overflowY: 'auto',
+                }}>
+                  {t.text.map((para, i) => (
+                    <p key={i} style={{ ...STYLE_MONO, fontSize: '20px', color: 'black' }}>{para}</p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
