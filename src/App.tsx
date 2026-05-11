@@ -774,7 +774,7 @@ function TestimonialRow({ t, idx }: { t: typeof TESTIMONIALS[0]; idx: number }) 
               alt={t.name}
               style={{ width: "clamp(120px,14vw,200px)", height: "clamp(120px,14vw,200px)", objectFit: "cover", objectPosition: "top center", flexShrink: 0, border: "1.372px solid black", borderRadius: "4px" }}
             />
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div style={{ flex: 1, maxWidth: "75%", display: "flex", flexDirection: "column", gap: "12px" }}>
               {t.text.map((para, i) => (
                 <p key={i} style={{ ...STYLE_MONO, fontSize: "clamp(14px,1.15vw,17px)", color: "black", lineHeight: "1.55" }}>{para}</p>
               ))}
@@ -833,7 +833,7 @@ function TestimonialsCarousel() {
                   </div>
                 </div>
                 {/* Body — fills remaining height like "Usual process" card */}
-                <div style={{ border: "1px solid black", borderTop: "none", borderRadius: "0 0 8px 8px", padding: "16px 28% 16px 16px", flex: 1, display: "flex", flexDirection: "column", gap: "12px" }}>
+                <div style={{ border: "1px solid black", borderTop: "none", borderRadius: "0 0 8px 8px", padding: "16px", flex: 1, display: "flex", flexDirection: "column", gap: "12px" }}>
                   {t.text.map((para, i) => (
                     <p key={i} style={{ ...STYLE_MONO, fontSize: "16px", color: "black" }}>{para}</p>
                   ))}
