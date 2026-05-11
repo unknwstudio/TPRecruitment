@@ -623,7 +623,7 @@ function RolesSection() {
         </Reveal>
 
         {/* Mobile: sticky stacking */}
-        <div className="lg:hidden">
+        <div className="xl:hidden">
           {ROLES.map((role, i) => (
             <div
               key={role.title}
@@ -654,19 +654,19 @@ function RolesSection() {
         </div>
 
         {/* Desktop: horizontal flex row */}
-        <div className="hidden lg:flex flex-row gap-[30px] items-stretch">
+        <div className="hidden xl:flex flex-row gap-[30px] items-stretch">
           {ROLES.map((role, i) => (
             <Reveal key={role.title} delay={i * 80} className="flex-1 basis-0 min-w-0">
               <HoverCard className="h-full">
                 <div className="bg-white flex flex-col h-full p-[10px]">
                   <div className="flex items-start mb-[-1.372px]">
-                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] lg:p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                      <p className="flex-1 text-[22px] lg:text-[28px] text-black" style={STYLE_DISPLAY}>{role.title}</p>
+                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] xl:p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
+                      <p className="flex-1 text-[22px] xl:text-[28px] text-black" style={STYLE_DISPLAY}>{role.title}</p>
                     </div>
                   </div>
                   <div className="flex flex-1">
-                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] lg:p-[20px] rounded-bl-[8px] rounded-br-[8px]">
-                      <p className="w-full text-[18px] lg:text-[20px] text-black" style={STYLE_MONO}>{role.description}</p>
+                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] xl:p-[20px] rounded-bl-[8px] rounded-br-[8px]">
+                      <p className="w-full text-[18px] xl:text-[20px] text-black" style={STYLE_MONO}>{role.description}</p>
                     </div>
                   </div>
                 </div>
@@ -824,10 +824,10 @@ function TestimonialsCarousel() {
                     <img src={t.photo} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }} />
                   </div>
                   <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                    <div style={{ border: "1px solid black", borderBottom: "none", borderRadius: "0 8px 0 0", flex: 1, display: "flex", alignItems: "center", padding: "0 16px" }}>
+                    <div style={{ border: "1px solid black", borderLeft: "none", borderBottom: "none", borderRadius: "0 8px 0 0", flex: 1, display: "flex", alignItems: "center", padding: "0 16px" }}>
                       <p style={{ ...STYLE_DISPLAY, fontSize: "20px", color: "black" }}>{t.name}</p>
                     </div>
-                    <div style={{ border: "1px solid black", flex: 1, display: "flex", alignItems: "center", padding: "0 16px" }}>
+                    <div style={{ border: "1px solid black", borderLeft: "none", flex: 1, display: "flex", alignItems: "center", padding: "0 16px" }}>
                       <p style={{ ...STYLE_DISPLAY, fontSize: "14px", color: "black" }}>{t.title}</p>
                     </div>
                   </div>

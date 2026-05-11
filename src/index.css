@@ -3,8 +3,10 @@
 /* ── Custom breakpoints ──────────────────────────────────────────────────────*/
 @theme {
   /* lg: fires at 1020px — used by Navbar + Hero for mobile→desktop switch.
-     md: stays at default 768px for tablet-level changes in other sections. */
+     md: stays at default 768px for tablet-level changes in other sections.
+     xl: fires at 1154px — used by Roles section layout switch. */
   --breakpoint-lg: 1020px;
+  --breakpoint-xl: 1154px;
 }
 
 @font-face {
