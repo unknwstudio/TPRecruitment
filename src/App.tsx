@@ -216,25 +216,25 @@ function Navbar() {
     <>
       <div className="sticky top-0 z-50 flex items-center justify-between px-[16px] md:px-[30px] py-[14px] md:py-[20px] w-full">
 
-        {/* Logo — small SVG on mobile, full logo on tablet+ */}
+        {/* Logo — small SVG below 1020px, full logo at 1020px+ */}
         <img
           src="/TP_logo.svg"
           alt="TPRecruitment"
-          className="hidden md:block w-auto cursor-pointer"
+          className="hidden lg:block w-auto cursor-pointer"
           style={{ height: "46px" }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         />
         <img
           src="/small_logo_TP.svg"
           alt="TPRecruitment"
-          className="block md:hidden w-auto cursor-pointer"
+          className="block lg:hidden w-auto cursor-pointer"
           style={{ height: "32px" }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         />
 
         {/* Desktop CTA — fades out when the contact form is in view */}
         <div
-          className="hidden md:flex flex-col items-start p-[6px]"
+          className="hidden lg:flex flex-col items-start p-[6px]"
           style={{
             backgroundColor: navHov ? "#FF9A6A" : "#fb8349",
             opacity: ctaHidden ? 0 : 1,
@@ -256,7 +256,7 @@ function Navbar() {
 
         {/* Mobile "Menu" button — orange background, height matches 32px logo */}
         <div
-          className="flex md:hidden flex-col items-start p-[6px] ml-auto"
+          className="flex lg:hidden flex-col items-start p-[6px] ml-auto"
           style={{ backgroundColor: menuHov ? "#FF9A6A" : "#fb8349", transition: "background-color 0.2s ease" }}
           onMouseEnter={() => setMenuHov(true)}
           onMouseLeave={() => setMenuHov(false)}
@@ -336,20 +336,20 @@ function Navbar() {
 function HeroSection() {
   return (
     <section className="bg-[#ffedd7] w-full overflow-hidden">
-      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[64px] md:pt-[120px] pb-[80px]">
+      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[80px] lg:pt-[120px] pb-[96px]">
 
         {/* Headline — fades in immediately on mount */}
-        <Reveal y={20} className="mb-[52px] md:mb-[80px]">
-          <p className="text-[40px] md:text-[60px] text-black max-w-[1155px]" style={STYLE_DISPLAY}>
+        <Reveal y={20} className="mb-[52px] lg:mb-[80px]">
+          <p className="text-[40px] lg:text-[60px] text-black max-w-[1155px]" style={STYLE_DISPLAY}>
             Recruitment is messy, human, and brutal. Most recruiters hide from that. I&nbsp;don&apos;t.
           </p>
         </Reveal>
 
         {/* Two equal-width cards — 675px each at 1440px viewport */}
-        <div className="flex flex-col md:flex-row gap-[16px] md:gap-[30px] md:items-stretch">
+        <div className="flex flex-col lg:flex-row gap-[16px] lg:gap-[30px] lg:items-stretch">
 
           {/* Left: Usual process */}
-          <Reveal delay={100} className="flex flex-1 min-w-0 md:max-w-[675px] md:self-stretch">
+          <Reveal delay={100} className="flex flex-1 min-w-0 lg:max-w-[675px] lg:self-stretch">
             <HoverCard className="flex w-full">
               <div className="bg-[#d1d1d1] flex flex-col w-full p-[10px]">
                 <div className="flex items-start shrink-0 w-full" style={{ marginBottom: "-1.372px" }}>
@@ -375,7 +375,7 @@ function HeroSection() {
           </Reveal>
 
           {/* Right: Working with me */}
-          <Reveal delay={180} className="flex flex-1 min-w-0 md:max-w-[675px] md:self-stretch">
+          <Reveal delay={180} className="flex flex-1 min-w-0 lg:max-w-[675px] lg:self-stretch">
             <HoverCard className="flex w-full">
               <div className="bg-white flex flex-col w-full p-[10px]">
                 <div className="flex items-start shrink-0 w-full" style={{ marginBottom: "-1.372px" }}>
@@ -468,9 +468,9 @@ function WhatWorkingSection() {
   return (
     <section id="working" className="bg-[#ffedd7] w-full">
 
-      {/* ── Mobile ── */}
-      <div className="md:hidden">
-        <div className="max-w-[1440px] mx-auto px-[16px] pt-[80px] pb-[52px]">
+      {/* ── Mobile / tablet ── */}
+      <div className="lg:hidden">
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[96px] pb-[64px]">
           <Reveal className="flex flex-col gap-[24px]">
             <div className="text-[40px] text-black" style={STYLE_DISPLAY}>
               <p>What&apos;s working</p>
@@ -480,7 +480,7 @@ function WhatWorkingSection() {
           </Reveal>
         </div>
 
-        <div className="max-w-[1440px] mx-auto px-[16px]">
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
           {WORKING_CARDS.map((card, idx) => (
             <div
               key={card.title}
@@ -506,8 +506,8 @@ function WhatWorkingSection() {
 
       {/* ── Desktop: two equal columns (each 675px at 1440px viewport) ── */}
       <div
-        className="hidden md:flex max-w-[1440px] mx-auto"
-        style={{ gap: "30px", padding: "80px 30px", alignItems: "flex-start" }}
+        className="hidden lg:flex max-w-[1440px] mx-auto"
+        style={{ gap: "30px", padding: "96px 30px", alignItems: "flex-start" }}
       >
         {/* Left: sticky text — flex-1 = 675px at 1440px */}
         <Reveal
@@ -578,10 +578,10 @@ function PartnersSection() {
   }, []);
 
   return (
-    <section id="partners" className="bg-[#ffedd7] w-full overflow-hidden py-[80px]">
+    <section id="partners" className="bg-[#ffedd7] w-full overflow-hidden py-[96px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
         <Reveal>
-          <p className="text-[36px] md:text-[52px] text-black mb-[52px] md:mb-[80px]" style={STYLE_DISPLAY}>
+          <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
             My partners &amp; collaborators
           </p>
         </Reveal>
@@ -614,10 +614,10 @@ const ROLES = [
 
 function RolesSection() {
   return (
-    <section id="roles" className="bg-[#ffedd7] w-full py-[80px]">
+    <section id="roles" className="bg-[#ffedd7] w-full py-[96px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
         <Reveal>
-          <p className="text-[36px] md:text-[52px] text-black mb-[52px] md:mb-[80px]" style={STYLE_DISPLAY}>
+          <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
             Roles that I hire for
           </p>
         </Reveal>
@@ -824,7 +824,7 @@ function TestimonialsCarousel() {
                     <img src={t.photo} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }} />
                   </div>
                   <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                    <div style={{ border: "1px solid black", borderRadius: "0 8px 0 0", flex: 1, display: "flex", alignItems: "center", padding: "0 16px", marginBottom: "-1px" }}>
+                    <div style={{ border: "1px solid black", borderBottom: "none", borderRadius: "0 8px 0 0", flex: 1, display: "flex", alignItems: "center", padding: "0 16px" }}>
                       <p style={{ ...STYLE_DISPLAY, fontSize: "20px", color: "black" }}>{t.name}</p>
                     </div>
                     <div style={{ border: "1px solid black", flex: 1, display: "flex", alignItems: "center", padding: "0 16px" }}>
@@ -883,9 +883,9 @@ function TestimonialsCarousel() {
 function TestimonialsSection() {
   return (
     <section id="testimonials" className="bg-[#ffedd7] w-full">
-      <div className="px-[16px] md:px-[30px] pt-[80px] pb-[32px] md:pb-[52px]">
+      <div className="px-[16px] md:px-[30px] pt-[96px] pb-[40px] md:pb-[60px]">
         <Reveal>
-          <p className="text-[36px] md:text-[52px] text-black" style={STYLE_DISPLAY}>
+          <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black" style={STYLE_DISPLAY}>
             I could keep going.<br />But they&apos;ll say it better.
           </p>
         </Reveal>
@@ -911,20 +911,20 @@ function TestimonialsSection() {
 // ── CTA ───────────────────────────────────────────────────────────────────────
 function CTASection() {
   return (
-    <section id="contact" className="bg-[#eaeae5] w-full overflow-hidden py-[80px]">
+    <section id="contact" className="bg-[#eaeae5] w-full overflow-hidden py-[96px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
         {/* TOP ROW: Headline (left) + Subtitle (right, bottom-aligned on desktop) */}
-        <div className="flex flex-col md:flex-row md:items-end gap-[24px] md:gap-[35px] mb-[52px] md:mb-[80px]">
-          <Reveal className="md:shrink-0 md:w-[655px]">
-            <div className="text-[36px] md:text-[52px] text-black" style={STYLE_DISPLAY}>
+        <div className="flex flex-col lg:flex-row lg:items-end gap-[24px] lg:gap-[35px] mb-[52px] lg:mb-[80px]">
+          <Reveal className="lg:shrink-0 lg:w-[655px]">
+            <div className="text-[36px] md:text-[44px] lg:text-[52px] text-black" style={STYLE_DISPLAY}>
               <p>If you&apos;ve read</p>
               <p>this far, we should</p>
               <p>probably talk</p>
             </div>
           </Reveal>
           <Reveal delay={80} className="flex-1">
-            <div className="text-[18px] md:text-[24px] text-black" style={STYLE_MONO}>
+            <div className="text-[18px] lg:text-[24px] text-black" style={STYLE_MONO}>
               <p>I&apos;d love to hear what you&apos;re building</p>
               <p>or just have a good conversation with you</p>
             </div>
@@ -932,10 +932,10 @@ function CTASection() {
         </div>
 
         {/* BOTTOM ROW: Contacts (left) + Form (right) */}
-        <div className="flex flex-col md:flex-row md:items-start gap-[40px] md:gap-[35px]">
+        <div className="flex flex-col lg:flex-row lg:items-start gap-[80px] lg:gap-[35px]">
 
           {/* Left: contact info */}
-          <Reveal className="md:shrink-0 md:w-[655px] flex flex-col gap-[24px] md:gap-[30px] text-[16px] text-black">
+          <Reveal className="lg:shrink-0 lg:w-[655px] flex flex-col gap-[24px] lg:gap-[30px] text-[16px] text-black">
             <div className="flex flex-col gap-[16px]">
               <p style={STYLE_DISPLAY}>Contacts</p>
               <div className="flex flex-col gap-[10px]" style={STYLE_MONO}>
@@ -1010,16 +1010,23 @@ function Footer() {
       <img src="/TPRecruitment_FooterLogo.svg" alt="TPRecruitment"
            className="absolute left-[16px] right-[16px] md:left-[30px] md:right-[30px]"
            style={{ top: "20px", width: "calc(100% - 32px)", height: "auto" }} />
-      <div className="absolute bottom-[16px] md:bottom-[30px] left-[16px] right-[16px] md:left-[30px] md:right-[30px] flex flex-col md:flex-row items-start md:items-baseline justify-between gap-[6px] text-white">
-        <p className="text-[11px] md:text-[14px]" style={STYLE_DISPLAY}>All rights reserved.</p>
-        <div className="flex gap-[4px] md:gap-[6px] items-center">
+      <div className="absolute bottom-[16px] md:bottom-[30px] left-[16px] right-[16px] md:left-[30px] md:right-[30px] flex flex-col md:flex-row items-start md:items-baseline gap-[6px] text-white">
+        {/* Left — flex-1 so center is truly centered */}
+        <div className="md:flex-1">
+          <p className="text-[11px] md:text-[14px]" style={STYLE_DISPLAY}>All rights reserved.</p>
+        </div>
+        {/* Center — copyright, centered on desktop */}
+        <div className="flex gap-[4px] md:gap-[6px] items-baseline md:justify-center md:flex-1">
           <span className="text-[18px] md:text-[28px]" style={STYLE_DISPLAY}>©</span>
           <span className="text-[13px] md:text-[20px]" style={STYLE_DISPLAY}>2026 TP Recruitment</span>
         </div>
-        <a className="text-[11px] md:text-[14px] hover:opacity-60 transition-opacity duration-150"
-           href="https://www.unknw.com/" target="_blank" rel="noopener noreferrer" style={STYLE_DISPLAY}>
-          brand &amp; website by UNKNW
-        </a>
+        {/* Right — flex-1, right-aligned */}
+        <div className="md:flex-1 md:flex md:justify-end">
+          <a className="text-[11px] md:text-[14px] hover:opacity-60 transition-opacity duration-150"
+             href="https://www.unknw.com/" target="_blank" rel="noopener noreferrer" style={STYLE_DISPLAY}>
+            designed by UNKWN
+          </a>
+        </div>
       </div>
     </footer>
   );

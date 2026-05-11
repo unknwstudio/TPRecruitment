@@ -2,7 +2,9 @@
 
 /* ── Custom breakpoints ──────────────────────────────────────────────────────*/
 @theme {
-  --breakpoint-md: 1020px;   /* single mobile→desktop breakpoint */
+  /* lg: fires at 1020px — used by Navbar + Hero for mobile→desktop switch.
+     md: stays at default 768px for tablet-level changes in other sections. */
+  --breakpoint-lg: 1020px;
 }
 
 @font-face {
