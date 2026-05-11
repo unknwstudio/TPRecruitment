@@ -185,16 +185,8 @@ const NAV_LINKS = [
 ];
 
 function Navbar() {
-  const [pastHero, setPastHero]   = useState(false);
-  const [menuOpen, setMenuOpen]   = useState(false);
-  const [navHov, setNavHov] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setPastHero(window.scrollY > window.innerHeight * 0.8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [navHov,   setNavHov]   = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -206,30 +198,36 @@ function Navbar() {
     setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }), 350);
   };
 
-  const navBg = pastHero ? "#fb8349" : "white";
-
   return (
     <>
       <div className="sticky top-0 z-50 bg-[#ffedd7] flex items-center justify-between px-[16px] md:px-[30px] py-[14px] md:py-[20px] w-full">
+
+        {/* Logo — small SVG on mobile, full logo on tablet+ */}
         <img
           src="/TP_logo.svg"
           alt="TPRecruitment"
-          className="block w-auto cursor-pointer"
+          className="hidden md:block w-auto cursor-pointer"
           style={{ height: "46px" }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         />
+        <img
+          src="/small_logo_TP.svg"
+          alt="TPRecruitment"
+          className="block md:hidden w-auto cursor-pointer"
+          style={{ height: "32px" }}
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        />
 
-        {/* Desktop CTA */}
+        {/* Desktop CTA — transparent background, orange on hover */}
         <div
           className="hidden md:flex flex-col items-start p-[6px]"
-          style={{ backgroundColor: navHov ? "#FF9A6A" : navBg, transition: "background-color 0.2s ease" }}
+          style={{ backgroundColor: navHov ? "#FF9A6A" : "transparent", transition: "background-color 0.2s ease" }}
           onMouseEnter={() => setNavHov(true)}
           onMouseLeave={() => setNavHov(false)}
         >
           <button
             onClick={scrollToContact}
             className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer"
-            style={{ backgroundColor: "transparent" }}
           >
             <p className="text-[18px] text-black whitespace-nowrap leading-[20px]" style={STYLE_MONO}>
               Start a conversation
@@ -237,11 +235,8 @@ function Navbar() {
           </button>
         </div>
 
-        {/* Mobile "Menu" button */}
-        <div
-          className="flex md:hidden flex-col items-start p-[6px] ml-auto transition-colors duration-300"
-          style={{ backgroundColor: navBg }}
-        >
+        {/* Mobile "Menu" button — transparent background */}
+        <div className="flex md:hidden flex-col items-start p-[6px] ml-auto">
           <button
             onClick={() => setMenuOpen(true)}
             className="border border-black flex items-center p-[10px] rounded-[4px] cursor-pointer"
@@ -481,7 +476,7 @@ function WhatWorkingSection() {
               </HoverCard>
             </div>
           ))}
-          <div style={{ height: "300px" }} />
+          <div style={{ height: "80px" }} />
         </div>
       </div>
 
@@ -631,7 +626,7 @@ function RolesSection() {
               </HoverCard>
             </div>
           ))}
-          <div style={{ height: "300px" }} />
+          <div style={{ height: "80px" }} />
         </div>
 
         {/* Tablet + desktop: horizontal flex row */}
@@ -709,13 +704,14 @@ function TestimonialRow({ t, idx }: { t: typeof TESTIMONIALS[0]; idx: number }) 
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
     >
-      {/* Sliding background — lives BELOW the row, so clipping isn't needed on outer div */}
+      {/* Background — scaleY(0→1) from bottom: never overflows into adjacent rows */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           backgroundColor: t.bg,
-          transform: hov ? "translateY(0)" : "translateY(100%)",
+          transform: hov ? "scaleY(1)" : "scaleY(0)",
+          transformOrigin: "bottom center",
           transition: "transform 0.55s cubic-bezier(0.4,0,0.2,1)",
           zIndex: 0,
           pointerEvents: "none",
@@ -790,14 +786,16 @@ function TestimonialsCarousel() {
         <div
           style={{
             display: "flex",
+            alignItems: "stretch",
             transform: `translateX(calc(-${activeIdx * 100}% + ${dragDelta}px))`,
             transition: dragging ? "none" : "transform 0.4s cubic-bezier(0.4,0,0.2,1)",
           }}
         >
           {TESTIMONIALS.map((t) => (
-            <div key={t.name} style={{ minWidth: "100%", backgroundColor: t.bg }}>
-              <div style={{ padding: "10px" }}>
-                <div style={{ display: "flex", alignItems: "stretch", marginBottom: "-1.372px" }}>
+            <div key={t.name} style={{ minWidth: "100%", backgroundColor: t.bg, display: "flex", flexDirection: "column" }}>
+              <div style={{ padding: "10px", flex: 1, display: "flex", flexDirection: "column" }}>
+                {/* Header: photo + name/title */}
+                <div style={{ display: "flex", alignItems: "stretch", marginBottom: "-1.372px", flexShrink: 0 }}>
                   <div style={{ width: "110px", height: "110px", flexShrink: 0, border: "1.372px solid black", borderRadius: "8px 0 0 0", overflow: "hidden" }}>
                     <img src={t.photo} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }} />
                   </div>
@@ -810,7 +808,8 @@ function TestimonialsCarousel() {
                     </div>
                   </div>
                 </div>
-                <div style={{ border: "1.372px solid black", borderTop: "none", borderRadius: "0 0 8px 8px", padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                {/* Body — fills remaining height like "Usual process" card */}
+                <div style={{ border: "1.372px solid black", borderTop: "none", borderRadius: "0 0 8px 8px", padding: "16px", flex: 1, display: "flex", flexDirection: "column", gap: "12px" }}>
                   {t.text.map((para, i) => (
                     <p key={i} style={{ ...STYLE_MONO, fontSize: "16px", color: "black" }}>{para}</p>
                   ))}
