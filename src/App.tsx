@@ -623,7 +623,7 @@ function RolesSection() {
         </Reveal>
 
         {/* Mobile: sticky stacking */}
-        <div className="md:hidden">
+        <div className="lg:hidden">
           {ROLES.map((role, i) => (
             <div
               key={role.title}
@@ -653,20 +653,20 @@ function RolesSection() {
           <div style={{ height: "80px" }} />
         </div>
 
-        {/* Tablet + desktop: horizontal flex row */}
-        <div className="hidden md:flex flex-row gap-[30px] items-stretch">
+        {/* Desktop: horizontal flex row */}
+        <div className="hidden lg:flex flex-row gap-[30px] items-stretch">
           {ROLES.map((role, i) => (
             <Reveal key={role.title} delay={i * 80} className="flex-1 basis-0 min-w-0">
               <HoverCard className="h-full">
                 <div className="bg-white flex flex-col h-full p-[10px]">
                   <div className="flex items-start mb-[-1.372px]">
-                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] md:p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                      <p className="flex-1 text-[22px] md:text-[28px] text-black" style={STYLE_DISPLAY}>{role.title}</p>
+                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] lg:p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
+                      <p className="flex-1 text-[22px] lg:text-[28px] text-black" style={STYLE_DISPLAY}>{role.title}</p>
                     </div>
                   </div>
                   <div className="flex flex-1">
-                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] md:p-[20px] rounded-bl-[8px] rounded-br-[8px]">
-                      <p className="w-full text-[18px] md:text-[24px] text-black" style={STYLE_MONO}>{role.description}</p>
+                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] lg:p-[20px] rounded-bl-[8px] rounded-br-[8px]">
+                      <p className="w-full text-[18px] lg:text-[20px] text-black" style={STYLE_MONO}>{role.description}</p>
                     </div>
                   </div>
                 </div>
@@ -932,7 +932,7 @@ function CTASection() {
         </div>
 
         {/* BOTTOM ROW: Contacts (left) + Form (right) */}
-        <div className="flex flex-col lg:flex-row lg:items-start gap-[80px] lg:gap-[35px]">
+        <div className="flex flex-col lg:flex-row lg:items-start gap-[120px] lg:gap-[35px]">
 
           {/* Left: contact info */}
           <Reveal className="lg:shrink-0 lg:w-[655px] flex flex-col gap-[24px] lg:gap-[30px] text-[16px] text-black">
