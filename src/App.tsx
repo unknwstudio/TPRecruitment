@@ -683,11 +683,11 @@ function RolesSection() {
 // ── Testimonials ─────────────────────────────────────────────────────────────
 const TESTIMONIALS = [
   {
-    name: "Gastón Tourn", title: "Chief Marketing Officer, Curio",
+    name: "Gastón Tourn", title: "Chief Growth Officer, Oddbox",
     photo: "/photo_gaston.jpeg", bg: "#c1c497",
     text: [
-      "Tiffany's took the time to understand my interests and introduced the opportunity when she saw it was a perfect match. This refreshing approach builds trust and confidence. I was considering other opportunities at the time, but I chose the role at Curio partly because of the assurance Tiffany provided during the hiring process.",
-      "I highly recommend Tiffany for her exceptional ability to identify and engage top talent. If you're looking for a dedicated ambassador for your startup, she is the professional you need.",
+      "Tiffany is an outstanding talent professional with a thoughtful, personal approach. She spends significant time understanding candidates and ensuring opportunities align perfectly with their goals.",
+      "I highly recommend Tiffany for her exceptional ability to identify and engage top talent. If you're looking for a dedicated ambassador for your startup, she is the professional you need. Tiffany excels at finding candidates who may not be actively seeking a change and persuading them to consider new, exciting opportunities.",
     ],
   },
   {
@@ -700,18 +700,18 @@ const TESTIMONIALS = [
     ],
   },
   {
-    name: "Maria Monks", title: "IQ Capital",
+    name: "Maria Monks", title: "Fractional CMO",
     photo: "/photo_maria.jpeg", bg: "#edead6",
     text: [
-      "Tiffany has been instrumental in helping me with marketing leadership hires across the IQ Capital portfolio. I have enjoyed working with her for years —her passion and professionalism is outstanding.",
-      "She also offers a great personalised service to both individual companies, and me, and I often seek her advice on everything recruitment, and building teams, related.",
+      "Tiffany has been instrumental in helping me with marketing leadership hires across multiple startups. I have enjoyed working with her for years —her passion and professionalism is outstanding.",
+      "She also offers a great personalised service to both individual companies, and me, and I often seek her advice on everything recruitment.",
     ],
   },
   {
-    name: "Govind Balakrishnan", title: "Co-founder, Curio",
+    name: "Govind Balakrishnan", title: "Co-founder, Gibran",
     photo: "/photo_govind.jpeg", bg: "#ffffff",
     text: [
-      "We've loved working with Tiffany over several years on multiple senior hires at Curio. Our requirements are often atypical, and she takes a very hands-on and considered approach.",
+      "We've loved working with Tiffany over several years on multiple senior hires. Our requirements are often atypical, and she takes a very hands-on and considered approach.",
       "Thanks to our collaboration, we have a phenomenal tight-knit team, investment from tier 1 Silicon Valley investors and partnerships with top media outlets. We trust her fully and will work with her again.",
     ],
   },
@@ -833,7 +833,7 @@ function TestimonialsCarousel() {
                   </div>
                 </div>
                 {/* Body — fills remaining height like "Usual process" card */}
-                <div style={{ border: "1px solid black", borderTop: "none", borderRadius: "0 0 8px 8px", padding: "16px", flex: 1, display: "flex", flexDirection: "column", gap: "12px" }}>
+                <div style={{ border: "1px solid black", borderTop: "none", borderRadius: "0 0 8px 8px", padding: "16px 28% 16px 16px", flex: 1, display: "flex", flexDirection: "column", gap: "12px" }}>
                   {t.text.map((para, i) => (
                     <p key={i} style={{ ...STYLE_MONO, fontSize: "16px", color: "black" }}>{para}</p>
                   ))}
