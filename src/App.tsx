@@ -21,7 +21,6 @@ const imgLinkedInIcon = "/assets/imgLinkedInIcon.svg";
 
 const FONT_DISPLAY = "'GT Canon Trial'";
 const FONT_MONO = "'GT Pressura Mono'";
-const FONT_SCRIPT = "'Seaweed Script', cursive";
 
 const STYLE_DISPLAY: React.CSSProperties = {
   fontFamily: FONT_DISPLAY,
@@ -38,26 +37,22 @@ const scrollToContact = () => {
   document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
 };
 
-// Reusable check icon components — rendered at 24px so the inner box equals 18px
+// Check icon components
 function CheckIcon() {
-  return <img src="/CheckedBox.svg" alt="" className="shrink-0 size-[24px]" />;
-}
-
-function DashIcon() {
-  return <img src="/EmptyCheckbox.svg" alt="" className="shrink-0 size-[24px]" />;
+  return <img src="/CheckedBox.svg" alt="" className="shrink-0 w-[24px] h-[24px]" />;
 }
 
 function CrossIcon() {
-  return <img src="/crossedBox.svg" alt="" className="shrink-0 size-[24px]" />;
+  return <img src="/crossedBox.svg" alt="" className="shrink-0 w-[24px] h-[24px]" />;
 }
 
-function CheckItem({ text, icon = "check" }: { text: string; icon?: "check" | "dash" | "cross" }) {
+function CheckItem({ text, icon = "check" }: { text: string; icon?: "check" | "cross" }) {
   return (
     <div className="flex gap-[14px] items-start w-full">
       <div className="shrink-0 mt-[1px]">
-        {icon === "check" ? <CheckIcon /> : icon === "cross" ? <CrossIcon /> : <DashIcon />}
+        {icon === "cross" ? <CrossIcon /> : <CheckIcon />}
       </div>
-      <p className="flex-1 text-black text-[20px]" style={STYLE_MONO}>
+      <p className="flex-1 text-black text-[18px] md:text-[20px]" style={STYLE_MONO}>
         {text}
       </p>
     </div>
@@ -69,13 +64,13 @@ function SectionCard({ title, children, expanded = true }: { title: string; chil
     <div className="bg-white flex flex-col items-start p-[10px] w-full">
       <div className="flex items-start w-full" style={{ marginBottom: expanded ? '-1.372px' : '0' }}>
         <div
-          className="border-[1.372px] border-black flex flex-1 items-start p-[30px] w-full"
+          className="border-[1.372px] border-black flex flex-1 items-start p-[20px] md:p-[30px] w-full"
           style={{
             borderRadius: expanded ? '8px 8px 0 0' : '8px',
             transition: 'border-radius 0.05s',
           }}
         >
-          <p className="text-[32px] text-black whitespace-nowrap" style={STYLE_DISPLAY}>
+          <p className="text-[24px] md:text-[32px] text-black" style={STYLE_DISPLAY}>
             {title}
           </p>
         </div>
@@ -88,7 +83,7 @@ function SectionCard({ title, children, expanded = true }: { title: string; chil
           transition: 'max-height 0.55s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
-        <div className="border-[1.372px] border-black flex flex-1 flex-col items-start p-[30px] rounded-bl-[8px] rounded-br-[8px]">
+        <div className="border-[1.372px] border-black flex flex-1 flex-col items-start p-[20px] md:p-[30px] rounded-bl-[8px] rounded-br-[8px]">
           {children}
         </div>
       </div>
@@ -111,8 +106,8 @@ function Navbar() {
   }, []);
 
   return (
-    <div className="sticky top-0 z-50 bg-[#ffedd7] flex items-center justify-between px-[30px] py-[20px] w-full">
-      <img src="/TP_logo.svg" alt="TPRecruitment" className="w-auto" style={{ height: `${btnHeight}px` }} />
+    <div className="sticky top-0 z-50 bg-[#ffedd7] flex items-center justify-between px-[16px] md:px-[30px] py-[14px] md:py-[20px] w-full">
+      <img src="/TP_logo.svg" alt="TPRecruitment" className="w-auto max-h-[36px] md:max-h-none" style={{ height: `${btnHeight}px` }} />
       <div
         className="flex flex-col items-start p-[6px] transition-colors duration-300"
         style={{ backgroundColor: pastHero ? '#fb8349' : 'white' }}
@@ -120,9 +115,9 @@ function Navbar() {
         <button
           ref={btnRef}
           onClick={scrollToContact}
-          className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer"
+          className="border border-black flex items-center p-[10px] md:p-[12px] rounded-[4px] cursor-pointer"
         >
-          <p className="text-[18px] text-black whitespace-nowrap leading-[20px]" style={STYLE_MONO}>
+          <p className="text-[14px] md:text-[18px] text-black whitespace-nowrap leading-[20px]" style={STYLE_MONO}>
             Start a conversation
           </p>
         </button>
@@ -135,45 +130,46 @@ function Navbar() {
 function HeroSection() {
   return (
     <section className="bg-[#ffedd7] w-full overflow-hidden">
-      <div className="max-w-[1440px] mx-auto px-[30px] pt-[100px] pb-[60px]">
+      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[48px] md:pt-[80px] lg:pt-[100px] pb-[40px] md:pb-[60px]">
         {/* Hero headline */}
-        <div className="mb-[60px]">
-          <p className="text-[60px] text-black max-w-[1155px]" style={STYLE_DISPLAY}>
+        <div className="mb-[40px] md:mb-[60px]">
+          <p className="text-[36px] md:text-[48px] lg:text-[60px] text-black max-w-[1155px]" style={STYLE_DISPLAY}>
             Recruitment is messy, human, and brutal. Most recruiters hide from that. I&nbsp;don&apos;t.
           </p>
         </div>
 
-        {/* Two columns — equal width + equal height, matching "My standards" card style */}
-        <div className="flex gap-[30px] items-stretch">
-          {/* Left: Usual recruitment process */}
-          <div className="flex flex-1 self-stretch">
-            <div className="bg-[#d1d1d1] flex flex-col h-full flex-1 p-[10px]">
+        {/* Two columns — stack on mobile, side by side on md+ */}
+        <div className="flex flex-col md:flex-row gap-[20px] md:gap-[30px] md:items-stretch">
+          {/* Left: Usual process */}
+          <div className="flex md:flex-1 md:self-stretch">
+            <div className="bg-[#d1d1d1] flex flex-col w-full md:h-full p-[10px]">
               {/* Header: overlap trick */}
               <div className="flex items-start shrink-0 w-full" style={{ marginBottom: '-1.372px' }}>
-                <div className="border-[1.372px] border-black flex flex-1 items-start p-[30px] rounded-tl-[8px] rounded-tr-[8px]">
-                  <p className="shrink-0 text-[32px] text-black" style={STYLE_DISPLAY}>
-                    Usual recruitment process:
+                <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] md:p-[30px] rounded-tl-[8px] rounded-tr-[8px]">
+                  <p className="shrink-0 text-[24px] md:text-[32px] text-black" style={STYLE_DISPLAY}>
+                    Usual process:
                   </p>
                 </div>
               </div>
               {/* Body: full border */}
-              <div className="flex flex-1 min-h-0">
-                <div className="border-[1.372px] border-black flex flex-1 flex-col gap-[30px] h-full items-start p-[30px] rounded-bl-[8px] rounded-br-[8px]">
-                  <div className="flex flex-col gap-[20px] items-start w-full">
+              <div className="flex md:flex-1 min-h-0">
+                <div className="border-[1.372px] border-black flex flex-1 flex-col gap-[24px] md:gap-[30px] md:h-full items-start p-[20px] md:p-[30px] rounded-bl-[8px] rounded-br-[8px]">
+                  <div className="flex flex-col gap-[16px] md:gap-[20px] items-start w-full">
                     {[
                       "You fill out a brief.",
                       "You get CVs.",
                       "You do the thinking.",
                     ].map((text) => (
-                      <div key={text} className="flex gap-[20px] items-start w-full">
-                        <div className="shrink-0 border border-[#4d453b] rounded-[2px] size-[18px] mt-[3px]" />
-                        <p className="flex-1 text-[24px] text-black" style={STYLE_MONO}>
+                      <div key={text} className="flex gap-[16px] md:gap-[20px] items-start w-full">
+                        {/* Empty bordered 18px square */}
+                        <div className="shrink-0 border border-[#4d453b] rounded-[2px] w-[18px] h-[18px] mt-[3px]" />
+                        <p className="flex-1 text-[18px] md:text-[24px] text-black" style={STYLE_MONO}>
                           {text}
                         </p>
                       </div>
                     ))}
                   </div>
-                  <p className="w-full text-[24px] text-black" style={STYLE_MONO}>
+                  <p className="w-full text-[18px] md:text-[24px] text-black" style={STYLE_MONO}>
                     Sound familiar?
                   </p>
                 </div>
@@ -182,49 +178,49 @@ function HeroSection() {
           </div>
 
           {/* Right: Working with me */}
-          <div className="bg-white flex flex-col flex-1 p-[10px]">
+          <div className="bg-white flex flex-col md:flex-1 p-[10px]">
             {/* Header: overlap trick */}
             <div className="flex items-start shrink-0 w-full" style={{ marginBottom: '-1.372px' }}>
-              <div className="border-[1.372px] border-black flex flex-1 items-start p-[30px] rounded-tl-[8px] rounded-tr-[8px]">
-                <p className="flex-1 text-[32px] text-black" style={STYLE_DISPLAY}>
+              <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] md:p-[30px] rounded-tl-[8px] rounded-tr-[8px]">
+                <p className="flex-1 text-[24px] md:text-[32px] text-black" style={STYLE_DISPLAY}>
                   Working with me:
                 </p>
               </div>
             </div>
             {/* Body: flex-1 + h-full to match left card height */}
-            <div className="flex flex-1 min-h-0">
-              <div className="border-[1.372px] border-black flex flex-1 flex-col gap-[40px] items-start p-[30px] h-full rounded-bl-[8px] rounded-br-[8px]">
-                <div className="flex flex-col gap-[20px] items-start w-full">
-                  <div className="flex gap-[20px] items-start w-full">
-                    <div className="shrink-0 bg-[#fb8349] rounded-[2px] size-[18px] mt-[3px]" />
-                    <p className="flex-1 text-[24px] text-black" style={STYLE_MONO}>
-                      You have a conversation.
-                    </p>
-                  </div>
-                  <div className="flex gap-[20px] items-start w-full">
-                    <div className="shrink-0 bg-[#fb8349] rounded-[2px] size-[18px] mt-[3px]" />
-                    <p className="flex-1 text-[24px] text-black" style={STYLE_MONO}>
-                      You meet people I believe in.
-                    </p>
-                  </div>
-                  <div className="flex gap-[20px] items-start w-full">
-                    <div className="shrink-0 bg-[#fb8349] rounded-[2px] size-[18px] mt-[3px]" />
-                    <div className="flex-1 text-[24px] text-black" style={{ ...STYLE_MONO, lineHeight: '1.1' }}>
+            <div className="flex md:flex-1 min-h-0">
+              <div className="border-[1.372px] border-black flex flex-1 flex-col gap-[24px] md:gap-[40px] items-start p-[20px] md:p-[30px] md:h-full rounded-bl-[8px] rounded-br-[8px]">
+                <div className="flex flex-col gap-[16px] md:gap-[20px] items-start w-full">
+                  {[
+                    "You have a conversation.",
+                    "You meet people I believe in.",
+                  ].map((text) => (
+                    <div key={text} className="flex gap-[16px] md:gap-[20px] items-start w-full">
+                      {/* Filled orange 18px square */}
+                      <div className="shrink-0 bg-[#fb8349] rounded-[2px] w-[18px] h-[18px] mt-[3px]" />
+                      <p className="flex-1 text-[18px] md:text-[24px] text-black" style={STYLE_MONO}>
+                        {text}
+                      </p>
+                    </div>
+                  ))}
+                  <div className="flex gap-[16px] md:gap-[20px] items-start w-full">
+                    <div className="shrink-0 bg-[#fb8349] rounded-[2px] w-[18px] h-[18px] mt-[3px]" />
+                    <div className="flex-1 text-[18px] md:text-[24px] text-black" style={{ ...STYLE_MONO, lineHeight: '1.1' }}>
                       <p>The decision is up to you —</p>
                       <p>but you never carry that weight alone.</p>
                     </div>
                   </div>
                 </div>
-                <div className="text-[24px] text-black" style={{ ...STYLE_MONO, lineHeight: '1.1' }}>
+                <div className="text-[18px] md:text-[24px] text-black" style={{ ...STYLE_MONO, lineHeight: '1.1' }}>
                   <p>Good hiring is a collaboration,</p>
                   <p>not a transaction.</p>
                 </div>
-                <div className="bg-[#fb8349] flex flex-col items-start p-[6px] mt-auto">
+                <div className="bg-[#fb8349] flex flex-col items-start p-[6px] md:mt-auto">
                   <button
                     onClick={scrollToContact}
-                    className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer"
+                    className="border border-black flex items-center p-[10px] md:p-[12px] rounded-[4px] cursor-pointer"
                   >
-                    <p className="text-[24px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
+                    <p className="text-[18px] md:text-[24px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
                       Start working together
                     </p>
                   </button>
@@ -283,15 +279,46 @@ const WORKING_CARDS = [
   },
 ];
 
-const STACK_FIRST_TOP = 96;  // px from viewport top where first card sticks
-const STACK_STEP = 16;       // each subsequent card sticks this many px lower
-const STACK_GAP = 40;        // margin-top between cards (creates scroll space)
+const STACK_FIRST_TOP = 96;
+const STACK_STEP = 16;
+const STACK_GAP = 40;
 
 function WhatWorkingSection() {
   return (
     <section className="bg-[#ffedd7] w-full">
+      {/* Mobile / tablet: stacked layout, no sticky */}
+      <div className="lg:hidden max-w-[1440px] mx-auto px-[16px] md:px-[30px] py-[40px] md:py-[60px] flex flex-col gap-[40px]">
+        <div className="flex flex-col gap-[24px]">
+          <div className="text-[36px] md:text-[44px] text-black" style={STYLE_DISPLAY}>
+            <p>What&apos;s working</p>
+            <p>with me looks like</p>
+          </div>
+          <div className="text-[16px] md:text-[20px] text-black" style={STYLE_MONO}>
+            <p className="mb-[1.08em]">
+              I know that growth asks a lot of a company. The pace. The pressure. The decisions that shape what comes next. None of it works without the right people around the table.
+            </p>
+            <p className="mb-[1.08em]">
+              That&apos;s why I work in partnership with ambitious teams to find the people who can carry that responsibility, people who bring judgement, energy and ownership, people who understand what it takes to build inside a fast-moving company, people who can help shape the outcome.
+            </p>
+            <p>The strongest teams are built in collaboration.</p>
+          </div>
+        </div>
+        <div className="flex flex-col gap-[16px]">
+          {WORKING_CARDS.map((card) => (
+            <SectionCard key={card.title} title={card.title} expanded={true}>
+              <div className="flex flex-col gap-[16px] items-start w-full">
+                {card.items.map((text) => (
+                  <CheckItem key={text} icon={card.icon} text={text} />
+                ))}
+              </div>
+            </SectionCard>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop: sticky stacking layout */}
       <div
-        className="max-w-[1440px] mx-auto flex"
+        className="hidden lg:flex max-w-[1440px] mx-auto"
         style={{ gap: '61px', padding: '30px', alignItems: 'flex-start' }}
       >
         {/* Left: sticky body text */}
@@ -314,7 +341,7 @@ function WhatWorkingSection() {
           </div>
         </div>
 
-        {/* Right: sticky stacking cards — each card individually sticky */}
+        {/* Right: sticky stacking cards */}
         <div className="flex-1">
           {WORKING_CARDS.map((card, idx) => (
             <div
@@ -335,7 +362,6 @@ function WhatWorkingSection() {
               </SectionCard>
             </div>
           ))}
-          {/* Spacer keeps the final stacked state visible for a comfortable dwell */}
           <div style={{ height: '600px' }} />
         </div>
       </div>
@@ -347,9 +373,12 @@ function WhatWorkingSection() {
 const partnerLogosRow1 = [imgImage30, imgImage31, imgImage32, imgImage33, imgImage36, imgImage34, imgImage35, imgImage37];
 const partnerLogosRow2 = [imgImage38, imgImage39, imgImage40, imgImage41, imgImage42, imgImage43, imgImage44, imgImage45];
 
-function PartnerLogo({ src }: { src: string }) {
+function PartnerLogo({ src, small }: { src: string; small?: boolean }) {
   return (
-    <div className="border-r border-black flex items-center justify-center shrink-0 w-[220px] h-[120px] p-[20px]">
+    <div
+      className="border-r border-black flex items-center justify-center shrink-0 p-[14px] md:p-[20px]"
+      style={{ width: small ? '140px' : '220px', height: small ? '80px' : '120px' }}
+    >
       <div
         className="w-full h-full"
         style={{
@@ -369,10 +398,19 @@ function PartnerLogo({ src }: { src: string }) {
 }
 
 function PartnersSection() {
+  // Detect small screens for logo sizing via state + resize observer
+  const [small, setSmall] = useState(false);
+  useEffect(() => {
+    const update = () => setSmall(window.innerWidth < 768);
+    update();
+    window.addEventListener('resize', update, { passive: true });
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
   return (
     <section className="bg-[#ffedd7] w-full overflow-hidden py-[30px]">
-      <div className="max-w-[1440px] mx-auto px-[30px]">
-        <p className="text-[52px] text-black mb-[60px]" style={STYLE_DISPLAY}>
+      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
+        <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[40px] md:mb-[60px]" style={STYLE_DISPLAY}>
           My partners &amp; collaborators
         </p>
       </div>
@@ -381,7 +419,7 @@ function PartnersSection() {
       <div className="flex border-t border-b border-black overflow-hidden mb-[-1px]">
         <div className="flex animate-marquee">
           {[...partnerLogosRow1, ...partnerLogosRow1].map((src, i) => (
-            <PartnerLogo key={i} src={src} />
+            <PartnerLogo key={i} src={src} small={small} />
           ))}
         </div>
       </div>
@@ -390,7 +428,7 @@ function PartnersSection() {
       <div className="flex border-t border-b border-black overflow-hidden">
         <div className="flex animate-marquee-reverse">
           {[...partnerLogosRow2, ...partnerLogosRow2].map((src, i) => (
-            <PartnerLogo key={i} src={src} />
+            <PartnerLogo key={i} src={src} small={small} />
           ))}
         </div>
       </div>
@@ -417,25 +455,26 @@ function RolesSection() {
 
   return (
     <section className="bg-[#ffedd7] w-full overflow-hidden py-[30px]">
-      <div className="max-w-[1440px] mx-auto px-[30px]">
-        <p className="text-[52px] text-black mb-[60px] whitespace-nowrap" style={STYLE_DISPLAY}>
+      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
+        <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[40px] md:mb-[60px]" style={STYLE_DISPLAY}>
           Roles that I hire for
         </p>
 
-        <div className="flex gap-[30px]">
+        {/* Stack on mobile, row on md+ */}
+        <div className="flex flex-col md:flex-row gap-[20px] md:gap-[30px] md:items-stretch">
           {roles.map((role) => (
-            <div key={role.title} className="flex-1 basis-0 min-w-0">
+            <div key={role.title} className="md:flex-1 md:basis-0 md:min-w-0">
               <div className="bg-white flex flex-col h-full p-[10px]">
                 <div className="flex items-start mb-[-1.372px]">
-                  <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                    <p className="flex-1 text-[28px] text-black" style={STYLE_DISPLAY}>
+                  <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] md:p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
+                    <p className="flex-1 text-[22px] md:text-[28px] text-black" style={STYLE_DISPLAY}>
                       {role.title}
                     </p>
                   </div>
                 </div>
                 <div className="flex flex-1">
-                  <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-bl-[8px] rounded-br-[8px]">
-                    <p className="w-full text-[24px] text-black" style={STYLE_MONO}>
+                  <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] md:p-[20px] rounded-bl-[8px] rounded-br-[8px]">
+                    <p className="w-full text-[18px] md:text-[24px] text-black" style={STYLE_MONO}>
                       {role.description}
                     </p>
                   </div>
@@ -500,16 +539,86 @@ function TestimonialsSection() {
   return (
     <section className="bg-[#ffedd7] w-full overflow-hidden">
       {/* Section heading */}
-      <div className="px-[30px] pt-[60px] pb-[40px]">
-        <p style={{ ...STYLE_DISPLAY, fontSize: '52px', color: 'black' }}>
+      <div className="px-[16px] md:px-[30px] pt-[40px] md:pt-[60px] pb-[24px] md:pb-[40px]">
+        <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black" style={STYLE_DISPLAY}>
           I could keep going.<br />But they&apos;ll say it better.
         </p>
       </div>
 
-      {/* Horizontal accordion — full viewport width */}
+      {/* Mobile: vertical expanded cards */}
+      <div className="flex flex-col gap-[0px] md:hidden pb-[40px]">
+        {testimonials.map((t, idx) => (
+          <div
+            key={t.name}
+            style={{
+              backgroundColor: t.bg,
+              borderTop: '1.372px solid black',
+              borderBottom: idx === testimonials.length - 1 ? '1.372px solid black' : 'none',
+            }}
+          >
+            {/* Header: photo + name/title */}
+            <div style={{ display: 'flex', alignItems: 'stretch', borderBottom: '1.372px solid black' }}>
+              <div style={{ width: '90px', height: '90px', flexShrink: 0, overflow: 'hidden' }}>
+                <img
+                  src={t.photo}
+                  alt={t.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }}
+                />
+              </div>
+              <div style={{ flex: 1, borderLeft: '1.372px solid black', padding: '14px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4px' }}>
+                <p style={{ ...STYLE_DISPLAY, fontSize: '18px', color: 'black' }}>{t.name}</p>
+                <p style={{ ...STYLE_DISPLAY, fontSize: '14px', color: 'black' }}>{t.title}</p>
+              </div>
+            </div>
+            {/* Quote */}
+            <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {t.text.map((para, i) => (
+                <p key={i} style={{ ...STYLE_MONO, fontSize: '16px', color: 'black' }}>{para}</p>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Tablet: 2×2 grid */}
+      <div className="hidden md:grid lg:hidden grid-cols-2 pb-[40px]" style={{ borderTop: '1.372px solid black' }}>
+        {testimonials.map((t, idx) => (
+          <div
+            key={t.name}
+            style={{
+              backgroundColor: t.bg,
+              borderRight: idx % 2 === 0 ? '1.372px solid black' : 'none',
+              borderBottom: idx < 2 ? '1.372px solid black' : 'none',
+            }}
+          >
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'stretch', borderBottom: '1.372px solid black' }}>
+              <div style={{ width: '110px', height: '110px', flexShrink: 0, overflow: 'hidden' }}>
+                <img
+                  src={t.photo}
+                  alt={t.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }}
+                />
+              </div>
+              <div style={{ flex: 1, borderLeft: '1.372px solid black', padding: '16px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '6px' }}>
+                <p style={{ ...STYLE_DISPLAY, fontSize: '20px', color: 'black' }}>{t.name}</p>
+                <p style={{ ...STYLE_DISPLAY, fontSize: '16px', color: 'black' }}>{t.title}</p>
+              </div>
+            </div>
+            {/* Quote */}
+            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {t.text.map((para, i) => (
+                <p key={i} style={{ ...STYLE_MONO, fontSize: '16px', color: 'black' }}>{para}</p>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop: horizontal hover accordion — height reduced ~25% from 680px */}
       <div
-        className="flex w-full"
-        style={{ height: '680px' }}
+        className="hidden lg:flex w-full"
+        style={{ height: '500px' }}
         onMouseLeave={() => setHoveredIdx(null)}
       >
         {testimonials.map((t, idx) => {
@@ -531,7 +640,7 @@ function TestimonialsSection() {
                 borderTop: '1.372px solid black',
               }}
             >
-              {/* Collapsed label — vertical name, fades out on hover */}
+              {/* Collapsed label */}
               <div style={{
                 position: 'absolute', inset: 0,
                 display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
@@ -553,7 +662,7 @@ function TestimonialsSection() {
                 </p>
               </div>
 
-              {/* Expanded content — fades in on hover */}
+              {/* Expanded content */}
               <div style={{
                 position: 'absolute', inset: 0,
                 opacity: isHovered ? 1 : 0,
@@ -561,13 +670,12 @@ function TestimonialsSection() {
                 display: 'flex',
                 flexDirection: 'column',
                 padding: '10px',
-                minWidth: '600px', /* prevents reflow jank */
+                minWidth: '560px',
               }}>
-                {/* Header row: photo + name/title */}
+                {/* Header: photo + name/title */}
                 <div style={{ display: 'flex', alignItems: 'stretch', marginBottom: '-1.372px' }}>
-                  {/* Photo */}
                   <div style={{
-                    width: '222px', height: '195px', flexShrink: 0,
+                    width: '180px', height: '160px', flexShrink: 0,
                     border: '1.372px solid black',
                     borderRadius: '8px 0 0 0',
                     overflow: 'hidden',
@@ -578,20 +686,19 @@ function TestimonialsSection() {
                       style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }}
                     />
                   </div>
-                  {/* Name + Title */}
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                     <div style={{
                       border: '1.372px solid black', borderRadius: '0 8px 0 0',
-                      flex: 1, display: 'flex', alignItems: 'center', padding: '0 30px',
+                      flex: 1, display: 'flex', alignItems: 'center', padding: '0 24px',
                       marginBottom: '-1.372px',
                     }}>
-                      <p style={{ ...STYLE_DISPLAY, fontSize: '32px', color: 'black', whiteSpace: 'nowrap' }}>{t.name}</p>
+                      <p style={{ ...STYLE_DISPLAY, fontSize: '28px', color: 'black', whiteSpace: 'nowrap' }}>{t.name}</p>
                     </div>
                     <div style={{
                       border: '1.372px solid black',
-                      flex: 1, display: 'flex', alignItems: 'center', padding: '0 30px',
+                      flex: 1, display: 'flex', alignItems: 'center', padding: '0 24px',
                     }}>
-                      <p style={{ ...STYLE_DISPLAY, fontSize: '24px', color: 'black', whiteSpace: 'nowrap' }}>{t.title}</p>
+                      <p style={{ ...STYLE_DISPLAY, fontSize: '20px', color: 'black', whiteSpace: 'nowrap' }}>{t.title}</p>
                     </div>
                   </div>
                 </div>
@@ -601,14 +708,14 @@ function TestimonialsSection() {
                   border: '1.372px solid black',
                   borderTop: 'none',
                   borderRadius: '0 0 8px 8px',
-                  padding: '30px',
+                  padding: '24px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '16px',
+                  gap: '14px',
                   overflowY: 'auto',
                 }}>
                   {t.text.map((para, i) => (
-                    <p key={i} style={{ ...STYLE_MONO, fontSize: '20px', color: 'black' }}>{para}</p>
+                    <p key={i} style={{ ...STYLE_MONO, fontSize: '18px', color: 'black' }}>{para}</p>
                   ))}
                 </div>
               </div>
@@ -623,41 +730,41 @@ function TestimonialsSection() {
 // --- CTA / CONTACT SECTION ---
 function CTASection() {
   return (
-    <section id="contact" className="bg-[#eaeae5] w-full overflow-hidden py-[60px]">
-      <div className="max-w-[1440px] mx-auto px-[30px] flex gap-[35px] items-start">
+    <section id="contact" className="bg-[#eaeae5] w-full overflow-hidden py-[40px] md:py-[60px]">
+      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] flex flex-col lg:flex-row gap-[40px] lg:gap-[35px] lg:items-start">
 
-        {/* Left column: headline + contacts (655px, matching Figma) */}
-        <div className="shrink-0 w-[655px] flex flex-col gap-[60px]">
-          <div className="text-[52px] text-black" style={STYLE_DISPLAY}>
+        {/* Left column: headline + contacts */}
+        <div className="lg:shrink-0 lg:w-[655px] flex flex-col gap-[40px] md:gap-[60px]">
+          <div className="text-[36px] md:text-[44px] lg:text-[52px] text-black" style={STYLE_DISPLAY}>
             <p>If you&apos;ve read</p>
             <p>this far, we should</p>
             <p>probably talk</p>
           </div>
 
-          <div className="flex flex-col gap-[30px] text-[16px] text-black">
-            <div className="flex flex-col gap-[20px]">
+          <div className="flex flex-col md:flex-row lg:flex-col gap-[24px] md:gap-[40px] lg:gap-[30px] text-[16px] text-black">
+            <div className="flex flex-col gap-[16px] md:gap-[20px]">
               <p style={STYLE_DISPLAY}>Contacts</p>
-              <div className="flex flex-col gap-[10px]" style={STYLE_MONO}>
+              <div className="flex flex-col gap-[8px] md:gap-[10px]" style={STYLE_MONO}>
                 <p>tprecruitment.co</p>
                 <p>tiffany@tprecruitment.co</p>
               </div>
             </div>
-            <div className="flex flex-col gap-[20px]">
+            <div className="flex flex-col gap-[16px] md:gap-[20px]">
               <p style={STYLE_DISPLAY}>Office</p>
               <p style={STYLE_MONO}>
                 20-22 Wenlock Road<br />
                 London, England, N1 7GU
               </p>
             </div>
-            <div className="flex flex-col gap-[20px]">
+            <div className="flex flex-col gap-[16px] md:gap-[20px]">
               <p style={STYLE_DISPLAY}>Socials</p>
               <div className="flex flex-col gap-[6px]">
                 <div className="flex gap-[6px] items-center">
-                  <img src={imgLinkedInIcon} alt="LinkedIn" className="size-[16px]" />
+                  <img src={imgLinkedInIcon} alt="LinkedIn" className="w-[16px] h-[16px]" />
                   <a className="text-[16px]" href="https://www.linkedin.com/company/tp-recruitment/" target="_blank" style={STYLE_MONO}>TP Recruitment</a>
                 </div>
                 <div className="flex gap-[6px] items-center">
-                  <img src={imgLinkedInIcon} alt="LinkedIn" className="size-[16px]" />
+                  <img src={imgLinkedInIcon} alt="LinkedIn" className="w-[16px] h-[16px]" />
                   <a className="text-[16px]" href="https://www.linkedin.com/in/tiffany-philippou/" target="_blank" style={STYLE_MONO}>Tiffany Philippou</a>
                 </div>
               </div>
@@ -665,10 +772,10 @@ function CTASection() {
           </div>
         </div>
 
-        {/* Right column: tagline + form (aligned with left column top, starts at ~646px) */}
-        <div className="flex-1 flex flex-col gap-[30px]">
+        {/* Right column: tagline + form */}
+        <div className="flex-1 flex flex-col gap-[24px] md:gap-[30px]">
           {/* Tagline */}
-          <div className="text-[24px] text-black" style={STYLE_MONO}>
+          <div className="text-[18px] md:text-[22px] lg:text-[24px] text-black" style={STYLE_MONO}>
             <p>I&apos;d love to hear what you&apos;re building</p>
             <p>or just have a good conversation with you</p>
           </div>
@@ -676,7 +783,7 @@ function CTASection() {
           {/* Form */}
           <div className="flex flex-col gap-[20px]">
             {/* Name + Email row */}
-            <div className="flex gap-[30px]">
+            <div className="flex flex-col sm:flex-row gap-[20px] sm:gap-[30px]">
               <div className="flex flex-col gap-[8px] flex-1">
                 <label className="text-[16px]" style={STYLE_DISPLAY}>
                   Your Name &amp; Surname
@@ -705,7 +812,7 @@ function CTASection() {
                 Tell me about you
               </label>
               <textarea
-                className="w-full h-[197px] border-[1.372px] border-black rounded-[4px] bg-transparent outline-none p-[12px] text-[16px] resize-none"
+                className="w-full h-[160px] md:h-[197px] border-[1.372px] border-black rounded-[4px] bg-transparent outline-none p-[12px] text-[16px] resize-none"
                 style={STYLE_MONO}
               />
             </div>
@@ -713,8 +820,8 @@ function CTASection() {
 
           {/* Submit button */}
           <div className="bg-[#fb8349] flex flex-col items-start p-[6px] self-start">
-            <button className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer">
-              <p className="text-[20px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
+            <button className="border border-black flex items-center p-[10px] md:p-[12px] rounded-[4px] cursor-pointer">
+              <p className="text-[18px] md:text-[20px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
                 Let&apos;s talk
               </p>
             </button>
@@ -729,23 +836,23 @@ function CTASection() {
 // --- FOOTER ---
 function Footer() {
   return (
-    <footer className="bg-[#4d453b] w-full overflow-hidden relative h-[400px]">
+    <footer className="bg-[#4d453b] w-full overflow-hidden relative" style={{ minHeight: '200px', height: 'clamp(200px, 28vw, 400px)' }}>
       {/* Big TPRecruitment logo */}
       <img
         src="/TPRecruitment_FooterLogo.svg"
         alt="TPRecruitment"
-        className="absolute left-[30px] right-[30px]"
-        style={{ top: '30px', width: 'calc(100% - 60px)', height: 'auto' }}
+        className="absolute left-[16px] right-[16px] md:left-[30px] md:right-[30px]"
+        style={{ top: '20px', width: 'calc(100% - 32px)', height: 'auto' }}
       />
 
       {/* Bottom bar */}
-      <div className="absolute bottom-[30px] left-[30px] right-[30px] flex items-end justify-between text-white">
-        <p className="text-[14px]" style={STYLE_DISPLAY}>All rights reserved.</p>
-        <div className="flex gap-[6px] items-center">
-          <span className="text-[28px]" style={STYLE_DISPLAY}>©</span>
-          <span className="text-[20px]" style={STYLE_DISPLAY}>2026 TP Recruitment</span>
+      <div className="absolute bottom-[16px] md:bottom-[30px] left-[16px] right-[16px] md:left-[30px] md:right-[30px] flex flex-col md:flex-row items-start md:items-end justify-between gap-[8px] text-white">
+        <p className="text-[11px] md:text-[14px]" style={STYLE_DISPLAY}>All rights reserved.</p>
+        <div className="flex gap-[4px] md:gap-[6px] items-center">
+          <span className="text-[20px] md:text-[28px]" style={STYLE_DISPLAY}>©</span>
+          <span className="text-[14px] md:text-[20px]" style={STYLE_DISPLAY}>2026 TP Recruitment</span>
         </div>
-        <a className="text-[14px]" href="https://www.unknw.com/" target="_blank" style={STYLE_DISPLAY}>brand &amp; website by UNKNW</a>
+        <a className="text-[11px] md:text-[14px]" href="https://www.unknw.com/" target="_blank" style={STYLE_DISPLAY}>brand &amp; website by UNKNW</a>
       </div>
     </footer>
   );
