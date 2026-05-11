@@ -217,7 +217,7 @@ function Navbar() {
         <img
           src="/TP_logo.svg"
           alt="TPRecruitment"
-          className="hidden sm:block w-auto cursor-pointer"
+          className="block w-auto cursor-pointer"
           style={{ height: `${btnH}px`, maxHeight: "46px" }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         />
@@ -600,7 +600,7 @@ const ROLES = [
 
 function RolesSection() {
   return (
-    <section id="roles" className="bg-[#ffedd7] w-full overflow-hidden py-[60px]">
+    <section id="roles" className="bg-[#ffedd7] w-full py-[60px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
         <Reveal>
           <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[40px] md:mb-[60px]" style={STYLE_DISPLAY}>
@@ -636,7 +636,7 @@ function RolesSection() {
               </HoverCard>
             </div>
           ))}
-          <div style={{ height: "200px" }} />
+          <div style={{ height: "300px" }} />
         </div>
 
         {/* Tablet + desktop: horizontal flex row */}
@@ -703,127 +703,67 @@ const TESTIMONIALS = [
   },
 ];
 
-// Desktop: single hover-expand row (thefirstthelast.agency style)
+// Tablet + desktop: hover-expand row (thefirstthelast.agency style)
+// Uses CSS grid-template-rows trick for buttery-smooth height animation.
 function TestimonialRow({ t, idx }: { t: typeof TESTIMONIALS[0]; idx: number }) {
   const [hov, setHov] = useState(false);
 
   return (
     <div
-      style={{
-        borderTop: "1.372px solid black",
-        position: "relative",
-        overflow: "hidden",
-        cursor: "default",
-      }}
+      style={{ borderTop: "1.372px solid black", position: "relative", cursor: "default" }}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
     >
-      {/* Sliding background fill – climbs up from bottom on hover */}
+      {/* Sliding background — lives BELOW the row, so clipping isn't needed on outer div */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           backgroundColor: t.bg,
           transform: hov ? "translateY(0)" : "translateY(100%)",
-          transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)",
+          transition: "transform 0.55s cubic-bezier(0.4,0,0.2,1)",
           zIndex: 0,
+          pointerEvents: "none",
         }}
       />
 
       {/* Row header: index · name · title */}
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          display: "flex",
-          alignItems: "center",
-          padding: "28px 30px",
-        }}
-      >
-        {/* Index number */}
-        <span
-          style={{
-            ...STYLE_MONO,
-            fontSize: "16px",
-            color: "black",
-            opacity: 0.4,
-            width: "72px",
-            flexShrink: 0,
-            transition: "opacity 0.3s ease",
-          }}
-        >
+      <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", padding: "clamp(18px,2vw,28px) 30px" }}>
+        <span style={{ ...STYLE_MONO, fontSize: "15px", color: "black", opacity: 0.4, width: "clamp(44px,4.5vw,72px)", flexShrink: 0 }}>
           {String(idx + 1).padStart(2, "0")}.
         </span>
 
-        {/* Person name — large display */}
-        <p
-          style={{
-            ...STYLE_DISPLAY,
-            fontSize: "clamp(28px, 3.2vw, 52px)",
-            color: "black",
-            flex: 1,
-            transition: "letter-spacing 0.4s ease",
-            letterSpacing: hov ? "-0.04em" : "-0.05em",
-          }}
-        >
+        <p style={{ ...STYLE_DISPLAY, fontSize: "clamp(22px, 3.2vw, 52px)", color: "black", flex: 1 }}>
           {t.name}
         </p>
 
-        {/* Role — fades out on hover */}
-        <p
-          style={{
-            ...STYLE_MONO,
-            fontSize: "15px",
-            color: "black",
-            opacity: hov ? 0 : 0.5,
-            transition: "opacity 0.35s ease",
-            flexShrink: 0,
-            maxWidth: "280px",
-            textAlign: "right",
-          }}
-        >
+        <p style={{ ...STYLE_MONO, fontSize: "clamp(12px,1.1vw,15px)", color: "black", opacity: hov ? 0 : 0.5, transition: "opacity 0.3s ease", flexShrink: 0, maxWidth: "clamp(140px,20vw,280px)", textAlign: "right" }}>
           {t.title}
         </p>
       </div>
 
-      {/* Expanded content — slides open */}
+      {/* Expanded content — CSS grid trick: 0fr → 1fr animates to EXACT content height, no jumpiness */}
       <div
         style={{
           position: "relative",
           zIndex: 1,
-          maxHeight: hov ? "520px" : "0",
-          overflow: "hidden",
-          transition: "max-height 0.6s cubic-bezier(0.4,0,0.2,1)",
+          display: "grid",
+          gridTemplateRows: hov ? "1fr" : "0fr",
+          transition: "grid-template-rows 0.55s cubic-bezier(0.4,0,0.2,1)",
         }}
       >
-        {/* Align photo/text with the name column (72px index + 0 gap) */}
-        <div
-          style={{
-            display: "flex",
-            gap: "36px",
-            padding: "0 30px 36px 102px",
-            alignItems: "flex-start",
-          }}
-        >
-          <img
-            src={t.photo}
-            alt={t.name}
-            style={{
-              width: "130px",
-              height: "130px",
-              objectFit: "cover",
-              objectPosition: "top center",
-              flexShrink: 0,
-              border: "1.372px solid black",
-              borderRadius: "4px",
-            }}
-          />
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "14px" }}>
-            {t.text.map((para, i) => (
-              <p key={i} style={{ ...STYLE_MONO, fontSize: "17px", color: "black", lineHeight: "1.55" }}>
-                {para}
-              </p>
-            ))}
+        <div style={{ overflow: "hidden" }}>
+          <div style={{ display: "flex", gap: "clamp(20px,2.5vw,36px)", padding: "0 30px 32px clamp(44px,4.5vw,102px)", alignItems: "flex-start" }}>
+            <img
+              src={t.photo}
+              alt={t.name}
+              style={{ width: "clamp(80px,8vw,130px)", height: "clamp(80px,8vw,130px)", objectFit: "cover", objectPosition: "top center", flexShrink: 0, border: "1.372px solid black", borderRadius: "4px" }}
+            />
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "12px" }}>
+              {t.text.map((para, i) => (
+                <p key={i} style={{ ...STYLE_MONO, fontSize: "clamp(14px,1.15vw,17px)", color: "black", lineHeight: "1.55" }}>{para}</p>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -924,7 +864,7 @@ function TestimonialsCarousel() {
 
 function TestimonialsSection() {
   return (
-    <section id="testimonials" className="bg-[#ffedd7] w-full overflow-hidden">
+    <section id="testimonials" className="bg-[#ffedd7] w-full">
       <div className="px-[16px] md:px-[30px] pt-[60px] pb-[24px] md:pb-[40px]">
         <Reveal>
           <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black" style={STYLE_DISPLAY}>
@@ -933,13 +873,13 @@ function TestimonialsSection() {
         </Reveal>
       </div>
 
-      {/* Mobile + tablet: swipe carousel */}
-      <div className="lg:hidden">
+      {/* Mobile only: swipe carousel */}
+      <div className="md:hidden">
         <TestimonialsCarousel />
       </div>
 
-      {/* Desktop: hover-expand rows */}
-      <Reveal y={16} className="hidden lg:block pb-[60px]">
+      {/* Tablet + desktop: hover-expand rows */}
+      <Reveal y={16} className="hidden md:block pb-[60px]">
         <div style={{ borderBottom: "1.372px solid black" }}>
           {TESTIMONIALS.map((t, idx) => (
             <TestimonialRow key={t.name} t={t} idx={idx} />
