@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* ── Custom breakpoints ──────────────────────────────────────────────────────*/
+@theme {
+  --breakpoint-md: 1020px;   /* single mobile→desktop breakpoint */
+}
+
 @font-face {
   font-family: 'GT Canon Trial';
   src: url('/fonts/GT-Canon-S-Expanded-Regular-Trial.otf') format('opentype');
@@ -29,7 +34,7 @@
     --stack-gap: 20px;
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1020px) {
     :root {
       --stack-top: 96px;
       --stack-step: 16px;
