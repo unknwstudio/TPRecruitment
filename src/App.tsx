@@ -143,22 +143,22 @@ function HeroSection() {
           </p>
         </div>
 
-        {/* Two columns — equal width + equal height, matching Figma 174-1641 */}
+        {/* Two columns — equal width + equal height, matching "My standards" card style */}
         <div className="flex gap-[30px] items-stretch">
-          {/* Left: Usual process */}
+          {/* Left: Usual recruitment process */}
           <div className="flex flex-1 self-stretch">
             <div className="bg-[#d1d1d1] flex flex-col h-full flex-1 p-[10px]">
-              {/* Header: full border, no overlap trick */}
-              <div className="flex items-start shrink-0 w-full">
-                <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                  <p className="shrink-0 text-[28px] text-black whitespace-nowrap" style={STYLE_DISPLAY}>
-                    Usual process of recruitment:
+              {/* Header: overlap trick */}
+              <div className="flex items-start shrink-0 w-full" style={{ marginBottom: '-1.372px' }}>
+                <div className="border-[1.372px] border-black flex flex-1 items-start p-[30px] rounded-tl-[8px] rounded-tr-[8px]">
+                  <p className="shrink-0 text-[32px] text-black" style={STYLE_DISPLAY}>
+                    Usual recruitment process:
                   </p>
                 </div>
               </div>
-              {/* Body: no top border (header bottom border acts as divider) */}
-              <div className="flex flex-1 items-start min-h-0">
-                <div className="border-b-[1.372px] border-l-[1.372px] border-r-[1.372px] border-black flex flex-1 flex-col gap-[30px] h-full items-center p-[20px] rounded-bl-[8px] rounded-br-[8px]">
+              {/* Body: full border */}
+              <div className="flex flex-1 min-h-0">
+                <div className="border-[1.372px] border-black flex flex-1 flex-col gap-[30px] h-full items-start p-[30px] rounded-bl-[8px] rounded-br-[8px]">
                   <div className="flex flex-col gap-[20px] items-start w-full">
                     {[
                       "You fill out a brief.",
@@ -166,7 +166,6 @@ function HeroSection() {
                       "You do the thinking.",
                     ].map((text) => (
                       <div key={text} className="flex gap-[20px] items-start w-full">
-                        {/* Figma: empty bordered 18px square */}
                         <div className="shrink-0 border border-[#4d453b] rounded-[2px] size-[18px] mt-[3px]" />
                         <p className="flex-1 text-[24px] text-black" style={STYLE_MONO}>
                           {text}
@@ -184,19 +183,19 @@ function HeroSection() {
 
           {/* Right: Working with me */}
           <div className="bg-white flex flex-col flex-1 p-[10px]">
-            {/* Header: overlap trick (mb negative) */}
+            {/* Header: overlap trick */}
             <div className="flex items-start shrink-0 w-full" style={{ marginBottom: '-1.372px' }}>
-              <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                <p className="flex-1 text-[28px] text-black" style={STYLE_DISPLAY}>
+              <div className="border-[1.372px] border-black flex flex-1 items-start p-[30px] rounded-tl-[8px] rounded-tr-[8px]">
+                <p className="flex-1 text-[32px] text-black" style={STYLE_DISPLAY}>
                   Working with me:
                 </p>
               </div>
             </div>
-            <div className="flex items-start shrink-0 w-full">
-              <div className="border-[1.372px] border-black flex flex-1 flex-col gap-[40px] items-start p-[20px] rounded-bl-[8px] rounded-br-[8px]">
+            {/* Body: flex-1 + h-full to match left card height */}
+            <div className="flex flex-1 min-h-0">
+              <div className="border-[1.372px] border-black flex flex-1 flex-col gap-[40px] items-start p-[30px] h-full rounded-bl-[8px] rounded-br-[8px]">
                 <div className="flex flex-col gap-[20px] items-start w-full">
                   <div className="flex gap-[20px] items-start w-full">
-                    {/* Figma: filled orange 18px square */}
                     <div className="shrink-0 bg-[#fb8349] rounded-[2px] size-[18px] mt-[3px]" />
                     <p className="flex-1 text-[24px] text-black" style={STYLE_MONO}>
                       You have a conversation.
@@ -220,7 +219,7 @@ function HeroSection() {
                   <p>Good hiring is a collaboration,</p>
                   <p>not a transaction.</p>
                 </div>
-                <div className="bg-[#fb8349] flex flex-col items-start p-[6px]">
+                <div className="bg-[#fb8349] flex flex-col items-start p-[6px] mt-auto">
                   <button
                     onClick={scrollToContact}
                     className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer"
@@ -454,12 +453,11 @@ function RolesSection() {
 const testimonials = [
   {
     name: "Gastón Tourn",
-    title: "Co-founder, Curio",
+    title: "Chief Marketing Officer, Curio",
     photo: "/photo_gaston.jpeg",
     bg: "#c1c497",
     text: [
-      "Tiffany's took the time to understand my interests and introduced the opportunity when she saw it was a perfect match.",
-      "This refreshing approach builds trust and confidence. I was considering other opportunities at the time, but I chose the role at Curio partly because of the assurance Tiffany provided during the hiring process.",
+      "Tiffany's took the time to understand my interests and introduced the opportunity when she saw it was a perfect match. This refreshing approach builds trust and confidence. I was considering other opportunities at the time, but I chose the role at Curio partly because of the assurance Tiffany provided during the hiring process.",
       "I highly recommend Tiffany for her exceptional ability to identify and engage top talent. If you're looking for a dedicated ambassador for your startup, she is the professional you need.",
     ],
   },
@@ -470,8 +468,8 @@ const testimonials = [
     bg: "#90b0bb",
     text: [
       "I had the pleasure of working with Tiffany as my recruiter, and I couldn't be more impressed, she has been the best by far. She did an outstanding job from start to finish. Tiffany was super communicative, keeping me informed at every step of the process.",
-      "Her honesty and openness was refreshing and made me feel confident throughout the process. I always felt I could trust her, and I truly appreciated how she checked up on me throughout the process. Most importantly, the entire process was incredibly fast, which was a huge plus.",
-      "I would definitely work with Tiffany again and highly recommend her to anyone in need of a top-notch recruiter.",
+      "Her honesty and openness was refreshing and made me feel confident throughout the process.",
+      "I always felt I could trust her, and I truly appreciated how she checked up on me throughout the process. Most importantly, the entire process was incredibly fast, which was a huge plus. I would definitely work with Tiffany again and highly recommend her to anyone in need of a top-notch recruiter.",
     ],
   },
   {
@@ -676,38 +674,38 @@ function CTASection() {
           </div>
 
           {/* Form */}
-          <div className="flex flex-col gap-[30px]">
+          <div className="flex flex-col gap-[20px]">
             {/* Name + Email row */}
-            <div className="flex gap-[30px] h-[53px]">
-              <div className="flex flex-col gap-[6px] flex-1">
-                <label className="text-[16px] leading-[1.08]" style={STYLE_DISPLAY}>
+            <div className="flex gap-[30px]">
+              <div className="flex flex-col gap-[8px] flex-1">
+                <label className="text-[16px]" style={STYLE_DISPLAY}>
                   Your Name &amp; Surname
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b border-[#4d453b] bg-transparent outline-none text-[16px]"
+                  className="w-full border-b-[1.372px] border-black bg-transparent outline-none text-[16px] pb-[8px]"
                   style={STYLE_MONO}
                 />
               </div>
-              <div className="flex flex-col gap-[6px] flex-1">
-                <label className="text-[16px] leading-[1.08]" style={STYLE_DISPLAY}>
+              <div className="flex flex-col gap-[8px] flex-1">
+                <label className="text-[16px]" style={STYLE_DISPLAY}>
                   Email
                 </label>
                 <input
                   type="email"
-                  className="w-full border-b border-[#4d453b] bg-transparent outline-none text-[16px]"
+                  className="w-full border-b-[1.372px] border-black bg-transparent outline-none text-[16px] pb-[8px]"
                   style={STYLE_MONO}
                 />
               </div>
             </div>
 
             {/* Textarea */}
-            <div className="flex flex-col gap-[15px]">
-              <label className="text-[16px] leading-[1.08]" style={STYLE_DISPLAY}>
+            <div className="flex flex-col gap-[8px]">
+              <label className="text-[16px]" style={STYLE_DISPLAY}>
                 Tell me about you
               </label>
               <textarea
-                className="w-full h-[197px] border border-[#949494] rounded-[4px] bg-transparent outline-none p-[12px] text-[16px] resize-none"
+                className="w-full h-[197px] border-[1.372px] border-black rounded-[4px] bg-transparent outline-none p-[12px] text-[16px] resize-none"
                 style={STYLE_MONO}
               />
             </div>
