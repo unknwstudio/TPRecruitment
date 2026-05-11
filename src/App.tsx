@@ -187,15 +187,12 @@ const NAV_LINKS = [
 function Navbar() {
   const [pastHero, setPastHero]   = useState(false);
   const [menuOpen, setMenuOpen]   = useState(false);
-  const btnRef = useRef<HTMLButtonElement>(null);
-  const [btnH, setBtnH] = useState(46);
   const [navHov, setNavHov] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setPastHero(window.scrollY > window.innerHeight * 0.8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    if (btnRef.current) setBtnH(btnRef.current.getBoundingClientRect().height);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -217,8 +214,8 @@ function Navbar() {
         <img
           src="/TP_logo.svg"
           alt="TPRecruitment"
-          className="hidden md:block w-auto cursor-pointer"
-          style={{ height: `${btnH}px`, maxHeight: "46px" }}
+          className="block w-auto cursor-pointer"
+          style={{ height: "46px" }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         />
 
@@ -230,7 +227,6 @@ function Navbar() {
           onMouseLeave={() => setNavHov(false)}
         >
           <button
-            ref={btnRef}
             onClick={scrollToContact}
             className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer"
             style={{ backgroundColor: "transparent" }}
@@ -247,7 +243,6 @@ function Navbar() {
           style={{ backgroundColor: navBg }}
         >
           <button
-            ref={btnRef}
             onClick={() => setMenuOpen(true)}
             className="border border-black flex items-center p-[10px] rounded-[4px] cursor-pointer"
             aria-label="Open menu"
@@ -600,7 +595,7 @@ const ROLES = [
 
 function RolesSection() {
   return (
-    <section id="roles" className="bg-[#ffedd7] w-full overflow-hidden py-[60px]">
+    <section id="roles" className="bg-[#ffedd7] w-full py-[60px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
         <Reveal>
           <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[40px] md:mb-[60px]" style={STYLE_DISPLAY}>
@@ -636,7 +631,7 @@ function RolesSection() {
               </HoverCard>
             </div>
           ))}
-          <div style={{ height: "200px" }} />
+          <div style={{ height: "300px" }} />
         </div>
 
         {/* Tablet + desktop: horizontal flex row */}
@@ -666,7 +661,7 @@ function RolesSection() {
   );
 }
 
-// ── Testimonials ──────────────────────────────────────────────────────────────
+// ── Testimonials ─────────────────────────────────────────────────────────────
 const TESTIMONIALS = [
   {
     name: "Gastón Tourn", title: "Chief Marketing Officer, Curio",
@@ -702,6 +697,74 @@ const TESTIMONIALS = [
     ],
   },
 ];
+
+// Tablet + desktop: hover-expand row (thefirstthelast.agency style)
+// Uses CSS grid-template-rows trick for buttery-smooth height animation.
+function TestimonialRow({ t, idx }: { t: typeof TESTIMONIALS[0]; idx: number }) {
+  const [hov, setHov] = useState(false);
+
+  return (
+    <div
+      style={{ borderTop: "1.372px solid black", position: "relative", cursor: "default" }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+    >
+      {/* Sliding background — lives BELOW the row, so clipping isn't needed on outer div */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundColor: t.bg,
+          transform: hov ? "translateY(0)" : "translateY(100%)",
+          transition: "transform 0.55s cubic-bezier(0.4,0,0.2,1)",
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Row header: index · name · title */}
+      <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", padding: "clamp(18px,2vw,28px) 30px" }}>
+        <span style={{ ...STYLE_MONO, fontSize: "15px", color: "black", opacity: 0.4, width: "clamp(44px,4.5vw,72px)", flexShrink: 0 }}>
+          {String(idx + 1).padStart(2, "0")}.
+        </span>
+
+        <p style={{ ...STYLE_DISPLAY, fontSize: "clamp(22px, 3.2vw, 52px)", color: "black", flex: 1 }}>
+          {t.name}
+        </p>
+
+        <p style={{ ...STYLE_MONO, fontSize: "clamp(12px,1.1vw,15px)", color: "black", opacity: hov ? 0 : 0.5, transition: "opacity 0.3s ease", flexShrink: 0, maxWidth: "clamp(140px,20vw,280px)", textAlign: "right" }}>
+          {t.title}
+        </p>
+      </div>
+
+      {/* Expanded content — CSS grid trick: 0fr → 1fr animates to EXACT content height, no jumpiness */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          display: "grid",
+          gridTemplateRows: hov ? "1fr" : "0fr",
+          transition: "grid-template-rows 0.55s cubic-bezier(0.4,0,0.2,1)",
+        }}
+      >
+        <div style={{ overflow: "hidden" }}>
+          <div style={{ display: "flex", gap: "clamp(20px,2.5vw,36px)", padding: "0 30px 32px clamp(44px,4.5vw,102px)", alignItems: "flex-start" }}>
+            <img
+              src={t.photo}
+              alt={t.name}
+              style={{ width: "clamp(80px,8vw,130px)", height: "clamp(80px,8vw,130px)", objectFit: "cover", objectPosition: "top center", flexShrink: 0, border: "1.372px solid black", borderRadius: "4px" }}
+            />
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "12px" }}>
+              {t.text.map((para, i) => (
+                <p key={i} style={{ ...STYLE_MONO, fontSize: "clamp(14px,1.15vw,17px)", color: "black", lineHeight: "1.55" }}>{para}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function TestimonialsCarousel() {
   const [activeIdx, setActiveIdx] = useState(0);
@@ -795,10 +858,8 @@ function TestimonialsCarousel() {
 }
 
 function TestimonialsSection() {
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-
   return (
-    <section id="testimonials" className="bg-[#ffedd7] w-full overflow-hidden">
+    <section id="testimonials" className="bg-[#ffedd7] w-full">
       <div className="px-[16px] md:px-[30px] pt-[60px] pb-[24px] md:pb-[40px]">
         <Reveal>
           <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black" style={STYLE_DISPLAY}>
@@ -807,62 +868,17 @@ function TestimonialsSection() {
         </Reveal>
       </div>
 
-      {/* Mobile + tablet */}
-      <div className="lg:hidden">
+      {/* Mobile only: swipe carousel */}
+      <div className="md:hidden">
         <TestimonialsCarousel />
       </div>
 
-      {/* Desktop accordion */}
-      <Reveal y={16} className="hidden lg:block">
-        <div
-          className="flex w-full"
-          style={{ height: "500px" }}
-          onMouseLeave={() => setHoveredIdx(null)}
-        >
-          {TESTIMONIALS.map((t, idx) => {
-            const isHov = hoveredIdx === idx;
-            const anyHov = hoveredIdx !== null;
-            return (
-              <div
-                key={t.name}
-                onMouseEnter={() => setHoveredIdx(idx)}
-                style={{
-                  flex: isHov ? "3 0 0" : anyHov ? "0.4 0 0" : "1 0 0",
-                  backgroundColor: t.bg,
-                  transition: "flex 0.55s cubic-bezier(0.4,0,0.2,1)",
-                  overflow: "hidden", position: "relative", cursor: "default",
-                  borderRight: idx < TESTIMONIALS.length - 1 ? "1.372px solid black" : "none",
-                  borderTop: "1.372px solid black",
-                }}
-              >
-                {/* Collapsed label */}
-                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-end", justifyContent: "center", paddingBottom: "30px", opacity: isHov ? 0 : 1, transition: "opacity 0.25s ease", pointerEvents: "none" }}>
-                  <p style={{ ...STYLE_DISPLAY, fontSize: "20px", color: "black", writingMode: "vertical-rl", transform: "rotate(180deg)", whiteSpace: "nowrap", letterSpacing: "-0.02em" }}>{t.name}</p>
-                </div>
-                {/* Expanded */}
-                <div style={{ position: "absolute", inset: 0, opacity: isHov ? 1 : 0, transition: "opacity 0.35s ease 0.15s", display: "flex", flexDirection: "column", padding: "10px", minWidth: "560px" }}>
-                  <div style={{ display: "flex", alignItems: "stretch", marginBottom: "-1.372px" }}>
-                    <div style={{ width: "180px", height: "160px", flexShrink: 0, border: "1.372px solid black", borderRadius: "8px 0 0 0", overflow: "hidden" }}>
-                      <img src={t.photo} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }} />
-                    </div>
-                    <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                      <div style={{ border: "1.372px solid black", borderRadius: "0 8px 0 0", flex: 1, display: "flex", alignItems: "center", padding: "0 24px", marginBottom: "-1.372px" }}>
-                        <p style={{ ...STYLE_DISPLAY, fontSize: "28px", color: "black", whiteSpace: "nowrap" }}>{t.name}</p>
-                      </div>
-                      <div style={{ border: "1.372px solid black", flex: 1, display: "flex", alignItems: "center", padding: "0 24px" }}>
-                        <p style={{ ...STYLE_DISPLAY, fontSize: "20px", color: "black", whiteSpace: "nowrap" }}>{t.title}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ flex: 1, border: "1.372px solid black", borderTop: "none", borderRadius: "0 0 8px 8px", padding: "24px", display: "flex", flexDirection: "column", gap: "14px", overflowY: "auto" }}>
-                    {t.text.map((para, i) => (
-                      <p key={i} style={{ ...STYLE_MONO, fontSize: "18px", color: "black" }}>{para}</p>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+      {/* Tablet + desktop: hover-expand rows */}
+      <Reveal y={16} className="hidden md:block pb-[60px]">
+        <div style={{ borderBottom: "1.372px solid black" }}>
+          {TESTIMONIALS.map((t, idx) => (
+            <TestimonialRow key={t.name} t={t} idx={idx} />
+          ))}
         </div>
       </Reveal>
     </section>
