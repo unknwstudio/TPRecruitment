@@ -159,7 +159,7 @@ function SectionCard({ title, children, expanded = true }: { title: string; chil
 function OrangeBtn({ onClick, children, className = "" }: { onClick?: () => void; children: React.ReactNode; className?: string }) {
   const [hov, setHov] = useState(false);
   return (
-    <div className="flex flex-col items-start p-[6px]" style={{ backgroundColor: "#fb8349" }}>
+    <div className="flex flex-col items-start p-[6px] w-fit self-start" style={{ backgroundColor: "#fb8349" }}>
       <button
         onClick={onClick}
         onMouseEnter={() => setHov(true)}
@@ -211,7 +211,7 @@ function Navbar() {
   return (
     <>
       <div className="sticky top-0 z-50 bg-[#ffedd7] flex items-center justify-between px-[16px] md:px-[30px] py-[14px] md:py-[20px] w-full">
-        <img src="/TP_logo.svg" alt="TPRecruitment" className="w-auto" style={{ height: `${btnH}px`, maxHeight: "46px" }} />
+        <img src="/TP_logo.svg" alt="TPRecruitment" className="hidden md:block w-auto" style={{ height: `${btnH}px`, maxHeight: "46px" }} />
 
         {/* Desktop CTA */}
         <div
