@@ -159,13 +159,16 @@ function SectionCard({ title, children, expanded = true }: { title: string; chil
 function OrangeBtn({ onClick, children, className = "" }: { onClick?: () => void; children: React.ReactNode; className?: string }) {
   const [hov, setHov] = useState(false);
   return (
-    <div className="flex flex-col items-start p-[6px] w-fit self-start" style={{ backgroundColor: "#fb8349" }}>
+    <div
+      className="flex flex-col items-start p-[6px] w-fit self-start"
+      style={{ backgroundColor: hov ? "#FF9A6A" : "#fb8349", transition: "background-color 0.2s ease" }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+    >
       <button
         onClick={onClick}
-        onMouseEnter={() => setHov(true)}
-        onMouseLeave={() => setHov(false)}
-        className={`border border-black flex items-center p-[10px] md:p-[12px] rounded-[4px] cursor-pointer transition-colors duration-200 ${className}`}
-        style={{ backgroundColor: hov ? "#FF9A6A" : "transparent" }}
+        className={`border border-black flex items-center p-[10px] md:p-[12px] rounded-[4px] cursor-pointer ${className}`}
+        style={{ backgroundColor: "transparent" }}
       >
         {children}
       </button>
@@ -211,20 +214,26 @@ function Navbar() {
   return (
     <>
       <div className="sticky top-0 z-50 bg-[#ffedd7] flex items-center justify-between px-[16px] md:px-[30px] py-[14px] md:py-[20px] w-full">
-        <img src="/TP_logo.svg" alt="TPRecruitment" className="hidden md:block w-auto" style={{ height: `${btnH}px`, maxHeight: "46px" }} />
+        <img
+          src="/TP_logo.svg"
+          alt="TPRecruitment"
+          className="hidden md:block w-auto cursor-pointer"
+          style={{ height: `${btnH}px`, maxHeight: "46px" }}
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        />
 
         {/* Desktop CTA */}
         <div
-          className="hidden md:flex flex-col items-start p-[6px] transition-colors duration-300"
-          style={{ backgroundColor: navBg }}
+          className="hidden md:flex flex-col items-start p-[6px]"
+          style={{ backgroundColor: navHov ? "#FF9A6A" : navBg, transition: "background-color 0.2s ease" }}
+          onMouseEnter={() => setNavHov(true)}
+          onMouseLeave={() => setNavHov(false)}
         >
           <button
             ref={btnRef}
             onClick={scrollToContact}
-            onMouseEnter={() => setNavHov(true)}
-            onMouseLeave={() => setNavHov(false)}
-            className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer transition-colors duration-200"
-            style={{ backgroundColor: navHov ? "#FF9A6A" : "transparent" }}
+            className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer"
+            style={{ backgroundColor: "transparent" }}
           >
             <p className="text-[18px] text-black whitespace-nowrap leading-[20px]" style={STYLE_MONO}>
               Start a conversation
@@ -234,7 +243,7 @@ function Navbar() {
 
         {/* Mobile "Menu" button */}
         <div
-          className="flex md:hidden flex-col items-start p-[6px] transition-colors duration-300"
+          className="flex md:hidden flex-col items-start p-[6px] ml-auto transition-colors duration-300"
           style={{ backgroundColor: navBg }}
         >
           <button
@@ -265,7 +274,7 @@ function Navbar() {
             src="/TP_logo.svg"
             alt="TPRecruitment"
             className="w-auto"
-            style={{ height: `${btnH}px`, maxHeight: "46px", filter: "invert(1) brightness(2)" }}
+            style={{ height: "28px", maxHeight: "28px", filter: "invert(1) brightness(2)" }}
           />
           <button
             onClick={() => setMenuOpen(false)}
@@ -599,9 +608,41 @@ function RolesSection() {
           </p>
         </Reveal>
 
-        <div className="flex flex-col md:flex-row gap-[16px] md:gap-[30px] md:items-stretch">
+        {/* Mobile: sticky stacking */}
+        <div className="md:hidden">
           {ROLES.map((role, i) => (
-            <Reveal key={role.title} delay={i * 80} className="md:flex-1 md:basis-0 md:min-w-0">
+            <div
+              key={role.title}
+              style={{
+                position: "sticky",
+                top: `calc(var(--stack-top) + ${i} * var(--stack-step))`,
+                marginTop: i === 0 ? 0 : "var(--stack-gap)",
+                zIndex: i + 1,
+              }}
+            >
+              <HoverCard>
+                <div className="bg-white flex flex-col p-[10px]">
+                  <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
+                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] rounded-tl-[8px] rounded-tr-[8px]">
+                      <p className="flex-1 text-[22px] text-black" style={STYLE_DISPLAY}>{role.title}</p>
+                    </div>
+                  </div>
+                  <div className="flex">
+                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] rounded-bl-[8px] rounded-br-[8px]">
+                      <p className="w-full text-[18px] text-black" style={STYLE_MONO}>{role.description}</p>
+                    </div>
+                  </div>
+                </div>
+              </HoverCard>
+            </div>
+          ))}
+          <div style={{ height: "200px" }} />
+        </div>
+
+        {/* Tablet + desktop: horizontal flex row */}
+        <div className="hidden md:flex flex-row gap-[30px] items-stretch">
+          {ROLES.map((role, i) => (
+            <Reveal key={role.title} delay={i * 80} className="flex-1 basis-0 min-w-0">
               <HoverCard className="h-full">
                 <div className="bg-white flex flex-col h-full p-[10px]">
                   <div className="flex items-start mb-[-1.372px]">
@@ -619,6 +660,7 @@ function RolesSection() {
             </Reveal>
           ))}
         </div>
+
       </div>
     </section>
   );

@@ -26,14 +26,14 @@
     /* Sticky stacking: top offset per breakpoint */
     --stack-top: 72px;
     --stack-step: 10px;
-    --stack-gap: 16px;
+    --stack-gap: 20px;
   }
 
   @media (min-width: 1024px) {
     :root {
       --stack-top: 96px;
       --stack-step: 16px;
-      --stack-gap: 40px;
+      --stack-gap: 52px;
     }
   }
 
