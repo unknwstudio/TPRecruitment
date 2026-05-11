@@ -750,7 +750,7 @@ function TestimonialRow({ t, idx }: { t: typeof TESTIMONIALS[0]; idx: number }) 
         }}
       >
         <div style={{ overflow: "hidden" }}>
-          <div style={{ display: "flex", gap: "clamp(16px,2vw,28px)", padding: "20px 30px 36px clamp(44px,4.5vw,102px)", alignItems: "flex-start" }}>
+          <div style={{ display: "flex", gap: "clamp(16px,2vw,28px)", padding: "20px 30px 36px clamp(74px, calc(30px + 4.5vw), 102px)", alignItems: "flex-start" }}>
             <img
               src={t.photo}
               alt={t.name}
@@ -950,25 +950,25 @@ function CTASection() {
           <Reveal delay={120} className="flex-1 flex flex-col gap-[30px]">
             <div className="flex flex-col gap-[30px]">
 
-              {/* Name & Email — underline style */}
+              {/* Name & Email — underline style, h-[64px] per Figma */}
               <div className="flex flex-col sm:flex-row gap-[20px] sm:gap-[30px]">
-                {[{ type: "text", label: "Your Name & Surname" }, { type: "email", label: "Email" }].map((f) => (
-                  <div key={f.label} className="flex flex-col gap-[6px] flex-1">
-                    <label className="text-[16px] text-black" style={STYLE_DISPLAY}>{f.label}</label>
+                {[{ type: "text", label: "Your Name & Surname" }, { type: "email", label: "Your Email" }].map((f) => (
+                  <div key={f.label} className="flex flex-col gap-[6px] flex-1 h-[64px]">
+                    <label className="text-[16px] text-black shrink-0" style={STYLE_DISPLAY}>{f.label}</label>
                     <input
                       type={f.type}
-                      className="w-full border-b border-black bg-transparent outline-none text-[16px] text-black pb-[6px] transition-colors duration-150 focus:border-[#fb8349]"
+                      className="w-full flex-1 border-b border-black/40 bg-transparent outline-none text-[16px] text-black pb-[6px] transition-colors duration-200 hover:border-black focus:border-[#fb8349]"
                       style={STYLE_MONO}
                     />
                   </div>
                 ))}
               </div>
 
-              {/* Textarea — full border, gray */}
+              {/* Textarea — full border, gray; hover darkens, focus turns orange */}
               <div className="flex flex-col gap-[15px]">
                 <label className="text-[16px] text-black" style={STYLE_DISPLAY}>Tell me about you</label>
                 <textarea
-                  className="w-full h-[160px] md:h-[197px] border border-[#949494] rounded-[4px] bg-transparent outline-none p-[12px] text-[16px] text-black resize-none transition-colors duration-150 focus:border-[#fb8349]"
+                  className="w-full h-[160px] md:h-[197px] border border-[#949494] rounded-[4px] bg-transparent outline-none p-[12px] text-[16px] text-black resize-none transition-colors duration-200 hover:border-black/50 focus:border-[#fb8349]"
                   style={STYLE_MONO}
                 />
               </div>
