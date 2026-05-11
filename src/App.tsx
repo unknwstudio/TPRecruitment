@@ -187,15 +187,12 @@ const NAV_LINKS = [
 function Navbar() {
   const [pastHero, setPastHero]   = useState(false);
   const [menuOpen, setMenuOpen]   = useState(false);
-  const btnRef = useRef<HTMLButtonElement>(null);
-  const [btnH, setBtnH] = useState(46);
   const [navHov, setNavHov] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setPastHero(window.scrollY > window.innerHeight * 0.8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    if (btnRef.current) setBtnH(btnRef.current.getBoundingClientRect().height);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -218,7 +215,7 @@ function Navbar() {
           src="/TP_logo.svg"
           alt="TPRecruitment"
           className="block w-auto cursor-pointer"
-          style={{ height: `${btnH}px`, maxHeight: "46px" }}
+          style={{ height: "46px" }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         />
 
@@ -230,7 +227,6 @@ function Navbar() {
           onMouseLeave={() => setNavHov(false)}
         >
           <button
-            ref={btnRef}
             onClick={scrollToContact}
             className="border border-black flex items-center p-[12px] rounded-[4px] cursor-pointer"
             style={{ backgroundColor: "transparent" }}
@@ -247,7 +243,6 @@ function Navbar() {
           style={{ backgroundColor: navBg }}
         >
           <button
-            ref={btnRef}
             onClick={() => setMenuOpen(true)}
             className="border border-black flex items-center p-[10px] rounded-[4px] cursor-pointer"
             aria-label="Open menu"
