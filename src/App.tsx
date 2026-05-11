@@ -185,8 +185,9 @@ const NAV_LINKS = [
 ];
 
 function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [navHov,   setNavHov]   = useState(false);
+  const [menuOpen,  setMenuOpen]  = useState(false);
+  const [navHov,    setNavHov]    = useState(false);
+  const [menuHov,   setMenuHov]   = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -235,11 +236,16 @@ function Navbar() {
           </button>
         </div>
 
-        {/* Mobile "Menu" button — transparent background */}
-        <div className="flex md:hidden flex-col items-start p-[6px] ml-auto">
+        {/* Mobile "Menu" button — orange background, height matches 32px logo */}
+        <div
+          className="flex md:hidden flex-col items-start p-[6px] ml-auto"
+          style={{ backgroundColor: menuHov ? "#FF9A6A" : "#fb8349", transition: "background-color 0.2s ease" }}
+          onMouseEnter={() => setMenuHov(true)}
+          onMouseLeave={() => setMenuHov(false)}
+        >
           <button
             onClick={() => setMenuOpen(true)}
-            className="border border-black flex items-center p-[10px] rounded-[4px] cursor-pointer"
+            className="border border-black flex items-center py-[5px] px-[12px] rounded-[4px] cursor-pointer"
             aria-label="Open menu"
           >
             <p className="text-[16px] text-black whitespace-nowrap leading-[20px]" style={STYLE_MONO}>
@@ -888,18 +894,33 @@ function TestimonialsSection() {
 function CTASection() {
   return (
     <section id="contact" className="bg-[#eaeae5] w-full overflow-hidden py-[60px]">
-      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] flex flex-col lg:flex-row gap-[40px] lg:gap-[35px] lg:items-start">
+      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
-        <Reveal className="lg:shrink-0 lg:w-[655px] flex flex-col gap-[40px] md:gap-[60px]">
-          <div className="text-[36px] md:text-[44px] lg:text-[52px] text-black" style={STYLE_DISPLAY}>
-            <p>If you&apos;ve read</p>
-            <p>this far, we should</p>
-            <p>probably talk</p>
-          </div>
-          <div className="flex flex-col md:flex-row lg:flex-col gap-[24px] md:gap-[40px] lg:gap-[30px] text-[16px] text-black">
+        {/* TOP ROW: Headline (left) + Subtitle (right, bottom-aligned on desktop) */}
+        <div className="flex flex-col lg:flex-row lg:items-end gap-[24px] lg:gap-[35px] mb-[40px] lg:mb-[60px]">
+          <Reveal className="lg:shrink-0 lg:w-[655px]">
+            <div className="text-[36px] md:text-[44px] lg:text-[52px] text-black" style={STYLE_DISPLAY}>
+              <p>If you&apos;ve read</p>
+              <p>this far, we should</p>
+              <p>probably talk</p>
+            </div>
+          </Reveal>
+          <Reveal delay={80} className="flex-1">
+            <div className="text-[18px] md:text-[22px] lg:text-[24px] text-black" style={STYLE_MONO}>
+              <p>I&apos;d love to hear what you&apos;re building</p>
+              <p>or just have a good conversation with you</p>
+            </div>
+          </Reveal>
+        </div>
+
+        {/* BOTTOM ROW: Contacts (left) + Form (right) */}
+        <div className="flex flex-col lg:flex-row lg:items-start gap-[40px] lg:gap-[35px]">
+
+          {/* Left: contact info */}
+          <Reveal className="lg:shrink-0 lg:w-[655px] flex flex-col md:flex-row lg:flex-col gap-[24px] md:gap-[40px] lg:gap-[30px] text-[16px] text-black">
             <div className="flex flex-col gap-[16px]">
               <p style={STYLE_DISPLAY}>Contacts</p>
-              <div className="flex flex-col gap-[8px]" style={STYLE_MONO}>
+              <div className="flex flex-col gap-[10px]" style={STYLE_MONO}>
                 <a href="https://tprecruitment.co" className="hover:underline underline-offset-2 transition-all duration-150">tprecruitment.co</a>
                 <a href="mailto:tiffany@tprecruitment.co" className="hover:underline underline-offset-2 transition-all duration-150">tiffany@tprecruitment.co</a>
               </div>
@@ -923,41 +944,42 @@ function CTASection() {
                 ))}
               </div>
             </div>
-          </div>
-        </Reveal>
+          </Reveal>
 
-        <Reveal delay={120} className="flex-1 flex flex-col gap-[24px] md:gap-[30px]">
-          <div className="text-[18px] md:text-[22px] lg:text-[24px] text-black" style={STYLE_MONO}>
-            <p>I&apos;d love to hear what you&apos;re building</p>
-            <p>or just have a good conversation with you</p>
-          </div>
+          {/* Right: form */}
+          <Reveal delay={120} className="flex-1 flex flex-col gap-[30px]">
+            <div className="flex flex-col gap-[30px]">
 
-          <div className="flex flex-col gap-[20px]">
-            <div className="flex flex-col sm:flex-row gap-[20px] sm:gap-[30px]">
-              {[{ type: "text",  label: "Your Name & Surname" }, { type: "email", label: "Email" }].map((f) => (
-                <div key={f.label} className="flex flex-col gap-[8px] flex-1">
-                  <label className="text-[16px]" style={STYLE_DISPLAY}>{f.label}</label>
-                  <input type={f.type}
-                    className="w-full border-b-[1.372px] border-black bg-transparent outline-none text-[16px] pb-[8px] transition-colors duration-150 focus:border-[#fb8349]"
-                    style={STYLE_MONO}
-                  />
-                </div>
-              ))}
+              {/* Name & Email — underline style */}
+              <div className="flex flex-col sm:flex-row gap-[20px] sm:gap-[30px]">
+                {[{ type: "text", label: "Your Name & Surname" }, { type: "email", label: "Email" }].map((f) => (
+                  <div key={f.label} className="flex flex-col gap-[6px] flex-1">
+                    <label className="text-[16px] text-black" style={STYLE_DISPLAY}>{f.label}</label>
+                    <input
+                      type={f.type}
+                      className="w-full border-b border-black bg-transparent outline-none text-[16px] text-black pb-[6px] transition-colors duration-150 focus:border-[#fb8349]"
+                      style={STYLE_MONO}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Textarea — full border, gray */}
+              <div className="flex flex-col gap-[15px]">
+                <label className="text-[16px] text-black" style={STYLE_DISPLAY}>Tell me about you</label>
+                <textarea
+                  className="w-full h-[160px] md:h-[197px] border border-[#949494] rounded-[4px] bg-transparent outline-none p-[12px] text-[16px] text-black resize-none transition-colors duration-150 focus:border-[#fb8349]"
+                  style={STYLE_MONO}
+                />
+              </div>
             </div>
-            <div className="flex flex-col gap-[8px]">
-              <label className="text-[16px]" style={STYLE_DISPLAY}>Tell me about you</label>
-              <textarea
-                className="w-full h-[160px] md:h-[197px] border-[1.372px] border-black rounded-[4px] bg-transparent outline-none p-[12px] text-[16px] resize-none transition-colors duration-150 focus:border-[#fb8349]"
-                style={STYLE_MONO}
-              />
-            </div>
-          </div>
 
-          <OrangeBtn>
-            <p className="text-[18px] md:text-[20px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>Let&apos;s talk</p>
-          </OrangeBtn>
-        </Reveal>
+            <OrangeBtn>
+              <p className="text-[18px] md:text-[20px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>Let&apos;s talk</p>
+            </OrangeBtn>
+          </Reveal>
 
+        </div>
       </div>
     </section>
   );
