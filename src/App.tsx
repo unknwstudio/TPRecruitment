@@ -200,7 +200,7 @@ function Navbar() {
 
   return (
     <>
-      <div className="sticky top-0 z-50 bg-[#ffedd7] flex items-center justify-between px-[16px] md:px-[30px] py-[14px] md:py-[20px] w-full">
+      <div className="sticky top-0 z-50 flex items-center justify-between px-[16px] md:px-[30px] py-[14px] md:py-[20px] w-full">
 
         {/* Logo — small SVG on mobile, full logo on tablet+ */}
         <img
@@ -221,7 +221,7 @@ function Navbar() {
         {/* Desktop CTA — transparent background, orange on hover */}
         <div
           className="hidden md:flex flex-col items-start p-[6px]"
-          style={{ backgroundColor: navHov ? "#FF9A6A" : "transparent", transition: "background-color 0.2s ease" }}
+          style={{ backgroundColor: navHov ? "#FF9A6A" : "#fb8349", transition: "background-color 0.2s ease" }}
           onMouseEnter={() => setNavHov(true)}
           onMouseLeave={() => setNavHov(false)}
         >
@@ -744,11 +744,11 @@ function TestimonialRow({ t, idx }: { t: typeof TESTIMONIALS[0]; idx: number }) 
         }}
       >
         <div style={{ overflow: "hidden" }}>
-          <div style={{ display: "flex", gap: "clamp(20px,2.5vw,36px)", padding: "0 30px 32px clamp(44px,4.5vw,102px)", alignItems: "flex-start" }}>
+          <div style={{ display: "flex", gap: "clamp(16px,2vw,28px)", padding: "20px 30px 36px clamp(44px,4.5vw,102px)", alignItems: "flex-start" }}>
             <img
               src={t.photo}
               alt={t.name}
-              style={{ width: "clamp(80px,8vw,130px)", height: "clamp(80px,8vw,130px)", objectFit: "cover", objectPosition: "top center", flexShrink: 0, border: "1.372px solid black", borderRadius: "4px" }}
+              style={{ width: "clamp(120px,14vw,200px)", height: "clamp(120px,14vw,200px)", objectFit: "cover", objectPosition: "top center", flexShrink: 0, border: "1.372px solid black", borderRadius: "4px" }}
             />
             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "12px" }}>
               {t.text.map((para, i) => (
@@ -873,7 +873,7 @@ function TestimonialsSection() {
       </div>
 
       {/* Tablet + desktop: hover-expand rows */}
-      <Reveal y={16} className="hidden md:block pb-[60px]">
+      <Reveal y={16} className="hidden md:block pb-[40px]">
         <div style={{ borderBottom: "1.372px solid black" }}>
           {TESTIMONIALS.map((t, idx) => (
             <TestimonialRow key={t.name} t={t} idx={idx} />
