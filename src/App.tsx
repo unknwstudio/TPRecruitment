@@ -1365,20 +1365,18 @@ function Footer() {
       className="bg-[#4d453b] w-full relative overflow-hidden"
       style={{ height: "400px" }}
     >
-      {/* "Higher Standard" — large display text, Figma 520:892: 126px, top 30px left 30px */}
-      <p
-        className="absolute text-[#eaeae5] whitespace-nowrap"
+      {/* "Higher Standard" — SVG scales to fill footer width, Figma 520:892 */}
+      <img
+        src="/footer-logo.svg"
+        alt="Higher Standard"
+        className="absolute"
         style={{
-          ...STYLE_DISPLAY,
-          fontSize: "clamp(52px, 8.75vw, 126px)",
-          letterSpacing: "-0.02em",
           left: "clamp(16px, 2.08vw, 30px)",
           top: "clamp(16px, 2.08vw, 30px)",
-          lineHeight: 1,
+          width: "calc(100% - clamp(16px, 2.08vw, 30px))",
+          height: "auto",
         }}
-      >
-        Higher Standard
-      </p>
+      />
 
       {/* Bottom bar — pinned to footer bottom */}
       <div className="absolute bottom-[16px] md:bottom-[30px] left-[16px] right-[16px] md:left-[30px] md:right-[30px] flex flex-col md:flex-row items-start md:items-end gap-[6px]">
