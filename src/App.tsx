@@ -249,7 +249,7 @@ function IntroAnimation({ onComplete }: { onComplete: () => void }) {
   });
 
   const labels = [
-    { text: "Higher",    pos: { left: "17.19%",  top: "17.13%" },                              delay: 0   },
+    { text: "Higher",    pos: { left: "17.19%",  top: "18.13%" },                              delay: 0   },
     { text: "Standard",  pos: { left: "58.28%",  top: "18.13%" },                              delay: 100 },
     { text: "In hiring", pos: { left: "17.19%",  top: "84.57%" },                              delay: 200 },
     { text: "People",    pos: { right: "14.85%", top: "84.57%", textAlign: "right" as const }, delay: 300 },
@@ -273,6 +273,7 @@ function IntroAnimation({ onComplete }: { onComplete: () => void }) {
         transform: phase === 3 ? burstTransform : "none",
         transition: phase === 3 ? "transform 0.85s cubic-bezier(0.4,0,0.2,1)" : "none",
         transformOrigin: "center center",
+        overflow: "hidden",
       }}>
         {/* ── Inline SVG burst ─────────────────────────────────────────────── */}
         <svg
@@ -326,7 +327,7 @@ function IntroAnimation({ onComplete }: { onComplete: () => void }) {
         {labels.map(({ text, pos, delay }) => (
           <p key={text} style={{
             ...STYLE_DISPLAY,
-            fontSize: "clamp(16px, 3.7vw, 25.4px)",
+            fontSize: `clamp(12px, ${isMobile ? "4.5vw" : "3.7vw"}, 25.4px)`,
             color: "black",
             position: "absolute",
             ...pos,
@@ -364,10 +365,10 @@ function NavLogo() {
 
 // ── Navbar ────────────────────────────────────────────────────────────────────
 const NAV_LINKS = [
-  { label: "How I work",    href: "working" },
-  { label: "Partners",      href: "partners" },
-  { label: "Roles",         href: "roles" },
-  { label: "Testimonials",  href: "testimonials" },
+  { label: "How I work",   href: "working" },
+  { label: "Roles",        href: "roles" },
+  { label: "Testimonials", href: "testimonials" },
+  { label: "Contact",      href: "contact" },
 ];
 
 function Navbar() {
@@ -473,10 +474,10 @@ function Navbar() {
         {/* Top bar */}
         <div className="flex items-center justify-between px-[16px] py-[14px] border-b border-white/15">
           <img
-            src="/TP_logo.svg"
-            alt="TPRecruitment"
+            src="/nav-logo-sm.svg"
+            alt="Higher Standard"
             className="w-auto"
-            style={{ height: "28px", maxHeight: "28px", filter: "invert(1) brightness(2)" }}
+            style={{ height: "32px", filter: "invert(1) brightness(2)" }}
           />
           <button
             onClick={() => setMenuOpen(false)}
@@ -578,7 +579,7 @@ function HeroSection() {
       </div>
 
       {/* ── Mobile (<1020px): stacked ── */}
-      <div className="lg:hidden px-[16px] md:px-[30px] pt-[60px] pb-[80px]">
+      <div className="lg:hidden px-[16px] md:px-[30px] pt-[46px] pb-[61px]">
         <div className="flex flex-col gap-[40px]">
           <Reveal>
             <p style={{ ...STYLE_DISPLAY, fontSize: "clamp(36px, 10vw, 48px)", letterSpacing: "-2px", lineHeight: "1.1", color: "black" }}>
@@ -635,9 +636,9 @@ function WhatWorkingSection() {
   return (
     <section id="working" className="bg-[#ffedd7] w-full">
 
-      {/* ── Mobile / tablet ── */}
-      <div className="lg:hidden">
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[134px] pb-[67px]">
+      {/* ── Mobile / tablet (up to xl) ── */}
+      <div className="xl:hidden">
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[103px] pb-[51px]">
           <Reveal>
             <div className="text-[40px] md:text-[44px] text-black" style={STYLE_DISPLAY}>
               <p>What Higher Standard</p>
@@ -645,7 +646,7 @@ function WhatWorkingSection() {
             </div>
           </Reveal>
         </div>
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[96px]">
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[73px]">
           {WORKING_MOBILE_CARDS.map((card, idx) => (
             <div
               key={card.title}
@@ -679,10 +680,10 @@ function WhatWorkingSection() {
         </div>
       </div>
 
-      {/* ── Desktop: title left, two cards right ── */}
+      {/* ── Desktop xl+: title left, two cards right ── */}
       <div
-        className="hidden lg:flex max-w-[1440px] mx-auto"
-        style={{ gap: "30px", padding: "134px 30px", alignItems: "flex-start" }}
+        className="hidden xl:flex max-w-[1440px] mx-auto"
+        style={{ gap: "30px", padding: "103px 30px", alignItems: "flex-start" }}
       >
         {/* Left: sticky title — 675px (matches right card width exactly) */}
         <div style={{ width: "675px", maxWidth: "675px", flexShrink: 0, position: "sticky", top: "var(--stack-top)" }}>
@@ -773,7 +774,7 @@ function PartnersSection() {
   }, []);
 
   return (
-    <section id="partners" className="bg-[#ffedd7] w-full overflow-hidden py-[56px]">
+    <section id="partners" className="bg-[#ffedd7] w-full overflow-hidden py-[43px]">
       <div className="flex border-t border-b border-black overflow-hidden mb-[-1px]">
         <div className="flex animate-marquee">
           {[...partnerLogosRow1, ...partnerLogosRow1].map((src, i) => <PartnerLogo key={i} src={src} small={small} />)}
@@ -970,7 +971,7 @@ function AboutSection() {
 
 
   return (
-    <section ref={sectionRef} id="about" className="bg-[#ffedd7] w-full py-[134px]">
+    <section ref={sectionRef} id="about" className="bg-[#ffedd7] w-full py-[103px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
         {/* Section title */}
@@ -1095,7 +1096,7 @@ function RolesSection() {
   const [openRole, setOpenRole] = useState<string | null>(null);
 
   return (
-    <section id="roles" className="bg-[#ffedd7] w-full py-[134px]">
+    <section id="roles" className="bg-[#ffedd7] w-full py-[103px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
         <Reveal>
           <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
@@ -1105,7 +1106,7 @@ function RolesSection() {
 
         <div className="flex flex-col xl:flex-row gap-[30px] items-start">
           {/* Left: accordion role list */}
-          <Reveal className="xl:w-[671px] xl:shrink-0 w-full">
+          <Reveal className="xl:w-[671px] xl:shrink-0 w-full xl:order-1 order-2">
             <div className="bg-white p-[10px]">
               {ROLE_ACCORDION_DATA.map((role, i) => (
                 <RoleAccordionRow
@@ -1124,7 +1125,7 @@ function RolesSection() {
           </Reveal>
 
           {/* Right: description + CTA */}
-          <Reveal delay={100} className="flex-1 flex flex-col gap-[30px] md:gap-[40px]">
+          <Reveal delay={100} className="flex-1 flex flex-col gap-[30px] md:gap-[40px] xl:order-2 order-1">
             <p className="text-[18px] md:text-[24px] xl:text-[28px] text-black" style={STYLE_MONO}>
               {ROLES_DESCRIPTION}
             </p>
@@ -1211,10 +1212,14 @@ const TESTIMONIALS = [
 ];
 
 // Shared card inner layout
-function TestimonialCardInner({ t }: { t: typeof TESTIMONIALS[0] }) {
+// stretch=true makes the card fill its parent container height (for equal-height carousels)
+function TestimonialCardInner({ t, stretch = false }: { t: typeof TESTIMONIALS[0]; stretch?: boolean }) {
   const initials = t.name.split(" ").map((w) => w[0]).join("").slice(0, 2);
   return (
-    <div style={{ backgroundColor: t.bg, padding: "6px" }}>
+    <div style={{
+      backgroundColor: t.bg, padding: "6px",
+      ...(stretch ? { height: "100%", display: "flex", flexDirection: "column" } : {}),
+    }}>
       {/* Header */}
       <div style={{ display: "flex", marginBottom: "-0.823px", flexShrink: 0 }}>
         <div style={{ width: 133, height: 117, flexShrink: 0, border: "0.6px solid black", borderRadius: "4.8px 0 0 0", overflow: "hidden" }}>
@@ -1235,8 +1240,12 @@ function TestimonialCardInner({ t }: { t: typeof TESTIMONIALS[0] }) {
           </div>
         </div>
       </div>
-      {/* Body */}
-      <div style={{ border: "0.6px solid black", borderTop: "none", borderRadius: "0 0 4.8px 4.8px", padding: "18px", display: "flex", flexDirection: "column", gap: "12px" }}>
+      {/* Body — flex-grow when stretching so card fills container height */}
+      <div style={{
+        border: "0.6px solid black", borderTop: "none", borderRadius: "0 0 4.8px 4.8px",
+        padding: "18px", display: "flex", flexDirection: "column", gap: "12px",
+        ...(stretch ? { flex: 1 } : {}),
+      }}>
         {t.text.map((para, i) => (
           <p key={i} style={{ ...STYLE_MONO, fontSize: 16, color: "black", lineHeight: 1.1 }}>{para}</p>
         ))}
@@ -1246,7 +1255,7 @@ function TestimonialCardInner({ t }: { t: typeof TESTIMONIALS[0] }) {
 }
 
 const TESTIMONIALS_SCATTER = [
-  { idx: 0, left: "68px",  top: "58px", width: "330px", rotate: 0      },
+  { idx: 0, left: "30px",  top: "58px", width: "330px", rotate: 0      },
   { idx: 1, left: "354px", top: "66px", width: "330px", rotate: -1.96  },
   { idx: 2, left: "663px", top: "50px", width: "330px", rotate: 0      },
   { idx: 3, left: "980px", top: "48px", width: "380px", rotate: -1.67  },
@@ -1351,9 +1360,48 @@ function MobileTestimonialCard({
   );
 }
 
+function TestimonialsCarousel({ testimonials }: { testimonials: typeof TESTIMONIALS }) {
+  const [idx, setIdx] = useState(0);
+  const total = testimonials.length;
+  const prev = () => setIdx(i => (i - 1 + total) % total);
+  const next = () => setIdx(i => (i + 1) % total);
+
+  return (
+    <div className="lg:hidden">
+      {/* All cards in same grid cell — height = tallest card; stretch fills that height */}
+      <div style={{ display: "grid" }}>
+        {testimonials.map((t, i) => (
+          <div key={t.name} style={{ gridArea: "1 / 1", visibility: i === idx ? "visible" : "hidden", height: "100%" }}>
+            <TestimonialCardInner t={t} stretch={true} />
+          </div>
+        ))}
+      </div>
+      {/* Controls */}
+      <div className="flex items-center justify-between mt-[16px]">
+        <p style={{ ...STYLE_MONO, fontSize: "14px", color: "black" }}>
+          {idx + 1} / {total}
+        </p>
+        <div className="flex gap-[10px]">
+          <button onClick={prev} className="border border-black rounded-[4px] p-[10px] cursor-pointer hover:bg-black/5 transition-colors" aria-label="Previous">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M11 3L5 9L11 15" stroke="black" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <button onClick={next} className="border border-black rounded-[4px] p-[10px] cursor-pointer hover:bg-black/5 transition-colors" aria-label="Next">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M7 3L13 9L7 15" stroke="black" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function TestimonialsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [inView, setInView] = useState(false);
+  const [scatterScale, setScatterScale] = useState(1);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -1366,38 +1414,41 @@ function TestimonialsSection() {
     return () => io.disconnect();
   }, []);
 
+  useEffect(() => {
+    const update = () => {
+      // Scatter natural width ~1400px; account for 60px total padding
+      const s = Math.min(1, Math.max(0.7, (window.innerWidth - 60) / 1400));
+      setScatterScale(s);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   return (
-    <section ref={sectionRef} id="testimonials" className="bg-[#ffedd7] w-full pt-[134px] pb-[80px] overflow-hidden">
+    <section ref={sectionRef} id="testimonials" className="bg-[#ffedd7] w-full pt-[103px] pb-[61px] overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
         <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[41px] md:mb-[61px]" style={STYLE_DISPLAY}>
           Testimonials
         </p>
 
-        {/* Desktop xl+: absolute scatter layout with hover-lift */}
-        <div className="hidden xl:block relative" style={{ minHeight: "920px" }}>
-          {TESTIMONIALS_SCATTER.map(({ idx, left, top, width, rotate }, layoutIdx) => (
-            <ScatterCard
-              key={TESTIMONIALS[idx].name}
-              t={TESTIMONIALS[idx]}
-              left={left} top={top} width={width}
-              rotate={rotate} baseZ={layoutIdx}
-              inView={inView} delay={layoutIdx * 300}
-            />
-          ))}
+        {/* Desktop lg+: scaled scatter layout */}
+        <div className="hidden lg:block relative overflow-hidden" style={{ height: `${Math.round(920 * scatterScale)}px` }}>
+          <div style={{ transform: `scale(${scatterScale})`, transformOrigin: "top left", width: "1400px", position: "relative" }}>
+            {TESTIMONIALS_SCATTER.map(({ idx, left, top, width, rotate }, layoutIdx) => (
+              <ScatterCard
+                key={TESTIMONIALS[idx].name}
+                t={TESTIMONIALS[idx]}
+                left={left} top={top} width={width}
+                rotate={rotate} baseZ={layoutIdx}
+                inView={inView} delay={layoutIdx * 300}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Mobile/tablet: 2-col grid with hover-lift */}
-        <div className="xl:hidden grid grid-cols-1 md:grid-cols-2 gap-[16px] md:gap-[20px]">
-          {TESTIMONIALS.map((t, i) => (
-            <MobileTestimonialCard
-              key={t.name}
-              t={t}
-              rotate={i % 2 === 0 ? -0.8 : 0.8}
-              inView={inView}
-              delay={i * 200}
-            />
-          ))}
-        </div>
+        {/* Mobile/tablet: carousel */}
+        <TestimonialsCarousel testimonials={TESTIMONIALS} />
       </div>
     </section>
   );
@@ -1439,9 +1490,61 @@ const NEWSLETTER_ARTICLES = [
   },
 ];
 
+function NewsletterCarousel({ articles }: { articles: typeof NEWSLETTER_ARTICLES }) {
+  const [idx, setIdx] = useState(0);
+  const total = articles.length;
+  const prev = () => setIdx(i => (i - 1 + total) % total);
+  const next = () => setIdx(i => (i + 1) % total);
+
+  return (
+    <div className="md:hidden">
+      {/* All cards in same grid cell — height = tallest card; stretch fills that height */}
+      <div style={{ display: "grid", marginBottom: "16px" }}>
+        {articles.map((article, i) => (
+          <div key={article.title} style={{ gridArea: "1 / 1", visibility: i === idx ? "visible" : "hidden", height: "100%" }}>
+            <HoverCard className="h-full" style={{ height: "100%" }}>
+              <div className="bg-white flex flex-col p-[10px]" style={{ height: "100%" }}>
+                <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
+                  <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
+                    <p className="text-[20px] text-black whitespace-pre-line" style={STYLE_DISPLAY}>{article.title}</p>
+                  </div>
+                </div>
+                <div className="border-[1.372px] border-black flex flex-1 flex-col justify-between p-[20px] rounded-bl-[8px] rounded-br-[8px] gap-[20px]">
+                  <p className="text-[16px] text-black" style={STYLE_MONO}>{article.excerpt}</p>
+                  <div className="bg-[#ffedd7] p-[4px] self-start">
+                    <button className="border border-black rounded-[4px] px-[12px] py-[10px] bg-[#ffedd7] cursor-pointer hover:bg-[#f0e4cf] transition-colors duration-150">
+                      <p className="text-[16px] text-black whitespace-nowrap" style={STYLE_MONO}>read now</p>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </HoverCard>
+          </div>
+        ))}
+      </div>
+      {/* Controls */}
+      <div className="flex items-center justify-between mt-[16px]">
+        <p style={{ ...STYLE_MONO, fontSize: "14px", color: "black" }}>{idx + 1} / {total}</p>
+        <div className="flex gap-[10px]">
+          <button onClick={prev} className="border border-black rounded-[4px] p-[10px] cursor-pointer hover:bg-black/5 transition-colors" aria-label="Previous">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M11 3L5 9L11 15" stroke="black" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <button onClick={next} className="border border-black rounded-[4px] p-[10px] cursor-pointer hover:bg-black/5 transition-colors" aria-label="Next">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M7 3L13 9L7 15" stroke="black" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function NewsletterSection() {
   return (
-    <section className="bg-[#ffedd7] w-full py-[134px]">
+    <section className="bg-[#ffedd7] w-full py-[103px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
         {/* Centred header */}
@@ -1454,20 +1557,33 @@ function NewsletterSection() {
           </p>
         </Reveal>
 
-        {/* Email subscribe row */}
-        <Reveal delay={60} className="flex flex-col sm:flex-row gap-[10px] items-stretch sm:items-center justify-center mb-[68px] md:mb-[78px]">
+        {/* Subscribe row — desktop/tablet only (shown above articles) */}
+        <Reveal delay={60} className="hidden sm:flex flex-row gap-[10px] items-center justify-center mb-[68px] md:mb-[78px]">
           <input
             type="email"
             placeholder="Enter your email"
             className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full sm:w-[403px] text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
             style={STYLE_DISPLAY}
           />
-          {/* Subscribe button — explicitly 50px tall to match the input */}
           <SubscribeBtn />
         </Reveal>
 
-        {/* Article cards — 3 columns desktop, 1 column mobile */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-[16px] md:gap-[30px]">
+        {/* Mobile carousel — shown before subscribe on small screens */}
+        <NewsletterCarousel articles={NEWSLETTER_ARTICLES} />
+
+        {/* Subscribe row — mobile only (shown after carousel) */}
+        <div className="flex sm:hidden flex-col gap-[10px] items-center justify-center mt-[24px] mb-[68px]">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
+            style={STYLE_DISPLAY}
+          />
+          <SubscribeBtn />
+        </div>
+
+        {/* Desktop/tablet grid (md+) */}
+        <div className="hidden md:grid grid-cols-3 gap-[30px]">
           {NEWSLETTER_ARTICLES.map((article, i) => (
             <Reveal key={article.title} delay={i * 80}>
               <HoverCard className="h-full">
@@ -1499,7 +1615,7 @@ function NewsletterSection() {
 // ── CTA ───────────────────────────────────────────────────────────────────────
 function CTASection() {
   return (
-    <section id="contact" className="bg-[#eaeae5] w-full overflow-hidden pt-[80px] md:pt-[60px] pb-[134px]">
+    <section id="contact" className="bg-[#eaeae5] w-full overflow-hidden pt-[61px] md:pt-[46px] pb-[103px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
         {/* TOP ROW: Headline (left) + Subtitle (right, bottom-aligned on desktop) */}
@@ -1592,10 +1708,7 @@ function CTASection() {
 // ── Footer ────────────────────────────────────────────────────────────────────
 function Footer() {
   return (
-    <footer
-      className="bg-[#4d453b] w-full relative overflow-hidden"
-      style={{ height: "400px" }}
-    >
+    <footer className="bg-[#4d453b] w-full relative overflow-hidden h-[320px] md:h-[400px]">
       {/* "Higher Standard" — SVG scales to fill footer width, Figma 520:892 */}
       <img
         src="/footer-logo.svg"
