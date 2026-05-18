@@ -1039,12 +1039,12 @@ function ScatterCard({
 
   useEffect(() => {
     if (!inView) return;
-    const id = setTimeout(() => setEntered(true), delay + 620);
+    const id = setTimeout(() => setEntered(true), delay + 650);
     return () => clearTimeout(id);
   }, [inView, delay]);
 
   const transform = !inView
-    ? `translateY(30px) rotate(${rotate}deg)`
+    ? `translateY(32px) rotate(${rotate}deg)`
     : hov && entered
       ? `translateY(-10px) scale(1.04) rotate(0deg)`
       : `rotate(${rotate}deg)`;
@@ -1053,7 +1053,7 @@ function ScatterCard({
     ? hov
       ? "transform 0.3s cubic-bezier(0.34,1.3,0.64,1), box-shadow 0.25s ease"
       : "transform 0.3s cubic-bezier(0.4,0,0.2,1), box-shadow 0.25s ease"
-    : `opacity 0.55s ease ${delay}ms, transform 0.55s cubic-bezier(0.4,0,0.2,1) ${delay}ms`;
+    : `opacity 0.6s ease ${delay}ms, transform 0.6s cubic-bezier(0.4,0,0.2,1) ${delay}ms`;
 
   return (
     <div
@@ -1150,7 +1150,7 @@ function TestimonialsSection() {
               t={TESTIMONIALS[idx]}
               left={left} top={top} width={width}
               rotate={rotate} baseZ={layoutIdx}
-              inView={inView} delay={layoutIdx * 140}
+              inView={inView} delay={layoutIdx * 300}
             />
           ))}
         </div>
@@ -1163,7 +1163,7 @@ function TestimonialsSection() {
               t={t}
               rotate={i % 2 === 0 ? -0.8 : 0.8}
               inView={inView}
-              delay={i * 100}
+              delay={i * 200}
             />
           ))}
         </div>
@@ -1361,17 +1361,15 @@ function CTASection() {
 // ── Footer ────────────────────────────────────────────────────────────────────
 function Footer() {
   return (
-    <footer
-      className="bg-[#4d453b] w-full overflow-hidden relative"
-      style={{ minHeight: "200px", height: "clamp(200px, 28vw, 400px)" }}
-    >
-      {/* Footer logo */}
-      <img
-        src="/footer-logo.svg"
-        alt="Higher Standard"
-        className="absolute"
-        style={{ left: "16px", top: "20px", height: "clamp(30px, 5vw, 60px)", width: "auto" }}
-      />
+    <footer className="bg-[#4d453b] w-full relative">
+      {/* Logo spans full footer width — aspect ratio 1351:126 ≈ 10.7:1 */}
+      <div className="w-full px-[16px] md:px-[30px] pt-[24px] md:pt-[40px] pb-[56px] md:pb-[80px]">
+        <img
+          src="/footer-logo.svg"
+          alt="Higher Standard"
+          style={{ width: "100%", height: "auto", display: "block" }}
+        />
+      </div>
 
       {/* Bottom bar */}
       <div
