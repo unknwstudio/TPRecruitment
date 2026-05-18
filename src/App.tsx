@@ -330,6 +330,14 @@ function Navbar() {
   const [navHov,    setNavHov]    = useState(false);
   const [menuHov,   setMenuHov]   = useState(false);
   const [ctaHidden, setCtaHidden] = useState(false);
+  const [scrolled,  setScrolled]  = useState(false);
+
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 80);
+    window.addEventListener("scroll", handler, { passive: true });
+    handler();
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -355,7 +363,14 @@ function Navbar() {
 
   return (
     <>
-      <div className="sticky top-0 z-50 flex items-center justify-between px-[16px] md:px-[30px] py-[14px] md:py-[20px] w-full">
+      <div
+        className="sticky top-0 z-50 flex items-center justify-between px-[16px] md:px-[30px] py-[14px] md:py-[20px] w-full"
+        style={{
+          backgroundColor: scrolled ? "#ffffff" : "#ffedd7",
+          boxShadow: scrolled ? "0 1px 8px rgba(0,0,0,0.06)" : "none",
+          transition: "background-color 0.35s ease, box-shadow 0.35s ease",
+        }}
+      >
 
         {/* Logo — custom SVG for all breakpoints */}
         <img
@@ -479,25 +494,18 @@ function HeroSection() {
       <div className="hidden lg:block relative" style={{ minHeight: "735px" }}>
         <div className="max-w-[1440px] mx-auto px-[30px] relative" style={{ height: "735px" }}>
 
-          {/* Left content: top=129px, w=799px, h=445px, justify-between */}
+          {/* Left content: top=129px, w=799px, gap=40px between all three elements */}
           <div
-            className="absolute flex flex-col justify-between"
-            style={{ left: "0px", top: "129px", width: "799px", height: "445px" }}
+            className="absolute flex flex-col gap-[40px]"
+            style={{ left: "0px", top: "129px", width: "799px" }}
           >
-            {/* Top group: headline + body, gap=40px */}
-            <div className="flex flex-col gap-[40px]">
-              <p
-                className="text-black"
-                style={{ ...STYLE_DISPLAY, fontSize: "60px", letterSpacing: "-3px", lineHeight: "1.1" }}
-              >
-                The right hire changes everything that comes after it.
-              </p>
-              <div style={{ ...STYLE_MONO, fontSize: "28px", lineHeight: "1.1", color: "black" }}>
-                <p>I&apos;m Tiffany Philippou, founder of Higher Standard.</p>
-                <p>I find the people who raise the bar for your whole company and shape the outcome, then I stay long after the offer is signed.</p>
-              </div>
+            <p className="text-black" style={{ ...STYLE_DISPLAY, fontSize: "60px", letterSpacing: "-3px", lineHeight: "1.1" }}>
+              The right hire changes everything that comes after it.
+            </p>
+            <div style={{ ...STYLE_MONO, fontSize: "28px", lineHeight: "1.1", color: "black" }}>
+              <p>I&apos;m Tiffany Philippou, founder of Higher Standard.</p>
+              <p>I find the people who raise the bar for your whole company and shape the outcome, then I stay long after the offer is signed.</p>
             </div>
-            {/* CTA at bottom */}
             <OrangeBtn onClick={scrollToContact}>
               <p style={{ ...STYLE_MONO, fontSize: "24px", lineHeight: "20px", color: "black", whiteSpace: "nowrap" }}>
                 Start working together
@@ -883,27 +891,27 @@ function RolesSection() {
 }
 
 // ── Testimonials ─────────────────────────────────────────────────────────────
-// All 8 testimonials — shown in scattered grid on desktop, carousel on mobile
+// All 8 testimonials — shown in scattered grid on desktop, grid on mobile
 const TESTIMONIALS = [
   {
     name: "Tom Picarony", title: "Head of Expansion",
-    photo: null as string | null, bg: "#e0ddd3",
+    photo: null as string | null, bg: "#edead6",
     text: [
       "Thanks to Tiffany's invaluable assistance, we've successfully hired our UK team.",
       "Her leadership, strategic insight, and dedication were instrumental in assembling a top-notch team ready to tackle any challenge.",
     ],
   },
   {
-    name: "Maria Monks", title: "Fractional CMO",
-    photo: "/photo_maria.jpeg" as string | null, bg: "#edead6",
+    name: "Maria Monks", title: "IQ Capital",
+    photo: "/photo_maria.jpeg" as string | null, bg: "#efd7ba",
     text: [
-      "Tiffany has been instrumental in helping me with marketing leadership hires across multiple startups. I have enjoyed working with her for years —her passion and professionalism is outstanding.",
-      "She also offers a great personalised service to both individual companies, and me, and I often seek her advice on everything recruitment.",
+      "Tiffany has been instrumental in helping me with marketing leadership hires across the IQ Capital portfolio. I have enjoyed working with her for years —her passion and professionalism is outstanding.",
+      "She also offers a great personalised service to both individual companies, and me, and I often seek her advice on everything recruitment, and building teams, related.",
     ],
   },
   {
     name: "Ruben Tadmor", title: "Founder",
-    photo: null as string | null, bg: "#d4dde0",
+    photo: null as string | null, bg: "#90b0bb",
     text: [
       "Tiffany is by far the best experience I've had working with external support for recruitment — really felt like an extension of the hiring team.",
     ],
@@ -912,21 +920,22 @@ const TESTIMONIALS = [
     name: "Gastón Tourn", title: "Chief Growth Officer, Oddbox",
     photo: "/photo_gaston.jpeg" as string | null, bg: "#c1c497",
     text: [
-      "Tiffany is an outstanding talent professional with a thoughtful, personal approach. She spends significant time understanding candidates and ensuring opportunities align perfectly with their goals.",
-      "I highly recommend Tiffany for her exceptional ability to identify and engage top talent. If you're looking for a dedicated ambassador for your startup, she is the professional you need. Tiffany excels at finding candidates who may not be actively seeking a change and persuading them to consider new, exciting opportunities.",
+      "Tiffany's took the time to understand my interests and introduced the opportunity when she saw it was a perfect match.",
+      "This refreshing approach builds trust and confidence. I was considering other opportunities at the time, but I chose the role at Curio partly because of the assurance Tiffany provided during the hiring process.",
+      "I highly recommend Tiffany for her exceptional ability to identify and engage top talent. If you're looking for a dedicated ambassador for your startup, she is the professional you need.",
     ],
   },
   {
     name: "Govind Balakrishnan", title: "Co-founder, Gibran",
     photo: "/photo_govind.jpeg" as string | null, bg: "#ffffff",
     text: [
-      "We've loved working with Tiffany over several years on multiple senior hires. Our requirements are often atypical, and she takes a very hands-on and considered approach.",
+      "We've loved working with Tiffany over several years on multiple senior hires at Curio. Our requirements are often atypical, and she takes a very hands-on and considered approach.",
       "Thanks to our collaboration, we have a phenomenal tight-knit team, investment from tier 1 Silicon Valley investors and partnerships with top media outlets. We trust her fully and will work with her again.",
     ],
   },
   {
     name: "Martin Leguay", title: "CEO, Touchnote",
-    photo: null as string | null, bg: "#d0c8c0",
+    photo: null as string | null, bg: "#edead6",
     text: [
       "Working with Tiffany has been great, she's helped us on multiple briefs and has been so effective in providing the right candidates within such a fast turnaround.",
       "Whether for full time or temp requirements, Tiffany has a vast network of quality candidates to reach out to.",
@@ -934,7 +943,7 @@ const TESTIMONIALS = [
   },
   {
     name: "Jonathan Canizales", title: "Chief of Staff, Mindgard",
-    photo: "/photo_jonathan.jpeg" as string | null, bg: "#90b0bb",
+    photo: "/photo_jonathan.jpeg" as string | null, bg: "#fff5e9",
     text: [
       "I had the pleasure of working with Tiffany as my recruiter, and I couldn't be more impressed, she has been the best by far. She did an outstanding job from start to finish. Tiffany was super communicative, keeping me informed at every step of the process.",
       "Her honesty and openness was refreshing and made me feel confident throughout the process. I always felt I could trust her, and I truly appreciated how she checked up on me throughout the process.",
@@ -942,7 +951,7 @@ const TESTIMONIALS = [
   },
   {
     name: "Haralds Gabrans Zukovs", title: "Head of Growth, Mindgard",
-    photo: null as string | null, bg: "#c8d4c8",
+    photo: null as string | null, bg: "#e0e0e0",
     text: [
       "Tiffany's expert guidance was invaluable in navigating my career transition.",
       "Her personalised advice and unwavering support empowered me to confidently land the perfect next step. I highly recommend her services to anyone seeking a career change partner.",
@@ -950,135 +959,111 @@ const TESTIMONIALS = [
   },
 ];
 
-// Shared card inner layout (used on both desktop grid and mobile carousel)
+// Shared card inner layout
 function TestimonialCardInner({ t }: { t: typeof TESTIMONIALS[0] }) {
   const initials = t.name.split(" ").map((w) => w[0]).join("").slice(0, 2);
   return (
-    <div style={{ backgroundColor: t.bg, padding: "6px", height: "100%" }}>
-      {/* Header: photo + name/title */}
+    <div style={{ backgroundColor: t.bg, padding: "6px" }}>
+      {/* Header */}
       <div style={{ display: "flex", marginBottom: "-0.823px", flexShrink: 0 }}>
-        <div style={{ width: 110, height: 96, flexShrink: 0, border: "0.6px solid black", borderRadius: "4.8px 0 0 0", overflow: "hidden" }}>
+        <div style={{ width: 133, height: 117, flexShrink: 0, border: "0.6px solid black", borderRadius: "4.8px 0 0 0", overflow: "hidden" }}>
           {t.photo ? (
             <img src={t.photo} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
           ) : (
             <div style={{ width: "100%", height: "100%", backgroundColor: "#4d453b", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ ...STYLE_DISPLAY, fontSize: 24, color: "white" }}>{initials}</span>
+              <span style={{ ...STYLE_DISPLAY, fontSize: 28, color: "white" }}>{initials}</span>
             </div>
           )}
         </div>
         <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <div style={{ border: "0.823px solid black", borderLeft: "none", borderBottom: "none", borderRadius: "0 4.8px 0 0", flex: 1, display: "flex", alignItems: "center", padding: "0 14px" }}>
-            <p style={{ ...STYLE_DISPLAY, fontSize: 15, color: "black", lineHeight: 1.1 }}>{t.name}</p>
+          <div style={{ border: "0.823px solid black", borderLeft: "none", borderBottom: "none", borderRadius: "0 4.8px 0 0", flex: 1, display: "flex", alignItems: "center", padding: "0 18px" }}>
+            <p style={{ ...STYLE_DISPLAY, fontSize: 16, color: "black", lineHeight: 1.08, letterSpacing: "-0.8px" }}>{t.name}</p>
           </div>
-          <div style={{ border: "0.823px solid black", borderLeft: "none", flex: 1, display: "flex", alignItems: "center", padding: "0 14px" }}>
-            <p style={{ ...STYLE_DISPLAY, fontSize: 13, color: "black", lineHeight: 1.1 }}>{t.title}</p>
+          <div style={{ border: "0.823px solid black", borderLeft: "none", flex: 1, display: "flex", alignItems: "center", padding: "0 18px" }}>
+            <p style={{ ...STYLE_DISPLAY, fontSize: 16, color: "black", lineHeight: 1.08, letterSpacing: "-0.8px" }}>{t.title}</p>
           </div>
         </div>
       </div>
-      {/* Text body */}
-      <div style={{ border: "0.6px solid black", borderTop: "none", borderRadius: "0 0 4.8px 4.8px", padding: "14px", display: "flex", flexDirection: "column", gap: "10px" }}>
+      {/* Body */}
+      <div style={{ border: "0.6px solid black", borderTop: "none", borderRadius: "0 0 4.8px 4.8px", padding: "18px", display: "flex", flexDirection: "column", gap: "12px" }}>
         {t.text.map((para, i) => (
-          <p key={i} style={{ ...STYLE_MONO, fontSize: 14, color: "black", lineHeight: 1.45 }}>{para}</p>
+          <p key={i} style={{ ...STYLE_MONO, fontSize: 16, color: "black", lineHeight: 1.1 }}>{para}</p>
         ))}
       </div>
     </div>
   );
 }
 
-// Desktop: single card with hover-to-foreground
-function TestimonialCard({ t, delay = 0 }: { t: typeof TESTIMONIALS[0]; delay?: number }) {
-  const [hov, setHov] = useState(false);
-  const [ref, inView] = useInView(0.05);
-  return (
-    <div
-      ref={ref}
-      style={{
-        opacity: inView ? 1 : 0,
-        transform: inView ? "translateY(0)" : "translateY(24px)",
-        transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms`,
-        position: "relative",
-        zIndex: hov ? 10 : 1,
-      }}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-    >
-      <div style={{
-        transform: hov ? "scale(1.03) translateY(-5px)" : "scale(1)",
-        boxShadow: hov ? "0 16px 48px rgba(0,0,0,0.14)" : "none",
-        transition: "transform 0.25s ease, box-shadow 0.25s ease",
-      }}>
-        <TestimonialCardInner t={t} />
-      </div>
-    </div>
-  );
-}
+const TESTIMONIALS_SCATTER = [
+  { idx: 0, left: "68px",  top: "197px", width: "330px", rotate: 0      },
+  { idx: 1, left: "354px", top: "166px", width: "330px", rotate: -1.96  },
+  { idx: 2, left: "663px", top: "155px", width: "330px", rotate: 0      },
+  { idx: 3, left: "980px", top: "160px", width: "380px", rotate: -1.67  },
+  { idx: 4, left: "81px",  top: "516px", width: "380px", rotate: -1.67  },
+  { idx: 5, left: "425px", top: "557px", width: "330px", rotate: -1.67  },
+  { idx: 6, left: "662px", top: "386px", width: "400px", rotate: 2      },
+  { idx: 7, left: "949px", top: "630px", width: "380px", rotate: 0      },
+];
 
-// Mobile: swipeable carousel
-function TestimonialsCarousel() {
-  const [activeIdx, setActiveIdx] = useState(0);
-  const [dragStart, setDragStart] = useState(0);
-  const [dragDelta, setDragDelta] = useState(0);
-  const [dragging,  setDragging]  = useState(false);
-  const go = (i: number) => setActiveIdx(Math.max(0, Math.min(TESTIMONIALS.length - 1, i)));
+function TestimonialsSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); io.disconnect(); } },
+      { threshold: 0.05 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <div className="pb-[60px]">
-      <div
-        className="overflow-hidden"
-        onTouchStart={(e) => { setDragStart(e.touches[0].clientX); setDragging(true); }}
-        onTouchMove={(e)  => { if (dragging) setDragDelta(e.touches[0].clientX - dragStart); }}
-        onTouchEnd={() => {
-          if (dragDelta > 60) go(activeIdx - 1);
-          else if (dragDelta < -60) go(activeIdx + 1);
-          setDragDelta(0); setDragging(false);
-        }}
-      >
-        <div style={{
-          display: "flex",
-          transform: `translateX(calc(-${activeIdx * 100}% + ${dragDelta}px))`,
-          transition: dragging ? "none" : "transform 0.4s cubic-bezier(0.4,0,0.2,1)",
-        }}>
-          {TESTIMONIALS.map((t) => (
-            <div key={t.name} style={{ minWidth: "100%" }}>
+    <section ref={sectionRef} id="testimonials" className="bg-[#ffedd7] w-full py-[96px] overflow-hidden">
+      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
+        <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
+          Testimonials
+        </p>
+
+        {/* Desktop xl+: absolute scatter layout */}
+        <div className="hidden xl:block relative" style={{ minHeight: "980px" }}>
+          {TESTIMONIALS_SCATTER.map(({ idx, left, top, width, rotate }, layoutIdx) => {
+            const t = TESTIMONIALS[idx];
+            const delay = layoutIdx * 140;
+            return (
+              <div
+                key={t.name}
+                style={{
+                  position: "absolute",
+                  left, top, width,
+                  opacity: inView ? 1 : 0,
+                  transform: `translateY(${inView ? 0 : 30}px) rotate(${rotate}deg)`,
+                  transition: `opacity 0.55s ease ${delay}ms, transform 0.55s cubic-bezier(0.4,0,0.2,1) ${delay}ms`,
+                  zIndex: layoutIdx,
+                }}
+              >
+                <TestimonialCardInner t={t} />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Mobile/tablet: 2-col grid with mild rotations */}
+        <div className="xl:hidden grid grid-cols-1 md:grid-cols-2 gap-[16px] md:gap-[20px]">
+          {TESTIMONIALS.map((t, i) => (
+            <div
+              key={t.name}
+              style={{
+                opacity: inView ? 1 : 0,
+                transform: `translateY(${inView ? 0 : 24}px) rotate(${i % 2 === 0 ? -0.8 : 0.8}deg)`,
+                transition: `opacity 0.5s ease ${i * 100}ms, transform 0.5s ease ${i * 100}ms`,
+              }}
+            >
               <TestimonialCardInner t={t} />
             </div>
           ))}
-        </div>
-      </div>
-      {/* Dots navigation */}
-      <div className="flex items-center justify-center gap-[8px] pt-[20px]">
-        {TESTIMONIALS.map((_, i) => (
-          <button key={i} onClick={() => go(i)}
-            className="rounded-full transition-all duration-250"
-            style={{ width: i === activeIdx ? "20px" : "8px", height: "8px", backgroundColor: i === activeIdx ? "#000" : "rgba(0,0,0,0.25)" }}
-            aria-label={`Go to ${i + 1}`}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function TestimonialsSection() {
-  return (
-    <section id="testimonials" className="bg-[#ffedd7] w-full py-[96px]">
-      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
-        <Reveal>
-          <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
-            Testimonials
-          </p>
-        </Reveal>
-
-        {/* Desktop: 4-column scattered grid, hover brings card to foreground */}
-        <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-[12px] lg:gap-[16px]">
-          {TESTIMONIALS.map((t, i) => (
-            <TestimonialCard key={t.name} t={t} delay={i * 80} />
-          ))}
-        </div>
-
-        {/* Mobile: swipe carousel */}
-        <div className="md:hidden">
-          <TestimonialsCarousel />
         </div>
       </div>
     </section>
@@ -1137,7 +1122,7 @@ function NewsletterSection() {
         </Reveal>
 
         {/* Email subscribe row */}
-        <Reveal delay={60} className="flex flex-col sm:flex-row gap-[10px] items-stretch sm:items-center justify-center mb-[52px] md:mb-[60px]">
+        <Reveal delay={60} className="flex flex-col sm:flex-row gap-[10px] items-stretch sm:items-center justify-center mb-[68px] md:mb-[78px]">
           <input
             type="email"
             placeholder="Enter your email"
@@ -1278,18 +1263,13 @@ function Footer() {
       className="bg-[#4d453b] w-full overflow-hidden relative"
       style={{ minHeight: "200px", height: "clamp(200px, 28vw, 400px)" }}
     >
-      {/* Large "Higher Standard" wordmark */}
-      <p
-        className="absolute left-[16px] md:left-[30px] top-[20px] md:top-[30px] text-[#eaeae5] whitespace-nowrap"
-        style={{
-          ...STYLE_DISPLAY,
-          fontSize: "clamp(36px, 8.75vw, 126px)",
-          letterSpacing: "clamp(-0.72px, -0.2vw, -2.52px)",
-          lineHeight: 1,
-        }}
-      >
-        Higher Standard
-      </p>
+      {/* Footer logo */}
+      <img
+        src="/footer-logo.svg"
+        alt="Higher Standard"
+        className="absolute"
+        style={{ left: "16px", top: "20px", height: "clamp(30px, 5vw, 60px)", width: "auto" }}
+      />
 
       {/* Bottom bar */}
       <div
@@ -1305,13 +1285,12 @@ function Footer() {
           </p>
         </div>
         {/* Centre — copyright */}
-        <div className="flex gap-[4px] md:gap-[6px] items-baseline md:justify-center md:flex-1">
-          <span className="text-[18px] md:text-[28px] text-[#eaeae5]" style={STYLE_DISPLAY}>©</span>
+        <div className="flex md:justify-center md:flex-1">
           <span
-            className="text-[13px] md:text-[20px] text-[#eaeae5]"
+            className="text-[14px] md:text-[20px] text-[#eaeae5]"
             style={{ ...STYLE_DISPLAY, letterSpacing: "-1px" }}
           >
-            2026 Higher Standards
+            © Higher Standard
           </span>
         </div>
         {/* Right */}
