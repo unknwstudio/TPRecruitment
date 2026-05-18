@@ -202,13 +202,15 @@ function OrangeBtn({ onClick, children, className = "" }: { onClick?: () => void
 }
 
 // ── Intro animation ───────────────────────────────────────────────────────────
-// Phase 0 (0ms):    Rectangle border appears
-// Phase 1 (700ms):  Arrow-burst SVG fades in, rect border hidden (SVG has it)
+// Phase 0 (0ms):    Rectangle border + dot appear
+// Phase 1 (700ms):  Arrow-burst SVG grows from centre (clip-path reveal)
 // Phase 2 (2200ms): Corner text labels appear
-// Phase 3 (4200ms): Everything fades out
-// onComplete (5000ms): parent removes overlay, main page revealed
+// Phase 3 (4200ms): Labels fade, burst slides to hero illustration position (desktop)
+//                   OR whole overlay fades out (mobile)
+// onComplete (5000ms): overlay unmounts, hero illustration already in place
 function IntroAnimation({ onComplete }: { onComplete: () => void }) {
   const [phase, setPhase] = useState<0 | 1 | 2 | 3>(0);
+  const [burstTransform, setBurstTransform] = useState<string>("none");
 
   useEffect(() => {
     const timers = [
@@ -220,33 +222,57 @@ function IntroAnimation({ onComplete }: { onComplete: () => void }) {
     return () => timers.forEach(clearTimeout);
   }, [onComplete]);
 
-  // Positions derived from Figma node 515:355 (container 687 × 755.573px)
-  // Rectangle 21: x=118.415 y=165.103 w=466.677 h=466.677  (scaled from 540×580 group)
-  // But the SVG viewBox="0 0 686.049 736.525" and the rect in SVG: x=118.415 y=165.103 w=466.677 h=466.677
-  // So as percentages of 686×736: left=17.26%, top=22.43%, right=right edge=84.26%, bottom=85.83%
-  // Text positions in the 687×755 container:
-  //   "Higher":   left=118.1/687=17.19%  top=138.42/755.573=18.32%
-  //   "Standard": left=434.3/687=63.22%  top=18.32%
-  //   "In hiring":left=118.1/687=17.19%  top=641.28/755.573=84.87%
-  //   "People":   right edge at left=585.12px → right = (687-585.12)/687=14.83% from right
+  // At phase 3 on desktop: compute hero illustration position and slide burst there
+  useEffect(() => {
+    if (phase !== 3) return;
+    if (window.innerWidth < 1020) return; // mobile just fades
+
+    const anchor = document.getElementById("hero-illustration-anchor");
+    if (!anchor) return;
+
+    const rect = anchor.getBoundingClientRect();
+    const targetCX = rect.left + rect.width / 2;
+    const targetCY = rect.top + rect.height / 2;
+
+    const containerW = Math.min(687, window.innerWidth * 0.9);
+    const vCX = window.innerWidth / 2;
+    const vCY = window.innerHeight / 2;
+
+    const dX = targetCX - vCX;
+    const dY = targetCY - vCY;
+    const sc = rect.width / containerW;
+
+    setBurstTransform(`translate(${dX}px, ${dY}px) scale(${sc})`);
+  }, [phase]);
+
   const labels = [
-    { text: "Higher",    style: { left: "17.19%", top: "18.32%" },                    delay: 0   },
-    { text: "Standard",  style: { left: "63.22%", top: "18.32%" },                    delay: 100 },
-    { text: "In hiring", style: { left: "17.19%", top: "84.87%" },                    delay: 200 },
+    { text: "Higher",    style: { left: "17.19%", top: "18.32%" },                              delay: 0   },
+    { text: "Standard",  style: { left: "63.22%", top: "18.32%" },                              delay: 100 },
+    { text: "In hiring", style: { left: "17.19%", top: "84.87%" },                              delay: 200 },
     { text: "People",    style: { right: "14.83%", top: "84.87%", textAlign: "right" as const }, delay: 300 },
   ];
+
+  // Mobile: overlay opacity 0; Desktop: burst slides, overlay stays solid until unmount
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 1020;
 
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 1000,
       backgroundColor: "#ffedd7",
       display: "flex", alignItems: "center", justifyContent: "center",
-      opacity: phase === 3 ? 0 : 1,
+      opacity: phase === 3 && isMobile ? 0 : 1,
       transition: phase === 3 ? "opacity 0.8s ease" : "none",
       pointerEvents: phase === 3 ? "none" : "auto",
     }}>
-      <div style={{ position: "relative", width: "min(687px, 90vw)", height: "min(756px, 90vh)" }}>
-        {/* Rect placeholder — visible only in phase 0 before SVG loads */}
+      <div style={{
+        position: "relative",
+        width: "min(687px, 90vw)",
+        height: "min(756px, 90vh)",
+        transform: phase === 3 ? burstTransform : "none",
+        transition: phase === 3 ? "transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)" : "none",
+        transformOrigin: "center center",
+      }}>
+        {/* Rect placeholder — visible only in phase 0 */}
         <div style={{
           position: "absolute",
           left: "17.26%", top: "22.43%", width: "67.03%", height: "63.4%",
@@ -257,16 +283,13 @@ function IntroAnimation({ onComplete }: { onComplete: () => void }) {
         }} />
         {/* Center dot */}
         <div style={{
-          position: "absolute",
-          left: "50%", top: "50%",
+          position: "absolute", left: "50%", top: "50%",
           transform: "translate(-50%, -50%)",
-          width: 5, height: 5,
-          backgroundColor: "#4d453b",
-          borderRadius: "50%",
+          width: 5, height: 5, backgroundColor: "#4d453b", borderRadius: "50%",
           opacity: phase === 0 ? 1 : 0,
           transition: "opacity 0.3s ease",
         }} />
-        {/* Arrow burst SVG — grows from centre via clip-path circle reveal */}
+        {/* Arrow burst SVG */}
         <img
           src="/intro-burst.svg"
           alt=""
@@ -276,7 +299,7 @@ function IntroAnimation({ onComplete }: { onComplete: () => void }) {
             clipPath: phase >= 1 ? undefined : "circle(0% at 51.09% 53.93%)",
           }}
         />
-        {/* Corner text labels */}
+        {/* Corner labels — fade out at phase 3 */}
         {labels.map(({ text, style, delay }) => (
           <p key={text} style={{
             ...STYLE_DISPLAY,
@@ -284,9 +307,9 @@ function IntroAnimation({ onComplete }: { onComplete: () => void }) {
             color: "black",
             position: "absolute",
             ...style,
-            opacity: phase >= 2 ? 1 : 0,
-            transform: phase >= 2 ? "translateY(0)" : "translateY(10px)",
-            transition: `opacity 0.5s ease ${delay}ms, transform 0.5s ease ${delay}ms`,
+            opacity: phase >= 2 && phase < 3 ? 1 : 0,
+            transform: phase >= 2 && phase < 3 ? "translateY(0)" : "translateY(8px)",
+            transition: `opacity 0.4s ease ${delay}ms, transform 0.4s ease ${delay}ms`,
           }}>{text}</p>
         ))}
       </div>
@@ -334,49 +357,12 @@ function Navbar() {
     <>
       <div className="sticky top-0 z-50 flex items-center justify-between px-[16px] md:px-[30px] py-[14px] md:py-[20px] w-full">
 
-        {/* Desktop logo — bordered cells: Higher Standard | tagline / Tiffany Philippou */}
-        <div
-          className="hidden lg:flex items-stretch bg-white p-[7px] cursor-pointer shrink-0"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          aria-label="Higher Standard – home"
-        >
-          {/* "Higher Standard" cell (left, rounded-l) */}
-          <div
-            className="flex items-center px-[11px] py-[14px] rounded-tl-[7px] rounded-bl-[7px]"
-            style={{ border: "1.252px solid black", marginRight: "-1.252px" }}
-          >
-            <span className="text-[32px] text-black whitespace-nowrap" style={{ ...STYLE_DISPLAY, letterSpacing: "-0.65px" }}>
-              Higher Standard
-            </span>
-          </div>
-          {/* Right column: tagline (top-right) + Tiffany (bottom-right) */}
-          <div className="flex flex-col">
-            <div
-              className="flex items-center px-[15px] py-[7px] rounded-tr-[7px]"
-              style={{ border: "1.252px solid black", marginBottom: "-1.252px", flex: 1 }}
-            >
-              <div className="text-[12px] text-black" style={{ ...STYLE_MONO, lineHeight: "1.1" }}>
-                <p>Hiring with depth</p>
-                <p>and rigour as a standard.</p>
-              </div>
-            </div>
-            <div
-              className="flex items-center px-[15px] py-[6px] rounded-br-[7px]"
-              style={{ border: "1.252px solid black", flex: 1 }}
-            >
-              <span className="text-[21px] text-black whitespace-nowrap font-script">
-                Tiffany Philippou
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile logo — small SVG */}
+        {/* Logo — custom SVG for all breakpoints */}
         <img
-          src="/small_logo_TP.svg"
-          alt="TPRecruitment"
-          className="block lg:hidden w-auto cursor-pointer"
-          style={{ height: "32px" }}
+          src="/nav-logo.svg"
+          alt="Higher Standard"
+          className="w-auto cursor-pointer"
+          style={{ height: "46px" }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         />
 
@@ -481,85 +467,86 @@ function Navbar() {
 }
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
+// Figma 513:299 — 821px total frame (incl. nav ~86px).
+// Content: left=30px, top=215px → from section top = 215-86 = 129px. w=799px h=445px.
+// Illustration: centered in 821px frame → center Y=410.5px → from section top=324.5px
+//   → illustration top = 324.5 - 595/2 = 27px. right=30px. w=541px h=595px.
 function HeroSection() {
   return (
     <section className="bg-[#ffedd7] w-full overflow-hidden">
 
-      {/* ── Desktop layout (≥1020px): fixed height, content left + illustration right ── */}
-      <div className="hidden lg:block relative" style={{ minHeight: "725px" }}>
-        <div className="max-w-[1440px] mx-auto px-[30px] relative h-full">
+      {/* ── Desktop (≥1020px): absolute positions matching Figma exactly ── */}
+      <div className="hidden lg:block relative" style={{ minHeight: "735px" }}>
+        <div className="max-w-[1440px] mx-auto px-[30px] relative" style={{ height: "735px" }}>
 
-          {/* Left: headline + body + CTA */}
+          {/* Left content: top=129px, w=799px, h=445px, justify-between */}
           <div
             className="absolute flex flex-col justify-between"
-            style={{ left: "0px", top: "119px", width: "799px", height: "445px" }}
+            style={{ left: "0px", top: "129px", width: "799px", height: "445px" }}
           >
-            {/* Top: headline + body */}
+            {/* Top group: headline + body, gap=40px */}
             <div className="flex flex-col gap-[40px]">
-              <Reveal>
-                <p
-                  className="text-[60px] text-black"
-                  style={{ ...STYLE_DISPLAY, letterSpacing: "-3px", lineHeight: "1.1" }}
-                >
-                  The right hire changes everything that comes after it.
-                </p>
-              </Reveal>
-              <Reveal delay={120}>
-                <div className="text-[28px] text-black" style={{ ...STYLE_MONO, lineHeight: "1.1" }}>
-                  <p>I&apos;m Tiffany Philippou, founder of Higher Standard.</p>
-                  <p>I find the people who raise the bar for your whole company and shape the outcome, then I stay long after the offer is signed.</p>
-                </div>
-              </Reveal>
+              <p
+                className="text-black"
+                style={{ ...STYLE_DISPLAY, fontSize: "60px", letterSpacing: "-3px", lineHeight: "1.1" }}
+              >
+                The right hire changes everything that comes after it.
+              </p>
+              <div style={{ ...STYLE_MONO, fontSize: "28px", lineHeight: "1.1", color: "black" }}>
+                <p>I&apos;m Tiffany Philippou, founder of Higher Standard.</p>
+                <p>I find the people who raise the bar for your whole company and shape the outcome, then I stay long after the offer is signed.</p>
+              </div>
             </div>
-            {/* Bottom: CTA */}
-            <Reveal delay={240}>
-              <OrangeBtn onClick={scrollToContact}>
-                <p className="text-[24px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
-                  Start working together
-                </p>
-              </OrangeBtn>
-            </Reveal>
+            {/* CTA at bottom */}
+            <OrangeBtn onClick={scrollToContact}>
+              <p style={{ ...STYLE_MONO, fontSize: "24px", lineHeight: "20px", color: "black", whiteSpace: "nowrap" }}>
+                Start working together
+              </p>
+            </OrangeBtn>
           </div>
 
-          {/* Right: illustration with corner labels */}
+          {/* Right illustration — anchor for the intro animation to fly into */}
+          {/* top=27px matches centering within the 821px Figma frame */}
           <div
+            id="hero-illustration-anchor"
             className="absolute"
-            style={{ right: "0px", top: "50%", transform: "translateY(-50%)", width: "541px", height: "595px" }}
+            style={{ right: "0px", top: "27px", width: "541px", height: "595px" }}
           >
-            {/* SVG centred inside container */}
-            <div
-              className="absolute"
-              style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: "540px", height: "580px" }}
-            >
-              <img src="/hero-illustration.svg" alt="" style={{ width: "100%", height: "100%" }} />
+            {/* SVG centered inside */}
+            <div className="absolute" style={{
+              left: "50%", top: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "540px", height: "580px",
+            }}>
+              <img src="/intro-burst.svg" alt="" style={{ width: "100%", height: "100%", display: "block" }} />
             </div>
-            {/* Corner labels */}
-            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "93px", top: "109px", letterSpacing: "-0.4px" }}>Higher</p>
+            {/* Corner labels — matching Figma node 513:345 positions */}
+            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "93px",  top: "109px", letterSpacing: "-0.4px" }}>Higher</p>
             <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "342px", top: "109px", letterSpacing: "-0.4px" }}>Standard</p>
-            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "93px", top: "505px", letterSpacing: "-0.4px" }}>In hiring</p>
+            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "93px",  top: "505px", letterSpacing: "-0.4px" }}>In hiring</p>
             <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "461px", top: "505px", letterSpacing: "-0.4px", transform: "translateX(-100%)" }}>People</p>
           </div>
 
         </div>
       </div>
 
-      {/* ── Mobile layout (<1020px): stacked ── */}
+      {/* ── Mobile (<1020px): stacked ── */}
       <div className="lg:hidden px-[16px] md:px-[30px] pt-[60px] pb-[80px]">
         <div className="flex flex-col gap-[40px]">
           <Reveal>
-            <p className="text-[40px] md:text-[48px] text-black" style={{ ...STYLE_DISPLAY, letterSpacing: "-2px", lineHeight: "1.1" }}>
+            <p style={{ ...STYLE_DISPLAY, fontSize: "clamp(36px, 10vw, 48px)", letterSpacing: "-2px", lineHeight: "1.1", color: "black" }}>
               The right hire changes everything that comes after it.
             </p>
           </Reveal>
           <Reveal delay={120}>
-            <div className="text-[18px] md:text-[22px] text-black" style={{ ...STYLE_MONO, lineHeight: "1.3" }}>
+            <div style={{ ...STYLE_MONO, fontSize: "clamp(16px, 4.5vw, 20px)", lineHeight: "1.3", color: "black" }}>
               <p>I&apos;m Tiffany Philippou, founder of Higher Standard.</p>
-              <p className="mt-[10px]">I find the people who raise the bar for your whole company and shape the outcome, then I stay long after the offer is signed.</p>
+              <p style={{ marginTop: "10px" }}>I find the people who raise the bar for your whole company and shape the outcome, then I stay long after the offer is signed.</p>
             </div>
           </Reveal>
           <Reveal delay={220}>
             <OrangeBtn onClick={scrollToContact}>
-              <p className="text-[18px] md:text-[20px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
+              <p style={{ ...STYLE_MONO, fontSize: "18px", lineHeight: "20px", color: "black", whiteSpace: "nowrap" }}>
                 Start working together
               </p>
             </OrangeBtn>
@@ -651,8 +638,8 @@ function WhatWorkingSection() {
         className="hidden lg:flex max-w-[1440px] mx-auto"
         style={{ gap: "30px", padding: "96px 30px", alignItems: "flex-start" }}
       >
-        {/* Left: sticky title — ~673px wide */}
-        <div style={{ width: "673px", flexShrink: 0, position: "sticky", top: "var(--stack-top)" }}>
+        {/* Left: sticky title — 675px (matches right card width exactly) */}
+        <div style={{ width: "675px", maxWidth: "675px", flexShrink: 0, position: "sticky", top: "var(--stack-top)" }}>
           <Reveal>
             <div className="text-[52px] text-black" style={STYLE_DISPLAY}>
               <p>What</p>
@@ -740,26 +727,17 @@ function PartnersSection() {
   }, []);
 
   return (
-    <section id="partners" className="bg-[#ffedd7] w-full overflow-hidden py-[96px]">
-      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
-        <Reveal>
-          <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
-            My partners &amp; collaborators
-          </p>
-        </Reveal>
+    <section id="partners" className="bg-[#ffedd7] w-full overflow-hidden py-[40px]">
+      <div className="flex border-t border-b border-black overflow-hidden mb-[-1px]">
+        <div className="flex animate-marquee">
+          {[...partnerLogosRow1, ...partnerLogosRow1].map((src, i) => <PartnerLogo key={i} src={src} small={small} />)}
+        </div>
       </div>
-      <Reveal y={16}>
-        <div className="flex border-t border-b border-black overflow-hidden mb-[-1px]">
-          <div className="flex animate-marquee">
-            {[...partnerLogosRow1, ...partnerLogosRow1].map((src, i) => <PartnerLogo key={i} src={src} small={small} />)}
-          </div>
+      <div className="flex border-t border-b border-black overflow-hidden">
+        <div className="flex animate-marquee-reverse">
+          {[...partnerLogosRow2, ...partnerLogosRow2].map((src, i) => <PartnerLogo key={i} src={src} small={small} />)}
         </div>
-        <div className="flex border-t border-b border-black overflow-hidden">
-          <div className="flex animate-marquee-reverse">
-            {[...partnerLogosRow2, ...partnerLogosRow2].map((src, i) => <PartnerLogo key={i} src={src} small={small} />)}
-          </div>
-        </div>
-      </Reveal>
+      </div>
     </section>
   );
 }
@@ -768,40 +746,41 @@ function PartnersSection() {
 const ROLES_DESCRIPTION = "Venture-backed startups, from seed to Series B. Companies where every senior hire shapes the culture and the trajectory. I know this environment from the inside, and I know what the right person looks like at every stage of growth.";
 
 const ROLE_ACCORDION_DATA = [
-  { name: "Marketing", bg: "#ffffff", items: "CMO, VP Marketing, Head of Marketing." },
-  { name: "Growth",    bg: "#e0e0e0", items: "VP Growth, Head of Growth." },
-  { name: "Product",   bg: "#e0e0e0", items: "CPO, VP Product, Head of Product, Product Lead." },
+  { name: "Marketing", items: "CMO, VP Marketing, Head of Marketing." },
+  { name: "Growth",    items: "VP Growth, Head of Growth." },
+  { name: "Product",   items: "CPO, VP Product, Head of Product, Product Lead." },
 ];
 
 function RoleAccordionRow({
-  role, index, isFirst, isLast,
+  role, index, isFirst, isLast, isOpen, anyOpen, onOpen, onClose,
 }: {
   role: typeof ROLE_ACCORDION_DATA[0];
   index: number;
   isFirst: boolean;
   isLast: boolean;
+  isOpen: boolean;
+  anyOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
 }) {
-  const [open, setOpen] = useState(false);
+  // All closed → white. One open → open row = white, others = grey.
+  const bg = anyOpen && !isOpen ? "#e0e0e0" : "#ffffff";
 
-  // Title border-radius:
-  // • First row always has rounded top corners
-  // • Last row (when closed) has rounded bottom corners; when open → sub-row gets them
   const titleRadius = isFirst
     ? "8px 8px 0 0"
-    : !isLast ? "0" : open ? "0" : "0 0 8px 8px";
+    : !isLast ? "0" : isOpen ? "0" : "0 0 8px 8px";
 
   return (
     <div
       style={{
         position: "relative",
-        // Next row overlaps this row's bottom border by 1.372px (shared-border trick)
         marginTop: isFirst ? 0 : "-1.372px",
-        // When open, sit above sibling rows so sub-row isn't hidden
-        zIndex: open ? 10 : (ROLE_ACCORDION_DATA.length - index),
-        backgroundColor: role.bg,
+        zIndex: isOpen ? 10 : (ROLE_ACCORDION_DATA.length - index),
+        backgroundColor: bg,
+        transition: "background-color 0.25s ease",
       }}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={onOpen}
+      onMouseLeave={onClose}
     >
       {/* Title row */}
       <div
@@ -809,8 +788,7 @@ function RoleAccordionRow({
         style={{
           border: "1.372px solid black",
           borderRadius: titleRadius,
-          // Remove bottom border when open — sub-row provides continuity
-          borderBottom: open ? "none" : "1.372px solid black",
+          borderBottom: isOpen ? "none" : "1.372px solid black",
           position: "relative",
           zIndex: 1,
         }}
@@ -819,16 +797,12 @@ function RoleAccordionRow({
           {role.name}
         </p>
         {/* Arrow rotates 90° when open */}
-        <div
-          style={{
-            backgroundColor: "#fb8349",
-            width: 24, height: 24, flexShrink: 0,
-            position: "relative",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            transform: open ? "rotate(90deg)" : "rotate(0deg)",
-            transition: "transform 0.25s ease",
-          }}
-        >
+        <div style={{
+          backgroundColor: "#fb8349", width: 24, height: 24, flexShrink: 0,
+          position: "relative", display: "flex", alignItems: "center", justifyContent: "center",
+          transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
+          transition: "transform 0.25s ease",
+        }}>
           <div style={{ position: "absolute", inset: 0, border: "0.4px solid black", borderRadius: "4px" }} />
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ position: "relative" }}>
             <path d="M2 5H8M6 3L8 5L6 7" stroke="black" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
@@ -836,24 +810,18 @@ function RoleAccordionRow({
         </div>
       </div>
 
-      {/* Sub-row — slides open via CSS grid 0fr → 1fr */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateRows: open ? "1fr" : "0fr",
-          transition: "grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}
-      >
-        <div style={{ overflow: "hidden", backgroundColor: role.bg }}>
-          <div
-            className="p-[24px] md:p-[30px]"
-            style={{
-              border: "1.372px solid black",
-              borderTop: "none",
-              borderRadius: isLast ? "0 0 8px 8px" : "0",
-              backgroundColor: role.bg,
-            }}
-          >
+      {/* Sub-row — grid 0fr → 1fr slide */}
+      <div style={{
+        display: "grid",
+        gridTemplateRows: isOpen ? "1fr" : "0fr",
+        transition: "grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+      }}>
+        <div style={{ overflow: "hidden", backgroundColor: bg }}>
+          <div className="p-[24px] md:p-[30px]" style={{
+            border: "1.372px solid black", borderTop: "none",
+            borderRadius: isLast ? "0 0 8px 8px" : "0",
+            backgroundColor: bg,
+          }}>
             <p className="text-[20px] md:text-[24px] text-black" style={STYLE_MONO}>
               {role.items}
             </p>
@@ -865,6 +833,8 @@ function RoleAccordionRow({
 }
 
 function RolesSection() {
+  const [openRole, setOpenRole] = useState<string | null>(null);
+
   return (
     <section id="roles" className="bg-[#ffedd7] w-full py-[96px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
@@ -885,6 +855,10 @@ function RolesSection() {
                   index={i}
                   isFirst={i === 0}
                   isLast={i === ROLE_ACCORDION_DATA.length - 1}
+                  isOpen={openRole === role.name}
+                  anyOpen={openRole !== null}
+                  onOpen={() => setOpenRole(role.name)}
+                  onClose={() => setOpenRole(null)}
                 />
               ))}
             </div>
@@ -1361,23 +1335,23 @@ function Footer() {
 export default function App() {
   const [introComplete, setIntroComplete] = useState(false);
 
+  // Prevent body scroll while intro overlay is active
+  useEffect(() => {
+    document.body.style.overflow = introComplete ? "" : "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, [introComplete]);
+
   return (
     <>
       {!introComplete && (
         <IntroAnimation onComplete={() => setIntroComplete(true)} />
       )}
-      <div
-        className="flex flex-col w-full"
-        style={{
-          opacity: introComplete ? 1 : 0,
-          transition: "opacity 0.8s ease",
-          pointerEvents: introComplete ? "auto" : "none",
-        }}
-      >
+      {/* Page is always rendered (opacity 1) — intro overlay sits on top */}
+      <div className="flex flex-col w-full">
         <Navbar />
         <HeroSection />
-        <WhatWorkingSection />
         <PartnersSection />
+        <WhatWorkingSection />
         <RolesSection />
         <TestimonialsSection />
         <NewsletterSection />
