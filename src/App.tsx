@@ -636,8 +636,8 @@ function WhatWorkingSection() {
   return (
     <section id="working" className="bg-[#ffedd7] w-full">
 
-      {/* ── Mobile / tablet ── */}
-      <div className="lg:hidden">
+      {/* ── Mobile / tablet (up to xl) ── */}
+      <div className="xl:hidden">
         <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[103px] pb-[51px]">
           <Reveal>
             <div className="text-[40px] md:text-[44px] text-black" style={STYLE_DISPLAY}>
@@ -680,10 +680,10 @@ function WhatWorkingSection() {
         </div>
       </div>
 
-      {/* ── Desktop: title left, two cards right ── */}
+      {/* ── Desktop xl+: title left, two cards right ── */}
       <div
-        className="hidden lg:flex max-w-[1440px] mx-auto"
-        style={{ gap: "30px", padding: "121px 30px", alignItems: "flex-start" }}
+        className="hidden xl:flex max-w-[1440px] mx-auto"
+        style={{ gap: "30px", padding: "103px 30px", alignItems: "flex-start" }}
       >
         {/* Left: sticky title — 675px (matches right card width exactly) */}
         <div style={{ width: "675px", maxWidth: "675px", flexShrink: 0, position: "sticky", top: "var(--stack-top)" }}>
@@ -1212,10 +1212,14 @@ const TESTIMONIALS = [
 ];
 
 // Shared card inner layout
-function TestimonialCardInner({ t }: { t: typeof TESTIMONIALS[0] }) {
+// stretch=true makes the card fill its parent container height (for equal-height carousels)
+function TestimonialCardInner({ t, stretch = false }: { t: typeof TESTIMONIALS[0]; stretch?: boolean }) {
   const initials = t.name.split(" ").map((w) => w[0]).join("").slice(0, 2);
   return (
-    <div style={{ backgroundColor: t.bg, padding: "6px" }}>
+    <div style={{
+      backgroundColor: t.bg, padding: "6px",
+      ...(stretch ? { height: "100%", display: "flex", flexDirection: "column" } : {}),
+    }}>
       {/* Header */}
       <div style={{ display: "flex", marginBottom: "-0.823px", flexShrink: 0 }}>
         <div style={{ width: 133, height: 117, flexShrink: 0, border: "0.6px solid black", borderRadius: "4.8px 0 0 0", overflow: "hidden" }}>
@@ -1236,8 +1240,12 @@ function TestimonialCardInner({ t }: { t: typeof TESTIMONIALS[0] }) {
           </div>
         </div>
       </div>
-      {/* Body */}
-      <div style={{ border: "0.6px solid black", borderTop: "none", borderRadius: "0 0 4.8px 4.8px", padding: "18px", display: "flex", flexDirection: "column", gap: "12px" }}>
+      {/* Body — flex-grow when stretching so card fills container height */}
+      <div style={{
+        border: "0.6px solid black", borderTop: "none", borderRadius: "0 0 4.8px 4.8px",
+        padding: "18px", display: "flex", flexDirection: "column", gap: "12px",
+        ...(stretch ? { flex: 1 } : {}),
+      }}>
         {t.text.map((para, i) => (
           <p key={i} style={{ ...STYLE_MONO, fontSize: 16, color: "black", lineHeight: 1.1 }}>{para}</p>
         ))}
@@ -1360,11 +1368,11 @@ function TestimonialsCarousel({ testimonials }: { testimonials: typeof TESTIMONI
 
   return (
     <div className="lg:hidden">
-      {/* All cards in same grid cell — height = tallest card */}
+      {/* All cards in same grid cell — height = tallest card; stretch fills that height */}
       <div style={{ display: "grid" }}>
         {testimonials.map((t, i) => (
-          <div key={t.name} style={{ gridArea: "1 / 1", visibility: i === idx ? "visible" : "hidden" }}>
-            <TestimonialCardInner t={t} />
+          <div key={t.name} style={{ gridArea: "1 / 1", visibility: i === idx ? "visible" : "hidden", height: "100%" }}>
+            <TestimonialCardInner t={t} stretch={true} />
           </div>
         ))}
       </div>
@@ -1490,12 +1498,12 @@ function NewsletterCarousel({ articles }: { articles: typeof NEWSLETTER_ARTICLES
 
   return (
     <div className="md:hidden">
-      {/* All cards in same grid cell — height = tallest card */}
+      {/* All cards in same grid cell — height = tallest card; stretch fills that height */}
       <div style={{ display: "grid", marginBottom: "16px" }}>
         {articles.map((article, i) => (
-          <div key={article.title} style={{ gridArea: "1 / 1", visibility: i === idx ? "visible" : "hidden" }}>
-            <HoverCard className="h-full">
-              <div className="bg-white flex flex-col p-[10px]">
+          <div key={article.title} style={{ gridArea: "1 / 1", visibility: i === idx ? "visible" : "hidden", height: "100%" }}>
+            <HoverCard className="h-full" style={{ height: "100%" }}>
+              <div className="bg-white flex flex-col p-[10px]" style={{ height: "100%" }}>
                 <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
                   <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
                     <p className="text-[20px] text-black whitespace-pre-line" style={STYLE_DISPLAY}>{article.title}</p>
@@ -1549,20 +1557,30 @@ function NewsletterSection() {
           </p>
         </Reveal>
 
-        {/* Email subscribe row */}
-        <Reveal delay={60} className="flex flex-col sm:flex-row gap-[10px] items-center justify-center mb-[68px] md:mb-[78px]">
+        {/* Subscribe row — desktop/tablet only (shown above articles) */}
+        <Reveal delay={60} className="hidden sm:flex flex-row gap-[10px] items-center justify-center mb-[68px] md:mb-[78px]">
           <input
             type="email"
             placeholder="Enter your email"
             className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full sm:w-[403px] text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
             style={STYLE_DISPLAY}
           />
-          {/* Subscribe button — explicitly 50px tall to match the input */}
           <SubscribeBtn />
         </Reveal>
 
-        {/* Mobile carousel */}
+        {/* Mobile carousel — shown before subscribe on small screens */}
         <NewsletterCarousel articles={NEWSLETTER_ARTICLES} />
+
+        {/* Subscribe row — mobile only (shown after carousel) */}
+        <div className="flex sm:hidden flex-col gap-[10px] items-center justify-center mt-[24px] mb-[68px]">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
+            style={STYLE_DISPLAY}
+          />
+          <SubscribeBtn />
+        </div>
 
         {/* Desktop/tablet grid (md+) */}
         <div className="hidden md:grid grid-cols-3 gap-[30px]">
