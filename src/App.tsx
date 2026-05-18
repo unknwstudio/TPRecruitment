@@ -202,92 +202,136 @@ function OrangeBtn({ onClick, children, className = "" }: { onClick?: () => void
 }
 
 // ── Intro animation ───────────────────────────────────────────────────────────
-// Phase 0 (0ms):    Rectangle border appears
-// Phase 1 (700ms):  Arrow-burst SVG fades in, rect border hidden (SVG has it)
-// Phase 2 (2200ms): Corner text labels appear
-// Phase 3 (4200ms): Everything fades out
-// onComplete (5000ms): parent removes overlay, main page revealed
+// Phase 0 (0ms):    Rectangle + centre dot visible; all arrows hidden
+// Phase 1 (700ms):  Arrows grow asynchronously from centre over ~2 s
+// Phase 2 (3100ms): Corner text labels appear (300 ms after last arrow)
+// Phase 3 (5200ms): Labels fade; burst slides to hero illustration (desktop)
+//                   OR whole overlay fades out (mobile)
+// onComplete (6000ms): overlay unmounts
 function IntroAnimation({ onComplete }: { onComplete: () => void }) {
   const [phase, setPhase] = useState<0 | 1 | 2 | 3>(0);
+  const [burstTransform, setBurstTransform] = useState<string>("none");
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 700),
-      setTimeout(() => setPhase(2), 2200),
-      setTimeout(() => setPhase(3), 4200),
-      setTimeout(onComplete, 5000),
+      setTimeout(() => setPhase(1),  700),
+      setTimeout(() => setPhase(2), 3100),
+      setTimeout(() => setPhase(3), 5200),
+      setTimeout(onComplete,        6000),
     ];
     return () => timers.forEach(clearTimeout);
   }, [onComplete]);
 
-  // Positions derived from Figma node 515:355 (container 687 × 755.573px)
-  // Rectangle 21: x=118.415 y=165.103 w=466.677 h=466.677  (scaled from 540×580 group)
-  // But the SVG viewBox="0 0 686.049 736.525" and the rect in SVG: x=118.415 y=165.103 w=466.677 h=466.677
-  // So as percentages of 686×736: left=17.26%, top=22.43%, right=right edge=84.26%, bottom=85.83%
-  // Text positions in the 687×755 container:
-  //   "Higher":   left=118.1/687=17.19%  top=138.42/755.573=18.32%
-  //   "Standard": left=434.3/687=63.22%  top=18.32%
-  //   "In hiring":left=118.1/687=17.19%  top=641.28/755.573=84.87%
-  //   "People":   right edge at left=585.12px → right = (687-585.12)/687=14.83% from right
+  // At phase 3 on desktop: slide burst to hero illustration position
+  useEffect(() => {
+    if (phase !== 3) return;
+    if (window.innerWidth < 1020) return;
+    const anchor = document.getElementById("hero-illustration-anchor");
+    if (!anchor) return;
+    const rect = anchor.getBoundingClientRect();
+    const targetCX = rect.left + rect.width / 2;
+    const targetCY = rect.top + rect.height / 2;
+    const containerW = Math.min(687, window.innerWidth * 0.9);
+    const dX = targetCX - window.innerWidth / 2;
+    const dY = targetCY - window.innerHeight / 2;
+    const sc = rect.width / containerW;
+    setBurstTransform(`translate(${dX}px, ${dY}px) scale(${sc})`);
+  }, [phase]);
+
+  // clip-path grow from SVG centre (51.09% / 53.93%) with per-arrow stagger
+  const arrowStyle = (delay: number): React.CSSProperties => ({
+    clipPath: phase >= 1
+      ? "circle(200% at 51.09% 53.93%)"
+      : "circle(0%   at 51.09% 53.93%)",
+    transition: phase >= 1
+      ? `clip-path 0.55s cubic-bezier(0.4,0,0.2,1) ${delay}ms`
+      : "none",
+  });
+
   const labels = [
-    { text: "Higher",    style: { left: "17.19%", top: "18.32%" },                    delay: 0   },
-    { text: "Standard",  style: { left: "63.22%", top: "18.32%" },                    delay: 100 },
-    { text: "In hiring", style: { left: "17.19%", top: "84.87%" },                    delay: 200 },
-    { text: "People",    style: { right: "14.83%", top: "84.87%", textAlign: "right" as const }, delay: 300 },
+    { text: "Higher",    pos: { left: "17.26%",  top: "19.5%" },                              delay: 0   },
+    { text: "Standard",  pos: { right: "14.71%", top: "19.5%", textAlign: "right" as const }, delay: 100 },
+    { text: "In hiring", pos: { left: "17.26%",  top: "87.5%" },                              delay: 200 },
+    { text: "People",    pos: { right: "14.71%", top: "87.5%", textAlign: "right" as const }, delay: 300 },
   ];
+
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 1020;
 
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 1000,
       backgroundColor: "#ffedd7",
       display: "flex", alignItems: "center", justifyContent: "center",
-      opacity: phase === 3 ? 0 : 1,
+      opacity: phase === 3 && isMobile ? 0 : 1,
       transition: phase === 3 ? "opacity 0.8s ease" : "none",
       pointerEvents: phase === 3 ? "none" : "auto",
     }}>
-      <div style={{ position: "relative", width: "min(687px, 90vw)", height: "min(756px, 90vh)" }}>
-        {/* Rect placeholder — visible only in phase 0 before SVG loads */}
-        <div style={{
-          position: "absolute",
-          left: "17.26%", top: "22.43%", width: "67.03%", height: "63.4%",
-          border: "0.635px solid #4d453b",
-          opacity: phase === 0 ? 1 : 0,
-          transition: "opacity 0.3s ease",
-          pointerEvents: "none",
-        }} />
-        {/* Center dot */}
-        <div style={{
-          position: "absolute",
-          left: "50%", top: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 5, height: 5,
-          backgroundColor: "#4d453b",
-          borderRadius: "50%",
-          opacity: phase === 0 ? 1 : 0,
-          transition: "opacity 0.3s ease",
-        }} />
-        {/* Arrow burst SVG */}
-        <img
-          src="/intro-burst.svg"
-          alt=""
-          style={{
-            position: "absolute", inset: 0, width: "100%", height: "100%",
-            opacity: phase >= 1 ? 1 : 0,
-            transform: `scale(${phase >= 1 ? 1 : 0.9})`,
-            transition: "opacity 1.5s ease, transform 1.5s cubic-bezier(0.4,0,0.2,1)",
-          }}
-        />
-        {/* Corner text labels */}
-        {labels.map(({ text, style, delay }) => (
+      <div style={{
+        position: "relative",
+        width: "min(687px, 90vw)",
+        transform: phase === 3 ? burstTransform : "none",
+        transition: phase === 3 ? "transform 0.85s cubic-bezier(0.4,0,0.2,1)" : "none",
+        transformOrigin: "center center",
+      }}>
+        {/* ── Inline SVG burst ─────────────────────────────────────────────── */}
+        <svg
+          viewBox="0 0 686.049 736.525"
+          width="100%"
+          style={{ display: "block" }}
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {/* Rectangle — always visible (phase 0+) */}
+          <rect
+            x="118.415" y="165.103" width="466.677" height="466.677"
+            stroke="#4D453B" strokeWidth="0.634935"
+          />
+
+          {/* ── Wave 1 — cross lines (0 ms, 80 ms) ── */}
+          <path d="M350.484 164.785L348.651 167.96H352.317L350.484 164.785ZM350.167 631.5V631.817H350.802V631.5H350.484H350.167ZM350.484 167.642H350.167V631.5H350.484H350.802V167.642H350.484Z" fill="#4D453B" style={arrowStyle(0)} />
+          <path d="M118.098 396.854H117.78V397.489H118.098V397.171V396.854ZM582.871 397.171V396.854H118.098V397.171V397.489H582.871V397.171Z" fill="#4D453B" style={arrowStyle(80)} />
+
+          {/* ── Wave 2 — upper arrows (250 ms – 400 ms) ── */}
+          <path d="M429.216 45.4173L426.734 48.115L430.312 48.9157L429.216 45.4173ZM350.175 397.102L350.105 397.412L350.725 397.551L350.794 397.241L350.484 397.171L350.175 397.102ZM428.592 48.2055L428.282 48.1362L350.175 397.102L350.484 397.171L350.794 397.241L428.902 48.2749L428.592 48.2055Z" fill="#4D453B" style={arrowStyle(250)} />
+          <path d="M440.645 223.498L437.555 225.471L440.809 227.16L440.645 223.498ZM350.202 397.026L350.056 397.308L350.619 397.6L350.765 397.318L350.484 397.172L350.202 397.026ZM439.329 226.033L439.047 225.887L350.202 397.026L350.484 397.172L350.765 397.318L439.61 226.18L439.329 226.033Z" fill="#4D453B" style={arrowStyle(330)} />
+          <path d="M393.025 150.817L390.679 153.633L394.291 154.257L393.025 150.817ZM350.172 397.117L350.118 397.43L350.744 397.538L350.798 397.226L350.485 397.172L350.172 397.117ZM392.539 153.632L392.226 153.578L350.172 397.117L350.485 397.172L350.798 397.226L392.852 153.686L392.539 153.632Z" fill="#4D453B" style={arrowStyle(410)} />
+
+          {/* ── Wave 3 — lower-left + right arrows (550 ms – 700 ms) ── */}
+          <path d="M271.752 736.525L274.255 733.847L270.684 733.018L271.752 736.525ZM350.793 397.243L350.865 396.934L350.246 396.791L350.174 397.1L350.484 397.172L350.793 397.243ZM272.398 733.742L272.707 733.814L350.793 397.243L350.484 397.172L350.174 397.1L272.089 733.67L272.398 733.742Z" fill="#4D453B" style={arrowStyle(550)} />
+          <path d="M275.559 634.14L278.264 631.666L274.769 630.56L275.559 634.14ZM350.787 397.267L350.883 396.964L350.277 396.773L350.182 397.076L350.484 397.171L350.787 397.267ZM276.421 631.416L276.724 631.511L350.787 397.267L350.484 397.171L350.182 397.076L276.118 631.32L276.421 631.416Z" fill="#4D453B" style={arrowStyle(630)} />
+          <path d="M591.125 480.983L588.73 478.208L587.524 481.67L591.125 480.983ZM350.588 396.872L350.288 396.768L350.079 397.367L350.379 397.472L350.484 397.172L350.588 396.872ZM588.427 480.043L588.531 479.743L350.588 396.872L350.484 397.172L350.379 397.472L588.322 480.343L588.427 480.043Z" fill="#4D453B" style={arrowStyle(710)} />
+
+          {/* ── Wave 4 — mid-ring arrows (850 ms – 1100 ms) ── */}
+          <path d="M86.9861 348.916L89.7787 351.291L90.4391 347.685L86.9861 348.916ZM350.426 397.484L350.738 397.541L350.852 396.916L350.54 396.859L350.483 397.171L350.426 397.484ZM89.7966 349.431L89.7394 349.743L350.426 397.484L350.483 397.171L350.54 396.859L89.8538 349.119L89.7966 349.431Z" fill="#4D453B" style={arrowStyle(850)} />
+          <path d="M330.166 586.382L332.328 583.421L328.683 583.03L330.166 586.382ZM350.799 397.205L350.833 396.89L350.201 396.822L350.167 397.138L350.483 397.171L350.799 397.205ZM330.471 583.541L330.787 583.575L350.799 397.205L350.483 397.171L350.167 397.138L330.156 583.507L330.471 583.541Z" fill="#4D453B" style={arrowStyle(930)} />
+          <path d="M540.33 594.636L539.451 591.078L536.808 593.618L540.33 594.636ZM350.712 396.951L350.492 396.723L350.034 397.163L350.254 397.392L350.483 397.171L350.712 396.951ZM538.35 592.577L538.579 592.357L350.712 396.951L350.483 397.171L350.254 397.392L538.121 592.797L538.35 592.577Z" fill="#4D453B" style={arrowStyle(1010)} />
+          <path d="M511.123 421.299L508.256 419.015L507.711 422.64L511.123 421.299ZM350.53 396.858L350.216 396.811L350.122 397.439L350.436 397.486L350.483 397.172L350.53 396.858ZM508.297 420.875L508.345 420.561L350.53 396.858L350.483 397.172L350.436 397.486L508.25 421.189L508.297 420.875Z" fill="#4D453B" style={arrowStyle(1090)} />
+          <path d="M263.498 350.821L265.438 353.932L267.162 350.697L263.498 350.821ZM350.334 397.452L350.614 397.601L350.913 397.041L350.632 396.892L350.483 397.172L350.334 397.452ZM266.02 352.165L265.87 352.445L350.334 397.452L350.483 397.172L350.632 396.892L266.169 351.885L266.02 352.165Z" fill="#4D453B" style={arrowStyle(1170)} />
+
+          {/* ── Wave 5 — outer / diagonal arrows (1300 ms – 1600 ms) ── */}
+          <path d="M222.862 594.3L226.126 592.631L223.049 590.639L222.862 594.3ZM350.751 397.343L350.924 397.077L350.391 396.732L350.218 396.998L350.485 397.171L350.751 397.343ZM224.415 591.901L224.681 592.074L350.751 397.343L350.485 397.171L350.218 396.998L224.148 591.729L224.415 591.901Z" fill="#4D453B" style={arrowStyle(1300)} />
+          <path d="M295.882 287.326L295.646 290.984L298.932 289.36L295.882 287.326ZM480.427 607.809C480.598 607.849 480.769 607.743 480.809 607.573L481.461 604.791C481.501 604.62 481.395 604.449 481.225 604.409C481.054 604.369 480.883 604.475 480.843 604.646L480.263 607.118L477.79 606.538C477.62 606.498 477.449 606.604 477.409 606.775C477.369 606.946 477.475 607.117 477.645 607.157L480.427 607.809ZM350.488 397.806L350.203 397.946L350.21 397.96L350.218 397.973L350.488 397.806ZM297.148 289.888L296.864 290.028L350.203 397.946L350.488 397.806L350.772 397.665L297.433 289.747L297.148 289.888ZM350.488 397.806L350.218 397.973L480.23 607.667L480.5 607.5L480.769 607.333L350.757 397.638L350.488 397.806Z" fill="#4D453B" style={arrowStyle(1380)} />
+          <path d="M212.068 189.211L212.296 192.87L215.351 190.843L212.068 189.211ZM350.221 397.981L350.396 398.246L350.925 397.895L350.75 397.63L350.485 397.806L350.221 397.981ZM213.648 191.592L213.384 191.767L350.221 397.981L350.485 397.806L350.75 397.63L213.913 191.416L213.648 191.592Z" fill="#4D453B" style={arrowStyle(1460)} />
+          <path d="M295.883 287.326L295.646 290.984L298.933 289.36L295.883 287.326ZM476.875 712.292C477.037 712.361 477.223 712.286 477.292 712.124L478.411 709.496C478.48 709.334 478.405 709.148 478.244 709.079C478.082 709.01 477.896 709.086 477.827 709.247L476.832 711.584L474.496 710.588C474.334 710.52 474.148 710.595 474.079 710.756C474.01 710.917 474.085 711.104 474.247 711.173L476.875 712.292ZM350.488 397.806L350.783 397.687L350.778 397.676L350.773 397.665L350.488 397.806ZM297.149 289.887L296.864 290.028L350.203 397.946L350.488 397.806L350.773 397.665L297.433 289.747L297.149 289.887ZM350.488 397.806L350.194 397.924L476.705 712.119L477 712L477.294 711.881L350.783 397.687L350.488 397.806Z" fill="#4D453B" style={arrowStyle(1540)} />
+          <path d="M0 48.592L0.955192 52.1312L3.5426 49.5344L0 48.592ZM350.895 398.666L351.12 398.89L351.568 398.441L351.343 398.216L351.119 398.441L350.895 398.666ZM2.02401 50.6087L1.79993 50.8336L350.895 398.666L351.119 398.441L351.343 398.216L2.24808 50.3838L2.02401 50.6087Z" fill="#4D453B" style={arrowStyle(1620)} />
+          <path d="M686.048 62.8304C686.048 62.6551 685.906 62.513 685.73 62.5131L682.873 62.5142C682.698 62.5143 682.556 62.6565 682.556 62.8318C682.556 63.0071 682.698 63.1492 682.873 63.1491L685.413 63.1482L685.414 65.6879C685.414 65.8632 685.556 66.0053 685.732 66.0052C685.907 66.0052 686.049 65.863 686.049 65.6877L686.048 62.8304ZM118.276 630.276L118.051 630.5L118.5 630.949L118.725 630.725L118.5 630.5L118.276 630.276ZM685.73 62.8306L685.506 62.6062L118.276 630.276L118.5 630.5L118.725 630.725L685.955 63.055L685.73 62.8306Z" fill="#4D453B" style={arrowStyle(1700)} />
+          <path d="M667.951 261.458L664.31 261.033L665.762 264.399L667.951 261.458ZM111.749 501.465L115.39 501.89L113.937 498.524L111.749 501.465ZM665.328 262.59L665.202 262.299L114.246 500.041L114.372 500.333L114.498 500.624L665.454 262.882L665.328 262.59Z" fill="#4D453B" style={arrowStyle(1780)} />
+
+          {/* Centre dot — always on top */}
+          <circle cx="350.484" cy="397.171" r="4.76201" fill="#FFEDD7" stroke="#4D453B" strokeWidth="0.634935" />
+        </svg>
+
+        {/* Corner labels — appear at phase 2, fade at phase 3 */}
+        {labels.map(({ text, pos, delay }) => (
           <p key={text} style={{
             ...STYLE_DISPLAY,
             fontSize: "clamp(16px, 3.7vw, 25.4px)",
             color: "black",
             position: "absolute",
-            ...style,
-            opacity: phase >= 2 ? 1 : 0,
-            transform: phase >= 2 ? "translateY(0)" : "translateY(10px)",
-            transition: `opacity 0.5s ease ${delay}ms, transform 0.5s ease ${delay}ms`,
+            ...pos,
+            opacity: phase >= 2 && phase < 3 ? 1 : 0,
+            transform: phase >= 2 && phase < 3 ? "translateY(0)" : "translateY(8px)",
+            transition: `opacity 0.45s ease ${delay}ms, transform 0.45s ease ${delay}ms`,
           }}>{text}</p>
         ))}
       </div>
@@ -308,6 +352,14 @@ function Navbar() {
   const [navHov,    setNavHov]    = useState(false);
   const [menuHov,   setMenuHov]   = useState(false);
   const [ctaHidden, setCtaHidden] = useState(false);
+  const [scrolled,  setScrolled]  = useState(false);
+
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 80);
+    window.addEventListener("scroll", handler, { passive: true });
+    handler();
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -333,21 +385,21 @@ function Navbar() {
 
   return (
     <>
-      <div className="sticky top-0 z-50 flex items-center justify-between px-[16px] md:px-[30px] py-[14px] md:py-[20px] w-full">
+      <div
+        className="sticky top-0 z-50 flex items-center justify-between px-[16px] md:px-[30px] py-[14px] md:py-[20px] w-full"
+        style={{
+          backgroundColor: scrolled ? "#ffffff" : "#ffedd7",
+          boxShadow: scrolled ? "0 1px 8px rgba(0,0,0,0.06)" : "none",
+          transition: "background-color 0.35s ease, box-shadow 0.35s ease",
+        }}
+      >
 
-        {/* Logo — small SVG below 1020px, full logo at 1020px+ */}
+        {/* Logo — custom SVG for all breakpoints */}
         <img
-          src="/TP_logo.svg"
-          alt="TPRecruitment"
-          className="hidden lg:block w-auto cursor-pointer"
+          src="/nav-logo.svg"
+          alt="Higher Standard"
+          className="w-auto cursor-pointer"
           style={{ height: "46px" }}
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        />
-        <img
-          src="/small_logo_TP.svg"
-          alt="TPRecruitment"
-          className="block lg:hidden w-auto cursor-pointer"
-          style={{ height: "32px" }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         />
 
@@ -452,92 +504,86 @@ function Navbar() {
 }
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
+// Figma 513:299 — 821px total frame (incl. nav ~86px).
+// Content: left=30px, top=215px → from section top = 215-86 = 129px. w=799px h=445px.
+// Illustration: centered in 821px frame → center Y=410.5px → from section top=324.5px
+//   → illustration top = 324.5 - 595/2 = 27px. right=30px. w=541px h=595px.
 function HeroSection() {
   return (
     <section className="bg-[#ffedd7] w-full overflow-hidden">
-      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[80px] lg:pt-[120px] pb-[96px]">
 
-        {/* Headline — fades in immediately on mount */}
-        <Reveal y={20} className="mb-[52px] lg:mb-[80px]">
-          <p className="text-[40px] lg:text-[60px] text-black max-w-[1155px]" style={STYLE_DISPLAY}>
-            Recruitment is messy, human, and brutal. Most recruiters hide from that. I&nbsp;don&apos;t.
-          </p>
-        </Reveal>
+      {/* ── Desktop (≥1020px): absolute positions matching Figma exactly ── */}
+      <div className="hidden lg:block relative" style={{ minHeight: "735px" }}>
+        <div className="max-w-[1440px] mx-auto px-[30px] relative" style={{ height: "735px" }}>
 
-        {/* Two equal-width cards — 675px each at 1440px viewport */}
-        <div className="flex flex-col lg:flex-row gap-[16px] lg:gap-[30px] lg:items-stretch">
+          {/* Left content: top=129px, w=799px, gap=40px between all three elements */}
+          <div
+            className="absolute flex flex-col gap-[40px]"
+            style={{ left: "0px", top: "129px", width: "799px" }}
+          >
+            <p className="text-black" style={{ ...STYLE_DISPLAY, fontSize: "60px", letterSpacing: "-3px", lineHeight: "1.1" }}>
+              The right hire changes everything that comes after it.
+            </p>
+            <div style={{ ...STYLE_MONO, fontSize: "28px", lineHeight: "1.1", color: "black" }}>
+              <p>I&apos;m Tiffany Philippou, founder of Higher Standard.</p>
+              <p>I find the people who raise the bar for your whole company and shape the outcome, then I stay long after the offer is signed.</p>
+            </div>
+            <OrangeBtn onClick={scrollToContact}>
+              <p style={{ ...STYLE_MONO, fontSize: "24px", lineHeight: "20px", color: "black", whiteSpace: "nowrap" }}>
+                Start working together
+              </p>
+            </OrangeBtn>
+          </div>
 
-          {/* Left: Usual process */}
-          <Reveal delay={100} className="flex flex-1 min-w-0 lg:max-w-[675px] lg:self-stretch">
-            <HoverCard className="flex w-full">
-              <div className="bg-[#d1d1d1] flex flex-col w-full p-[10px]">
-                <div className="flex items-start shrink-0 w-full" style={{ marginBottom: "-1.372px" }}>
-                  <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] md:p-[30px] rounded-tl-[8px] rounded-tr-[8px]">
-                    <p className="shrink-0 text-[24px] md:text-[32px] text-black" style={STYLE_DISPLAY}>Usual process:</p>
-                  </div>
-                </div>
-                <div className="flex flex-1 min-h-0">
-                  <div className="border-[1.372px] border-black flex flex-1 flex-col gap-[24px] md:gap-[30px] items-start p-[20px] md:p-[30px] rounded-bl-[8px] rounded-br-[8px]">
-                    <div className="flex flex-col gap-[16px] md:gap-[20px] items-start w-full">
-                      {["You fill out a brief.", "You get CVs.", "You do the thinking."].map((t) => (
-                        <div key={t} className="flex gap-[16px] md:gap-[20px] items-start w-full">
-                          <div className="shrink-0 border border-[#4d453b] rounded-[2px] w-[18px] h-[18px] mt-[3px]" />
-                          <p className="flex-1 text-[18px] md:text-[24px] text-black" style={STYLE_MONO}>{t}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="w-full text-[18px] md:text-[24px] text-black" style={STYLE_MONO}>Sound familiar?</p>
-                  </div>
-                </div>
-              </div>
-            </HoverCard>
-          </Reveal>
-
-          {/* Right: Working with me */}
-          <Reveal delay={180} className="flex flex-1 min-w-0 lg:max-w-[675px] lg:self-stretch">
-            <HoverCard className="flex w-full">
-              <div className="bg-white flex flex-col w-full p-[10px]">
-                <div className="flex items-start shrink-0 w-full" style={{ marginBottom: "-1.372px" }}>
-                  <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] md:p-[30px] rounded-tl-[8px] rounded-tr-[8px]">
-                    <p className="flex-1 text-[24px] md:text-[32px] text-black" style={STYLE_DISPLAY}>Working with me:</p>
-                  </div>
-                </div>
-                <div className="flex flex-1 min-h-0">
-                  <div className="border-[1.372px] border-black flex flex-1 flex-col gap-[20px] md:gap-[40px] items-start p-[20px] md:p-[30px] rounded-bl-[8px] rounded-br-[8px]">
-                    <div className="flex flex-col gap-[14px] md:gap-[20px] items-start w-full">
-                      {["You have a conversation.", "You meet people I believe in."].map((t) => (
-                        <div key={t} className="flex gap-[16px] md:gap-[20px] items-start w-full">
-                          <OrangeCheckbox />
-                          <p className="flex-1 text-[18px] md:text-[24px] text-black" style={STYLE_MONO}>{t}</p>
-                        </div>
-                      ))}
-                      <div className="flex gap-[16px] md:gap-[20px] items-start w-full">
-                        <OrangeCheckbox />
-                        <div className="flex-1 text-[18px] md:text-[24px] text-black" style={{ ...STYLE_MONO, lineHeight: "1.1" }}>
-                          <p>The decision is up to you —</p>
-                          <p>but you never carry that weight alone.</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-[18px] md:text-[24px] text-black" style={{ ...STYLE_MONO, lineHeight: "1.1" }}>
-                      <p>Good hiring is a collaboration,</p>
-                      <p>not a transaction.</p>
-                    </div>
-                    <div className="md:mt-auto">
-                      <OrangeBtn onClick={scrollToContact}>
-                        <p className="text-[18px] md:text-[24px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
-                          Start working together
-                        </p>
-                      </OrangeBtn>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </HoverCard>
-          </Reveal>
+          {/* Right illustration — anchor for the intro animation to fly into */}
+          {/* top=27px matches centering within the 821px Figma frame */}
+          <div
+            id="hero-illustration-anchor"
+            className="absolute"
+            style={{ right: "0px", top: "27px", width: "541px", height: "595px" }}
+          >
+            {/* SVG centered inside */}
+            <div className="absolute" style={{
+              left: "50%", top: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "540px", height: "580px",
+            }}>
+              <img src="/intro-burst.svg" alt="" style={{ width: "100%", height: "100%", display: "block" }} />
+            </div>
+            {/* Corner labels — matching Figma node 513:345 positions */}
+            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "93px",  top: "109px", letterSpacing: "-0.4px" }}>Higher</p>
+            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "342px", top: "109px", letterSpacing: "-0.4px" }}>Standard</p>
+            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "93px",  top: "505px", letterSpacing: "-0.4px" }}>In hiring</p>
+            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "461px", top: "505px", letterSpacing: "-0.4px", transform: "translateX(-100%)" }}>People</p>
+          </div>
 
         </div>
       </div>
+
+      {/* ── Mobile (<1020px): stacked ── */}
+      <div className="lg:hidden px-[16px] md:px-[30px] pt-[60px] pb-[80px]">
+        <div className="flex flex-col gap-[40px]">
+          <Reveal>
+            <p style={{ ...STYLE_DISPLAY, fontSize: "clamp(36px, 10vw, 48px)", letterSpacing: "-2px", lineHeight: "1.1", color: "black" }}>
+              The right hire changes everything that comes after it.
+            </p>
+          </Reveal>
+          <Reveal delay={120}>
+            <div style={{ ...STYLE_MONO, fontSize: "clamp(16px, 4.5vw, 20px)", lineHeight: "1.3", color: "black" }}>
+              <p>I&apos;m Tiffany Philippou, founder of Higher Standard.</p>
+              <p style={{ marginTop: "10px" }}>I find the people who raise the bar for your whole company and shape the outcome, then I stay long after the offer is signed.</p>
+            </div>
+          </Reveal>
+          <Reveal delay={220}>
+            <OrangeBtn onClick={scrollToContact}>
+              <p style={{ ...STYLE_MONO, fontSize: "18px", lineHeight: "20px", color: "black", whiteSpace: "nowrap" }}>
+                Start working together
+              </p>
+            </OrangeBtn>
+          </Reveal>
+        </div>
+      </div>
+
     </section>
   );
 }
@@ -622,8 +668,8 @@ function WhatWorkingSection() {
         className="hidden lg:flex max-w-[1440px] mx-auto"
         style={{ gap: "30px", padding: "96px 30px", alignItems: "flex-start" }}
       >
-        {/* Left: sticky title — ~673px wide */}
-        <div style={{ width: "673px", flexShrink: 0, position: "sticky", top: "var(--stack-top)" }}>
+        {/* Left: sticky title — 675px (matches right card width exactly) */}
+        <div style={{ width: "675px", maxWidth: "675px", flexShrink: 0, position: "sticky", top: "var(--stack-top)" }}>
           <Reveal>
             <div className="text-[52px] text-black" style={STYLE_DISPLAY}>
               <p>What</p>
@@ -711,35 +757,114 @@ function PartnersSection() {
   }, []);
 
   return (
-    <section id="partners" className="bg-[#ffedd7] w-full overflow-hidden py-[96px]">
-      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
-        <Reveal>
-          <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
-            My partners &amp; collaborators
-          </p>
-        </Reveal>
+    <section id="partners" className="bg-[#ffedd7] w-full overflow-hidden py-[40px]">
+      <div className="flex border-t border-b border-black overflow-hidden mb-[-1px]">
+        <div className="flex animate-marquee">
+          {[...partnerLogosRow1, ...partnerLogosRow1].map((src, i) => <PartnerLogo key={i} src={src} small={small} />)}
+        </div>
       </div>
-      <Reveal y={16}>
-        <div className="flex border-t border-b border-black overflow-hidden mb-[-1px]">
-          <div className="flex animate-marquee">
-            {[...partnerLogosRow1, ...partnerLogosRow1].map((src, i) => <PartnerLogo key={i} src={src} small={small} />)}
-          </div>
+      <div className="flex border-t border-b border-black overflow-hidden">
+        <div className="flex animate-marquee-reverse">
+          {[...partnerLogosRow2, ...partnerLogosRow2].map((src, i) => <PartnerLogo key={i} src={src} small={small} />)}
         </div>
-        <div className="flex border-t border-b border-black overflow-hidden">
-          <div className="flex animate-marquee-reverse">
-            {[...partnerLogosRow2, ...partnerLogosRow2].map((src, i) => <PartnerLogo key={i} src={src} small={small} />)}
-          </div>
-        </div>
-      </Reveal>
+      </div>
     </section>
   );
 }
 
 // ── Roles ─────────────────────────────────────────────────────────────────────
-const ROLE_NAMES = ["Marketing", "Growth", "Product"];
 const ROLES_DESCRIPTION = "Venture-backed startups, from seed to Series B. Companies where every senior hire shapes the culture and the trajectory. I know this environment from the inside, and I know what the right person looks like at every stage of growth.";
 
+const ROLE_ACCORDION_DATA = [
+  { name: "Marketing", items: "CMO, VP Marketing, Head of Marketing." },
+  { name: "Growth",    items: "VP Growth, Head of Growth." },
+  { name: "Product",   items: "CPO, VP Product, Head of Product, Product Lead." },
+];
+
+function RoleAccordionRow({
+  role, index, isFirst, isLast, isOpen, anyOpen, onOpen, onClose,
+}: {
+  role: typeof ROLE_ACCORDION_DATA[0];
+  index: number;
+  isFirst: boolean;
+  isLast: boolean;
+  isOpen: boolean;
+  anyOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+}) {
+  // All closed → white. One open → open row = white, others = grey.
+  const bg = anyOpen && !isOpen ? "#e0e0e0" : "#ffffff";
+
+  const titleRadius = isFirst
+    ? "8px 8px 0 0"
+    : !isLast ? "0" : isOpen ? "0" : "0 0 8px 8px";
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        marginTop: isFirst ? 0 : "-1.372px",
+        zIndex: isOpen ? 10 : (ROLE_ACCORDION_DATA.length - index),
+        backgroundColor: bg,
+        transition: "background-color 0.25s ease",
+      }}
+      onMouseEnter={onOpen}
+      onMouseLeave={onClose}
+    >
+      {/* Title row */}
+      <div
+        className="flex items-center gap-[30px] p-[24px] md:p-[30px]"
+        style={{
+          border: "1.372px solid black",
+          borderRadius: titleRadius,
+          borderBottom: isOpen ? "none" : "1.372px solid black",
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
+        <p className="flex-1 text-[24px] md:text-[28px] text-black" style={STYLE_DISPLAY}>
+          {role.name}
+        </p>
+        {/* Arrow rotates 90° when open */}
+        <div style={{
+          backgroundColor: "#fb8349", width: 24, height: 24, flexShrink: 0,
+          position: "relative", display: "flex", alignItems: "center", justifyContent: "center",
+          transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
+          transition: "transform 0.25s ease",
+        }}>
+          <div style={{ position: "absolute", inset: 0, border: "0.4px solid black", borderRadius: "4px" }} />
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ position: "relative" }}>
+            <path d="M2 5H8M6 3L8 5L6 7" stroke="black" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Sub-row — grid 0fr → 1fr slide */}
+      <div style={{
+        display: "grid",
+        gridTemplateRows: isOpen ? "1fr" : "0fr",
+        transition: "grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+      }}>
+        <div style={{ overflow: "hidden", backgroundColor: bg }}>
+          <div className="p-[24px] md:p-[30px]" style={{
+            border: "1.372px solid black", borderTop: "none",
+            borderRadius: isLast ? "0 0 8px 8px" : "0",
+            backgroundColor: bg,
+          }}>
+            <p className="text-[20px] md:text-[24px] text-black" style={STYLE_MONO}>
+              {role.items}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function RolesSection() {
+  const [openRole, setOpenRole] = useState<string | null>(null);
+
   return (
     <section id="roles" className="bg-[#ffedd7] w-full py-[96px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
@@ -750,28 +875,23 @@ function RolesSection() {
         </Reveal>
 
         <div className="flex flex-col xl:flex-row gap-[30px] items-start">
-          {/* Left: role list card */}
+          {/* Left: accordion role list */}
           <Reveal className="xl:w-[671px] xl:shrink-0 w-full">
-            <HoverCard className="w-full">
-              <div className="bg-white p-[10px]">
-                {ROLE_NAMES.map((name, i) => (
-                  <div
-                    key={name}
-                    className="flex items-center gap-[30px] p-[24px] md:p-[30px]"
-                    style={{
-                      border: "1.372px solid black",
-                      borderRadius: i === 0 ? "8px 8px 0 0" : i === ROLE_NAMES.length - 1 ? "0 0 8px 8px" : "0",
-                      marginBottom: i < ROLE_NAMES.length - 1 ? "-1.372px" : 0,
-                      position: "relative",
-                      zIndex: i,
-                    }}
-                  >
-                    <p className="flex-1 text-[24px] md:text-[28px] text-black" style={STYLE_DISPLAY}>{name}</p>
-                    <ArrowBtn onClick={scrollToContact} />
-                  </div>
-                ))}
-              </div>
-            </HoverCard>
+            <div className="bg-white p-[10px]">
+              {ROLE_ACCORDION_DATA.map((role, i) => (
+                <RoleAccordionRow
+                  key={role.name}
+                  role={role}
+                  index={i}
+                  isFirst={i === 0}
+                  isLast={i === ROLE_ACCORDION_DATA.length - 1}
+                  isOpen={openRole === role.name}
+                  anyOpen={openRole !== null}
+                  onOpen={() => setOpenRole(role.name)}
+                  onClose={() => setOpenRole(null)}
+                />
+              ))}
+            </div>
           </Reveal>
 
           {/* Right: description + CTA */}
@@ -793,27 +913,27 @@ function RolesSection() {
 }
 
 // ── Testimonials ─────────────────────────────────────────────────────────────
-// All 8 testimonials — shown in scattered grid on desktop, carousel on mobile
+// All 8 testimonials — shown in scattered grid on desktop, grid on mobile
 const TESTIMONIALS = [
   {
     name: "Tom Picarony", title: "Head of Expansion",
-    photo: null as string | null, bg: "#e0ddd3",
+    photo: "/photo_tom.jpeg" as string | null, bg: "#edead6",
     text: [
       "Thanks to Tiffany's invaluable assistance, we've successfully hired our UK team.",
       "Her leadership, strategic insight, and dedication were instrumental in assembling a top-notch team ready to tackle any challenge.",
     ],
   },
   {
-    name: "Maria Monks", title: "Fractional CMO",
-    photo: "/photo_maria.jpeg" as string | null, bg: "#edead6",
+    name: "Maria Monks", title: "IQ Capital",
+    photo: "/photo_maria.jpeg" as string | null, bg: "#efd7ba",
     text: [
-      "Tiffany has been instrumental in helping me with marketing leadership hires across multiple startups. I have enjoyed working with her for years —her passion and professionalism is outstanding.",
-      "She also offers a great personalised service to both individual companies, and me, and I often seek her advice on everything recruitment.",
+      "Tiffany has been instrumental in helping me with marketing leadership hires across the IQ Capital portfolio. I have enjoyed working with her for years —her passion and professionalism is outstanding.",
+      "She also offers a great personalised service to both individual companies, and me, and I often seek her advice on everything recruitment, and building teams, related.",
     ],
   },
   {
     name: "Ruben Tadmor", title: "Founder",
-    photo: null as string | null, bg: "#d4dde0",
+    photo: "/photo_ruben.jpeg" as string | null, bg: "#90b0bb",
     text: [
       "Tiffany is by far the best experience I've had working with external support for recruitment — really felt like an extension of the hiring team.",
     ],
@@ -822,21 +942,22 @@ const TESTIMONIALS = [
     name: "Gastón Tourn", title: "Chief Growth Officer, Oddbox",
     photo: "/photo_gaston.jpeg" as string | null, bg: "#c1c497",
     text: [
-      "Tiffany is an outstanding talent professional with a thoughtful, personal approach. She spends significant time understanding candidates and ensuring opportunities align perfectly with their goals.",
-      "I highly recommend Tiffany for her exceptional ability to identify and engage top talent. If you're looking for a dedicated ambassador for your startup, she is the professional you need. Tiffany excels at finding candidates who may not be actively seeking a change and persuading them to consider new, exciting opportunities.",
+      "Tiffany's took the time to understand my interests and introduced the opportunity when she saw it was a perfect match.",
+      "This refreshing approach builds trust and confidence. I was considering other opportunities at the time, but I chose the role at Curio partly because of the assurance Tiffany provided during the hiring process.",
+      "I highly recommend Tiffany for her exceptional ability to identify and engage top talent. If you're looking for a dedicated ambassador for your startup, she is the professional you need.",
     ],
   },
   {
     name: "Govind Balakrishnan", title: "Co-founder, Gibran",
     photo: "/photo_govind.jpeg" as string | null, bg: "#ffffff",
     text: [
-      "We've loved working with Tiffany over several years on multiple senior hires. Our requirements are often atypical, and she takes a very hands-on and considered approach.",
+      "We've loved working with Tiffany over several years on multiple senior hires at Curio. Our requirements are often atypical, and she takes a very hands-on and considered approach.",
       "Thanks to our collaboration, we have a phenomenal tight-knit team, investment from tier 1 Silicon Valley investors and partnerships with top media outlets. We trust her fully and will work with her again.",
     ],
   },
   {
     name: "Martin Leguay", title: "CEO, Touchnote",
-    photo: null as string | null, bg: "#d0c8c0",
+    photo: "/photo_martin.jpeg" as string | null, bg: "#edead6",
     text: [
       "Working with Tiffany has been great, she's helped us on multiple briefs and has been so effective in providing the right candidates within such a fast turnaround.",
       "Whether for full time or temp requirements, Tiffany has a vast network of quality candidates to reach out to.",
@@ -844,7 +965,7 @@ const TESTIMONIALS = [
   },
   {
     name: "Jonathan Canizales", title: "Chief of Staff, Mindgard",
-    photo: "/photo_jonathan.jpeg" as string | null, bg: "#90b0bb",
+    photo: "/photo_jonathan.jpeg" as string | null, bg: "#fff5e9",
     text: [
       "I had the pleasure of working with Tiffany as my recruiter, and I couldn't be more impressed, she has been the best by far. She did an outstanding job from start to finish. Tiffany was super communicative, keeping me informed at every step of the process.",
       "Her honesty and openness was refreshing and made me feel confident throughout the process. I always felt I could trust her, and I truly appreciated how she checked up on me throughout the process.",
@@ -852,7 +973,7 @@ const TESTIMONIALS = [
   },
   {
     name: "Haralds Gabrans Zukovs", title: "Head of Growth, Mindgard",
-    photo: null as string | null, bg: "#c8d4c8",
+    photo: "/photo_haralds.jpeg" as string | null, bg: "#e0e0e0",
     text: [
       "Tiffany's expert guidance was invaluable in navigating my career transition.",
       "Her personalised advice and unwavering support empowered me to confidently land the perfect next step. I highly recommend her services to anyone seeking a career change partner.",
@@ -860,135 +981,111 @@ const TESTIMONIALS = [
   },
 ];
 
-// Shared card inner layout (used on both desktop grid and mobile carousel)
+// Shared card inner layout
 function TestimonialCardInner({ t }: { t: typeof TESTIMONIALS[0] }) {
   const initials = t.name.split(" ").map((w) => w[0]).join("").slice(0, 2);
   return (
-    <div style={{ backgroundColor: t.bg, padding: "6px", height: "100%" }}>
-      {/* Header: photo + name/title */}
+    <div style={{ backgroundColor: t.bg, padding: "6px" }}>
+      {/* Header */}
       <div style={{ display: "flex", marginBottom: "-0.823px", flexShrink: 0 }}>
-        <div style={{ width: 110, height: 96, flexShrink: 0, border: "0.6px solid black", borderRadius: "4.8px 0 0 0", overflow: "hidden" }}>
+        <div style={{ width: 133, height: 117, flexShrink: 0, border: "0.6px solid black", borderRadius: "4.8px 0 0 0", overflow: "hidden" }}>
           {t.photo ? (
             <img src={t.photo} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
           ) : (
             <div style={{ width: "100%", height: "100%", backgroundColor: "#4d453b", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ ...STYLE_DISPLAY, fontSize: 24, color: "white" }}>{initials}</span>
+              <span style={{ ...STYLE_DISPLAY, fontSize: 28, color: "white" }}>{initials}</span>
             </div>
           )}
         </div>
         <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <div style={{ border: "0.823px solid black", borderLeft: "none", borderBottom: "none", borderRadius: "0 4.8px 0 0", flex: 1, display: "flex", alignItems: "center", padding: "0 14px" }}>
-            <p style={{ ...STYLE_DISPLAY, fontSize: 15, color: "black", lineHeight: 1.1 }}>{t.name}</p>
+          <div style={{ border: "0.823px solid black", borderLeft: "none", borderBottom: "none", borderRadius: "0 4.8px 0 0", flex: 1, display: "flex", alignItems: "center", padding: "0 18px" }}>
+            <p style={{ ...STYLE_DISPLAY, fontSize: 16, color: "black", lineHeight: 1.08, letterSpacing: "-0.8px" }}>{t.name}</p>
           </div>
-          <div style={{ border: "0.823px solid black", borderLeft: "none", flex: 1, display: "flex", alignItems: "center", padding: "0 14px" }}>
-            <p style={{ ...STYLE_DISPLAY, fontSize: 13, color: "black", lineHeight: 1.1 }}>{t.title}</p>
+          <div style={{ border: "0.823px solid black", borderLeft: "none", flex: 1, display: "flex", alignItems: "center", padding: "0 18px" }}>
+            <p style={{ ...STYLE_DISPLAY, fontSize: 16, color: "black", lineHeight: 1.08, letterSpacing: "-0.8px" }}>{t.title}</p>
           </div>
         </div>
       </div>
-      {/* Text body */}
-      <div style={{ border: "0.6px solid black", borderTop: "none", borderRadius: "0 0 4.8px 4.8px", padding: "14px", display: "flex", flexDirection: "column", gap: "10px" }}>
+      {/* Body */}
+      <div style={{ border: "0.6px solid black", borderTop: "none", borderRadius: "0 0 4.8px 4.8px", padding: "18px", display: "flex", flexDirection: "column", gap: "12px" }}>
         {t.text.map((para, i) => (
-          <p key={i} style={{ ...STYLE_MONO, fontSize: 14, color: "black", lineHeight: 1.45 }}>{para}</p>
+          <p key={i} style={{ ...STYLE_MONO, fontSize: 16, color: "black", lineHeight: 1.1 }}>{para}</p>
         ))}
       </div>
     </div>
   );
 }
 
-// Desktop: single card with hover-to-foreground
-function TestimonialCard({ t, delay = 0 }: { t: typeof TESTIMONIALS[0]; delay?: number }) {
-  const [hov, setHov] = useState(false);
-  const [ref, inView] = useInView(0.05);
-  return (
-    <div
-      ref={ref}
-      style={{
-        opacity: inView ? 1 : 0,
-        transform: inView ? "translateY(0)" : "translateY(24px)",
-        transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms`,
-        position: "relative",
-        zIndex: hov ? 10 : 1,
-      }}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-    >
-      <div style={{
-        transform: hov ? "scale(1.03) translateY(-5px)" : "scale(1)",
-        boxShadow: hov ? "0 16px 48px rgba(0,0,0,0.14)" : "none",
-        transition: "transform 0.25s ease, box-shadow 0.25s ease",
-      }}>
-        <TestimonialCardInner t={t} />
-      </div>
-    </div>
-  );
-}
+const TESTIMONIALS_SCATTER = [
+  { idx: 0, left: "68px",  top: "197px", width: "330px", rotate: 0      },
+  { idx: 1, left: "354px", top: "166px", width: "330px", rotate: -1.96  },
+  { idx: 2, left: "663px", top: "155px", width: "330px", rotate: 0      },
+  { idx: 3, left: "980px", top: "160px", width: "380px", rotate: -1.67  },
+  { idx: 4, left: "81px",  top: "516px", width: "380px", rotate: -1.67  },
+  { idx: 5, left: "425px", top: "557px", width: "330px", rotate: -1.67  },
+  { idx: 6, left: "662px", top: "386px", width: "400px", rotate: 2      },
+  { idx: 7, left: "949px", top: "630px", width: "380px", rotate: 0      },
+];
 
-// Mobile: swipeable carousel
-function TestimonialsCarousel() {
-  const [activeIdx, setActiveIdx] = useState(0);
-  const [dragStart, setDragStart] = useState(0);
-  const [dragDelta, setDragDelta] = useState(0);
-  const [dragging,  setDragging]  = useState(false);
-  const go = (i: number) => setActiveIdx(Math.max(0, Math.min(TESTIMONIALS.length - 1, i)));
+function TestimonialsSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); io.disconnect(); } },
+      { threshold: 0.05 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <div className="pb-[60px]">
-      <div
-        className="overflow-hidden"
-        onTouchStart={(e) => { setDragStart(e.touches[0].clientX); setDragging(true); }}
-        onTouchMove={(e)  => { if (dragging) setDragDelta(e.touches[0].clientX - dragStart); }}
-        onTouchEnd={() => {
-          if (dragDelta > 60) go(activeIdx - 1);
-          else if (dragDelta < -60) go(activeIdx + 1);
-          setDragDelta(0); setDragging(false);
-        }}
-      >
-        <div style={{
-          display: "flex",
-          transform: `translateX(calc(-${activeIdx * 100}% + ${dragDelta}px))`,
-          transition: dragging ? "none" : "transform 0.4s cubic-bezier(0.4,0,0.2,1)",
-        }}>
-          {TESTIMONIALS.map((t) => (
-            <div key={t.name} style={{ minWidth: "100%" }}>
+    <section ref={sectionRef} id="testimonials" className="bg-[#ffedd7] w-full py-[96px] overflow-hidden">
+      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
+        <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
+          Testimonials
+        </p>
+
+        {/* Desktop xl+: absolute scatter layout */}
+        <div className="hidden xl:block relative" style={{ minHeight: "980px" }}>
+          {TESTIMONIALS_SCATTER.map(({ idx, left, top, width, rotate }, layoutIdx) => {
+            const t = TESTIMONIALS[idx];
+            const delay = layoutIdx * 140;
+            return (
+              <div
+                key={t.name}
+                style={{
+                  position: "absolute",
+                  left, top, width,
+                  opacity: inView ? 1 : 0,
+                  transform: `translateY(${inView ? 0 : 30}px) rotate(${rotate}deg)`,
+                  transition: `opacity 0.55s ease ${delay}ms, transform 0.55s cubic-bezier(0.4,0,0.2,1) ${delay}ms`,
+                  zIndex: layoutIdx,
+                }}
+              >
+                <TestimonialCardInner t={t} />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Mobile/tablet: 2-col grid with mild rotations */}
+        <div className="xl:hidden grid grid-cols-1 md:grid-cols-2 gap-[16px] md:gap-[20px]">
+          {TESTIMONIALS.map((t, i) => (
+            <div
+              key={t.name}
+              style={{
+                opacity: inView ? 1 : 0,
+                transform: `translateY(${inView ? 0 : 24}px) rotate(${i % 2 === 0 ? -0.8 : 0.8}deg)`,
+                transition: `opacity 0.5s ease ${i * 100}ms, transform 0.5s ease ${i * 100}ms`,
+              }}
+            >
               <TestimonialCardInner t={t} />
             </div>
           ))}
-        </div>
-      </div>
-      {/* Dots navigation */}
-      <div className="flex items-center justify-center gap-[8px] pt-[20px]">
-        {TESTIMONIALS.map((_, i) => (
-          <button key={i} onClick={() => go(i)}
-            className="rounded-full transition-all duration-250"
-            style={{ width: i === activeIdx ? "20px" : "8px", height: "8px", backgroundColor: i === activeIdx ? "#000" : "rgba(0,0,0,0.25)" }}
-            aria-label={`Go to ${i + 1}`}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function TestimonialsSection() {
-  return (
-    <section id="testimonials" className="bg-[#ffedd7] w-full py-[96px]">
-      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
-        <Reveal>
-          <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
-            Testimonials
-          </p>
-        </Reveal>
-
-        {/* Desktop: 4-column scattered grid, hover brings card to foreground */}
-        <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-[12px] lg:gap-[16px]">
-          {TESTIMONIALS.map((t, i) => (
-            <TestimonialCard key={t.name} t={t} delay={i * 80} />
-          ))}
-        </div>
-
-        {/* Mobile: swipe carousel */}
-        <div className="md:hidden">
-          <TestimonialsCarousel />
         </div>
       </div>
     </section>
@@ -996,6 +1093,26 @@ function TestimonialsSection() {
 }
 
 // ── Newsletter ────────────────────────────────────────────────────────────────
+// Subscribe button: explicitly 50px tall (matches the email input height)
+function SubscribeBtn() {
+  const [hov, setHov] = useState(false);
+  return (
+    <div
+      className="flex flex-col items-start p-[6px] w-fit shrink-0 h-[50px]"
+      style={{ backgroundColor: hov ? "#FF9A6A" : "#fb8349", transition: "background-color 0.2s ease" }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+    >
+      <button
+        className="border border-black flex flex-1 items-center px-[14px] rounded-[4px] cursor-pointer"
+        style={{ backgroundColor: "transparent" }}
+      >
+        <p className="text-[18px] md:text-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>Subscribe</p>
+      </button>
+    </div>
+  );
+}
+
 const NEWSLETTER_ARTICLES = [
   {
     title: "Why great hires fail after six months",
@@ -1027,16 +1144,15 @@ function NewsletterSection() {
         </Reveal>
 
         {/* Email subscribe row */}
-        <Reveal delay={60} className="flex flex-col sm:flex-row gap-[10px] items-stretch sm:items-end justify-center mb-[52px] md:mb-[60px]">
+        <Reveal delay={60} className="flex flex-col sm:flex-row gap-[10px] items-stretch sm:items-center justify-center mb-[68px] md:mb-[78px]">
           <input
             type="email"
             placeholder="Enter your email"
-            className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full sm:w-[403px] text-[16px] bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200"
-            style={{ ...STYLE_DISPLAY, color: "#767676" }}
+            className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full sm:w-[403px] text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
+            style={STYLE_DISPLAY}
           />
-          <OrangeBtn>
-            <p className="text-[18px] md:text-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>Subscribe</p>
-          </OrangeBtn>
+          {/* Subscribe button — explicitly 50px tall to match the input */}
+          <SubscribeBtn />
         </Reveal>
 
         {/* Article cards — 3 columns desktop, 1 column mobile */}
@@ -1165,25 +1281,50 @@ function CTASection() {
 // ── Footer ────────────────────────────────────────────────────────────────────
 function Footer() {
   return (
-    <footer className="bg-[#4d453b] w-full overflow-hidden relative" style={{ minHeight: "200px", height: "clamp(200px,28vw,400px)" }}>
-      <img src="/TPRecruitment_FooterLogo.svg" alt="TPRecruitment"
-           className="absolute left-[16px] right-[16px] md:left-[30px] md:right-[30px]"
-           style={{ top: "20px", width: "calc(100% - 32px)", height: "auto" }} />
-      <div className="absolute bottom-[16px] md:bottom-[30px] left-[16px] right-[16px] md:left-[30px] md:right-[30px] flex flex-col md:flex-row items-start md:items-baseline gap-[6px] text-white">
-        {/* Left — flex-1 so center is truly centered */}
+    <footer
+      className="bg-[#4d453b] w-full overflow-hidden relative"
+      style={{ minHeight: "200px", height: "clamp(200px, 28vw, 400px)" }}
+    >
+      {/* Footer logo */}
+      <img
+        src="/footer-logo.svg"
+        alt="Higher Standard"
+        className="absolute"
+        style={{ left: "16px", top: "20px", height: "clamp(30px, 5vw, 60px)", width: "auto" }}
+      />
+
+      {/* Bottom bar */}
+      <div
+        className="absolute bottom-[16px] md:bottom-[30px] left-[16px] right-[16px] md:left-[30px] md:right-[30px] flex flex-col md:flex-row items-start md:items-end gap-[6px] text-white"
+      >
+        {/* Left */}
         <div className="md:flex-1">
-          <p className="text-[11px] md:text-[14px]" style={STYLE_DISPLAY}>All rights reserved.</p>
+          <p
+            className="text-[11px] md:text-[14px] text-[#eaeae5]"
+            style={{ ...STYLE_DISPLAY, letterSpacing: "-0.42px" }}
+          >
+            All rights reserved.
+          </p>
         </div>
-        {/* Center — copyright, centered on desktop */}
-        <div className="flex gap-[4px] md:gap-[6px] items-baseline md:justify-center md:flex-1">
-          <span className="text-[18px] md:text-[28px]" style={STYLE_DISPLAY}>©</span>
-          <span className="text-[13px] md:text-[20px]" style={STYLE_DISPLAY}>2026 TP Recruitment</span>
+        {/* Centre — copyright */}
+        <div className="flex md:justify-center md:flex-1">
+          <span
+            className="text-[14px] md:text-[20px] text-[#eaeae5]"
+            style={{ ...STYLE_DISPLAY, letterSpacing: "-1px" }}
+          >
+            © Higher Standard
+          </span>
         </div>
-        {/* Right — flex-1, right-aligned */}
+        {/* Right */}
         <div className="md:flex-1 md:flex md:justify-end">
-          <a className="text-[11px] md:text-[14px] hover:opacity-60 transition-opacity duration-150"
-             href="https://www.unknw.com/" target="_blank" rel="noopener noreferrer" style={STYLE_DISPLAY}>
-            designed by UNKWN
+          <a
+            className="text-[11px] md:text-[14px] text-[#eaeae5] hover:opacity-60 transition-opacity duration-150"
+            href="https://www.unknw.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ ...STYLE_DISPLAY, letterSpacing: "-0.7px" }}
+          >
+            designed by UNKNW
           </a>
         </div>
       </div>
@@ -1195,23 +1336,23 @@ function Footer() {
 export default function App() {
   const [introComplete, setIntroComplete] = useState(false);
 
+  // Prevent body scroll while intro overlay is active
+  useEffect(() => {
+    document.body.style.overflow = introComplete ? "" : "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, [introComplete]);
+
   return (
     <>
       {!introComplete && (
         <IntroAnimation onComplete={() => setIntroComplete(true)} />
       )}
-      <div
-        className="flex flex-col w-full"
-        style={{
-          opacity: introComplete ? 1 : 0,
-          transition: "opacity 0.8s ease",
-          pointerEvents: introComplete ? "auto" : "none",
-        }}
-      >
+      {/* Page is always rendered (opacity 1) — intro overlay sits on top */}
+      <div className="flex flex-col w-full">
         <Navbar />
         <HeroSection />
-        <WhatWorkingSection />
         <PartnersSection />
+        <WhatWorkingSection />
         <RolesSection />
         <TestimonialsSection />
         <NewsletterSection />

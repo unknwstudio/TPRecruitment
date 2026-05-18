@@ -89,3 +89,13 @@
 .animate-marquee-reverse {
   animation: marquee 30s linear infinite reverse;
 }
+
+/* Intro burst: arrows grow from the SVG centre point (51.09% / 53.93%) */
+@keyframes burst-grow {
+  from { clip-path: circle(0% at 51.09% 53.93%); }
+  to   { clip-path: circle(120% at 51.09% 53.93%); }
+}
+
+.animate-burst-grow {
+  animation: burst-grow 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
