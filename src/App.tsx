@@ -365,7 +365,6 @@ function NavLogo() {
 
 // ── Navbar ────────────────────────────────────────────────────────────────────
 const NAV_LINKS = [
-  { label: "About",        href: "about" },
   { label: "How I work",   href: "working" },
   { label: "Roles",        href: "roles" },
   { label: "Testimonials", href: "testimonials" },
@@ -580,7 +579,7 @@ function HeroSection() {
       </div>
 
       {/* ── Mobile (<1020px): stacked ── */}
-      <div className="lg:hidden px-[16px] md:px-[30px] pt-[54px] pb-[72px]">
+      <div className="lg:hidden px-[16px] md:px-[30px] pt-[46px] pb-[61px]">
         <div className="flex flex-col gap-[40px]">
           <Reveal>
             <p style={{ ...STYLE_DISPLAY, fontSize: "clamp(36px, 10vw, 48px)", letterSpacing: "-2px", lineHeight: "1.1", color: "black" }}>
@@ -639,7 +638,7 @@ function WhatWorkingSection() {
 
       {/* ── Mobile / tablet ── */}
       <div className="lg:hidden">
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[121px] pb-[60px]">
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[103px] pb-[51px]">
           <Reveal>
             <div className="text-[40px] md:text-[44px] text-black" style={STYLE_DISPLAY}>
               <p>What Higher Standard</p>
@@ -647,7 +646,7 @@ function WhatWorkingSection() {
             </div>
           </Reveal>
         </div>
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[86px]">
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[73px]">
           {WORKING_MOBILE_CARDS.map((card, idx) => (
             <div
               key={card.title}
@@ -775,7 +774,7 @@ function PartnersSection() {
   }, []);
 
   return (
-    <section id="partners" className="bg-[#ffedd7] w-full overflow-hidden py-[50px]">
+    <section id="partners" className="bg-[#ffedd7] w-full overflow-hidden py-[43px]">
       <div className="flex border-t border-b border-black overflow-hidden mb-[-1px]">
         <div className="flex animate-marquee">
           {[...partnerLogosRow1, ...partnerLogosRow1].map((src, i) => <PartnerLogo key={i} src={src} small={small} />)}
@@ -972,7 +971,7 @@ function AboutSection() {
 
 
   return (
-    <section ref={sectionRef} id="about" className="bg-[#ffedd7] w-full py-[121px]">
+    <section ref={sectionRef} id="about" className="bg-[#ffedd7] w-full py-[103px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
         {/* Section title */}
@@ -1097,7 +1096,7 @@ function RolesSection() {
   const [openRole, setOpenRole] = useState<string | null>(null);
 
   return (
-    <section id="roles" className="bg-[#ffedd7] w-full py-[121px]">
+    <section id="roles" className="bg-[#ffedd7] w-full py-[103px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
         <Reveal>
           <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
@@ -1248,7 +1247,7 @@ function TestimonialCardInner({ t }: { t: typeof TESTIMONIALS[0] }) {
 }
 
 const TESTIMONIALS_SCATTER = [
-  { idx: 0, left: "68px",  top: "58px", width: "330px", rotate: 0      },
+  { idx: 0, left: "30px",  top: "58px", width: "330px", rotate: 0      },
   { idx: 1, left: "354px", top: "66px", width: "330px", rotate: -1.96  },
   { idx: 2, left: "663px", top: "50px", width: "330px", rotate: 0      },
   { idx: 3, left: "980px", top: "48px", width: "380px", rotate: -1.67  },
@@ -1358,36 +1357,29 @@ function TestimonialsCarousel({ testimonials }: { testimonials: typeof TESTIMONI
   const total = testimonials.length;
   const prev = () => setIdx(i => (i - 1 + total) % total);
   const next = () => setIdx(i => (i + 1) % total);
-  const t = testimonials[idx];
 
   return (
-    <div className="xl:hidden">
-      {/* Card */}
-      <div style={{ marginBottom: "20px" }}>
-        <TestimonialCardInner t={t} />
+    <div className="lg:hidden">
+      {/* All cards in same grid cell — height = tallest card */}
+      <div style={{ display: "grid" }}>
+        {testimonials.map((t, i) => (
+          <div key={t.name} style={{ gridArea: "1 / 1", visibility: i === idx ? "visible" : "hidden" }}>
+            <TestimonialCardInner t={t} />
+          </div>
+        ))}
       </div>
       {/* Controls */}
       <div className="flex items-center justify-between mt-[16px]">
-        {/* Counter */}
         <p style={{ ...STYLE_MONO, fontSize: "14px", color: "black" }}>
           {idx + 1} / {total}
         </p>
-        {/* Arrows */}
         <div className="flex gap-[10px]">
-          <button
-            onClick={prev}
-            className="border border-black rounded-[4px] p-[10px] cursor-pointer hover:bg-black/5 transition-colors"
-            aria-label="Previous"
-          >
+          <button onClick={prev} className="border border-black rounded-[4px] p-[10px] cursor-pointer hover:bg-black/5 transition-colors" aria-label="Previous">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path d="M11 3L5 9L11 15" stroke="black" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-          <button
-            onClick={next}
-            className="border border-black rounded-[4px] p-[10px] cursor-pointer hover:bg-black/5 transition-colors"
-            aria-label="Next"
-          >
+          <button onClick={next} className="border border-black rounded-[4px] p-[10px] cursor-pointer hover:bg-black/5 transition-colors" aria-label="Next">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path d="M7 3L13 9L7 15" stroke="black" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -1401,6 +1393,7 @@ function TestimonialsCarousel({ testimonials }: { testimonials: typeof TESTIMONI
 function TestimonialsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [inView, setInView] = useState(false);
+  const [scatterScale, setScatterScale] = useState(1);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -1413,24 +1406,37 @@ function TestimonialsSection() {
     return () => io.disconnect();
   }, []);
 
+  useEffect(() => {
+    const update = () => {
+      // Scatter natural width ~1400px; account for 60px total padding
+      const s = Math.min(1, Math.max(0.7, (window.innerWidth - 60) / 1400));
+      setScatterScale(s);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   return (
-    <section ref={sectionRef} id="testimonials" className="bg-[#ffedd7] w-full pt-[121px] pb-[72px] overflow-hidden">
+    <section ref={sectionRef} id="testimonials" className="bg-[#ffedd7] w-full pt-[103px] pb-[61px] overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
         <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[41px] md:mb-[61px]" style={STYLE_DISPLAY}>
           Testimonials
         </p>
 
-        {/* Desktop xl+: absolute scatter layout with hover-lift */}
-        <div className="hidden xl:block relative" style={{ minHeight: "920px" }}>
-          {TESTIMONIALS_SCATTER.map(({ idx, left, top, width, rotate }, layoutIdx) => (
-            <ScatterCard
-              key={TESTIMONIALS[idx].name}
-              t={TESTIMONIALS[idx]}
-              left={left} top={top} width={width}
-              rotate={rotate} baseZ={layoutIdx}
-              inView={inView} delay={layoutIdx * 300}
-            />
-          ))}
+        {/* Desktop lg+: scaled scatter layout */}
+        <div className="hidden lg:block relative overflow-hidden" style={{ height: `${Math.round(920 * scatterScale)}px` }}>
+          <div style={{ transform: `scale(${scatterScale})`, transformOrigin: "top left", width: "1400px", position: "relative" }}>
+            {TESTIMONIALS_SCATTER.map(({ idx, left, top, width, rotate }, layoutIdx) => (
+              <ScatterCard
+                key={TESTIMONIALS[idx].name}
+                t={TESTIMONIALS[idx]}
+                left={left} top={top} width={width}
+                rotate={rotate} baseZ={layoutIdx}
+                inView={inView} delay={layoutIdx * 300}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Mobile/tablet: carousel */}
@@ -1481,27 +1487,33 @@ function NewsletterCarousel({ articles }: { articles: typeof NEWSLETTER_ARTICLES
   const total = articles.length;
   const prev = () => setIdx(i => (i - 1 + total) % total);
   const next = () => setIdx(i => (i + 1) % total);
-  const article = articles[idx];
 
   return (
     <div className="md:hidden">
-      <HoverCard className="h-full">
-        <div className="bg-white flex flex-col p-[10px]">
-          <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
-            <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-              <p className="text-[20px] text-black whitespace-pre-line" style={STYLE_DISPLAY}>{article.title}</p>
-            </div>
+      {/* All cards in same grid cell — height = tallest card */}
+      <div style={{ display: "grid", marginBottom: "16px" }}>
+        {articles.map((article, i) => (
+          <div key={article.title} style={{ gridArea: "1 / 1", visibility: i === idx ? "visible" : "hidden" }}>
+            <HoverCard className="h-full">
+              <div className="bg-white flex flex-col p-[10px]">
+                <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
+                  <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
+                    <p className="text-[20px] text-black whitespace-pre-line" style={STYLE_DISPLAY}>{article.title}</p>
+                  </div>
+                </div>
+                <div className="border-[1.372px] border-black flex flex-1 flex-col justify-between p-[20px] rounded-bl-[8px] rounded-br-[8px] gap-[20px]">
+                  <p className="text-[16px] text-black" style={STYLE_MONO}>{article.excerpt}</p>
+                  <div className="bg-[#ffedd7] p-[4px] self-start">
+                    <button className="border border-black rounded-[4px] px-[12px] py-[10px] bg-[#ffedd7] cursor-pointer hover:bg-[#f0e4cf] transition-colors duration-150">
+                      <p className="text-[16px] text-black whitespace-nowrap" style={STYLE_MONO}>read now</p>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </HoverCard>
           </div>
-          <div className="border-[1.372px] border-black flex flex-1 flex-col justify-between p-[20px] rounded-bl-[8px] rounded-br-[8px] gap-[20px]">
-            <p className="text-[16px] text-black" style={STYLE_MONO}>{article.excerpt}</p>
-            <div className="bg-[#ffedd7] p-[4px] self-start">
-              <button className="border border-black rounded-[4px] px-[12px] py-[10px] bg-[#ffedd7] cursor-pointer hover:bg-[#f0e4cf] transition-colors duration-150">
-                <p className="text-[16px] text-black whitespace-nowrap" style={STYLE_MONO}>read now</p>
-              </button>
-            </div>
-          </div>
-        </div>
-      </HoverCard>
+        ))}
+      </div>
       {/* Controls */}
       <div className="flex items-center justify-between mt-[16px]">
         <p style={{ ...STYLE_MONO, fontSize: "14px", color: "black" }}>{idx + 1} / {total}</p>
@@ -1524,7 +1536,7 @@ function NewsletterCarousel({ articles }: { articles: typeof NEWSLETTER_ARTICLES
 
 function NewsletterSection() {
   return (
-    <section className="bg-[#ffedd7] w-full py-[121px]">
+    <section className="bg-[#ffedd7] w-full py-[103px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
         {/* Centred header */}
@@ -1538,7 +1550,7 @@ function NewsletterSection() {
         </Reveal>
 
         {/* Email subscribe row */}
-        <Reveal delay={60} className="flex flex-col sm:flex-row gap-[10px] items-stretch sm:items-center justify-center mb-[68px] md:mb-[78px]">
+        <Reveal delay={60} className="flex flex-col sm:flex-row gap-[10px] items-center justify-center mb-[68px] md:mb-[78px]">
           <input
             type="email"
             placeholder="Enter your email"
@@ -1585,7 +1597,7 @@ function NewsletterSection() {
 // ── CTA ───────────────────────────────────────────────────────────────────────
 function CTASection() {
   return (
-    <section id="contact" className="bg-[#eaeae5] w-full overflow-hidden pt-[72px] md:pt-[54px] pb-[121px]">
+    <section id="contact" className="bg-[#eaeae5] w-full overflow-hidden pt-[61px] md:pt-[46px] pb-[103px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
         {/* TOP ROW: Headline (left) + Subtitle (right, bottom-aligned on desktop) */}
