@@ -517,7 +517,7 @@ function HeroSection() {
           {/* Left content: top=129px, w=799px, gap=40px between all three elements */}
           <div
             className="absolute flex flex-col gap-[40px]"
-            style={{ left: "0px", top: "129px", width: "799px" }}
+            style={{ left: "30px", top: "129px", width: "799px" }}
           >
             <p className="text-black" style={{ ...STYLE_DISPLAY, fontSize: "60px", letterSpacing: "-3px", lineHeight: "1.1" }}>
               The right hire changes everything that comes after it.
@@ -550,9 +550,9 @@ function HeroSection() {
             </div>
             {/* Corner labels — matching Figma node 513:345 positions */}
             <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "93px",  top: "109px", letterSpacing: "-0.4px" }}>Higher</p>
-            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "342px", top: "109px", letterSpacing: "-0.4px" }}>Standard</p>
-            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "93px",  top: "505px", letterSpacing: "-0.4px" }}>In hiring</p>
-            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "461px", top: "505px", letterSpacing: "-0.4px", transform: "translateX(-100%)" }}>People</p>
+            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "308px", top: "109px", letterSpacing: "-0.4px" }}>Standard</p>
+            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "93px",  top: "512px", letterSpacing: "-0.4px" }}>In hiring</p>
+            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "461px", top: "512px", letterSpacing: "-0.4px", transform: "translateX(-100%)" }}>People</p>
           </div>
 
         </div>
@@ -1015,14 +1015,14 @@ function TestimonialCardInner({ t }: { t: typeof TESTIMONIALS[0] }) {
 }
 
 const TESTIMONIALS_SCATTER = [
-  { idx: 0, left: "68px",  top: "197px", width: "330px", rotate: 0      },
-  { idx: 1, left: "354px", top: "166px", width: "330px", rotate: -1.96  },
-  { idx: 2, left: "663px", top: "155px", width: "330px", rotate: 0      },
-  { idx: 3, left: "980px", top: "160px", width: "380px", rotate: -1.67  },
-  { idx: 4, left: "81px",  top: "516px", width: "380px", rotate: -1.67  },
-  { idx: 5, left: "425px", top: "557px", width: "330px", rotate: -1.67  },
-  { idx: 6, left: "662px", top: "386px", width: "400px", rotate: 2      },
-  { idx: 7, left: "949px", top: "630px", width: "380px", rotate: 0      },
+  { idx: 0, left: "68px",  top: "58px", width: "330px", rotate: 0      },
+  { idx: 1, left: "354px", top: "66px", width: "330px", rotate: -1.96  },
+  { idx: 2, left: "663px", top: "50px", width: "330px", rotate: 0      },
+  { idx: 3, left: "980px", top: "48px", width: "380px", rotate: -1.67  },
+  { idx: 4, left: "81px",  top: "380px", width: "380px", rotate: -1.67  },
+  { idx: 5, left: "425px", top: "420px", width: "330px", rotate: -1.67  },
+  { idx: 6, left: "662px", top: "300px", width: "400px", rotate: 2      },
+  { idx: 7, left: "949px", top: "400px", width: "380px", rotate: 0      },
 ];
 
 // Scatter card with hover-lift interaction.
@@ -1373,7 +1373,7 @@ function Footer() {
         style={{
           left: "clamp(16px, 2.08vw, 30px)",
           top: "clamp(16px, 2.08vw, 30px)",
-          width: "calc(100% - clamp(16px, 2.08vw, 30px))",
+          width: "calc(98% - clamp(16px, 2.08vw, 30px))",
           height: "auto",
         }}
       />
