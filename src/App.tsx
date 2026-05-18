@@ -202,57 +202,59 @@ function OrangeBtn({ onClick, children, className = "" }: { onClick?: () => void
 }
 
 // ── Intro animation ───────────────────────────────────────────────────────────
-// Phase 0 (0ms):    Rectangle border + dot appear
-// Phase 1 (700ms):  Arrow-burst SVG grows from centre (clip-path reveal)
-// Phase 2 (2200ms): Corner text labels appear
-// Phase 3 (4200ms): Labels fade, burst slides to hero illustration position (desktop)
+// Phase 0 (0ms):    Rectangle + centre dot visible; all arrows hidden
+// Phase 1 (700ms):  Arrows grow asynchronously from centre over ~2 s
+// Phase 2 (3100ms): Corner text labels appear (300 ms after last arrow)
+// Phase 3 (5200ms): Labels fade; burst slides to hero illustration (desktop)
 //                   OR whole overlay fades out (mobile)
-// onComplete (5000ms): overlay unmounts, hero illustration already in place
+// onComplete (6000ms): overlay unmounts
 function IntroAnimation({ onComplete }: { onComplete: () => void }) {
   const [phase, setPhase] = useState<0 | 1 | 2 | 3>(0);
   const [burstTransform, setBurstTransform] = useState<string>("none");
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 700),
-      setTimeout(() => setPhase(2), 2200),
-      setTimeout(() => setPhase(3), 4200),
-      setTimeout(onComplete, 5000),
+      setTimeout(() => setPhase(1),  700),
+      setTimeout(() => setPhase(2), 3100),
+      setTimeout(() => setPhase(3), 5200),
+      setTimeout(onComplete,        6000),
     ];
     return () => timers.forEach(clearTimeout);
   }, [onComplete]);
 
-  // At phase 3 on desktop: compute hero illustration position and slide burst there
+  // At phase 3 on desktop: slide burst to hero illustration position
   useEffect(() => {
     if (phase !== 3) return;
-    if (window.innerWidth < 1020) return; // mobile just fades
-
+    if (window.innerWidth < 1020) return;
     const anchor = document.getElementById("hero-illustration-anchor");
     if (!anchor) return;
-
     const rect = anchor.getBoundingClientRect();
     const targetCX = rect.left + rect.width / 2;
     const targetCY = rect.top + rect.height / 2;
-
     const containerW = Math.min(687, window.innerWidth * 0.9);
-    const vCX = window.innerWidth / 2;
-    const vCY = window.innerHeight / 2;
-
-    const dX = targetCX - vCX;
-    const dY = targetCY - vCY;
+    const dX = targetCX - window.innerWidth / 2;
+    const dY = targetCY - window.innerHeight / 2;
     const sc = rect.width / containerW;
-
     setBurstTransform(`translate(${dX}px, ${dY}px) scale(${sc})`);
   }, [phase]);
 
+  // clip-path grow from SVG centre (51.09% / 53.93%) with per-arrow stagger
+  const arrowStyle = (delay: number): React.CSSProperties => ({
+    clipPath: phase >= 1
+      ? "circle(200% at 51.09% 53.93%)"
+      : "circle(0%   at 51.09% 53.93%)",
+    transition: phase >= 1
+      ? `clip-path 0.55s cubic-bezier(0.4,0,0.2,1) ${delay}ms`
+      : "none",
+  });
+
   const labels = [
-    { text: "Higher",    style: { left: "17.19%", top: "18.32%" },                              delay: 0   },
-    { text: "Standard",  style: { left: "63.22%", top: "18.32%" },                              delay: 100 },
-    { text: "In hiring", style: { left: "17.19%", top: "84.87%" },                              delay: 200 },
-    { text: "People",    style: { right: "14.83%", top: "84.87%", textAlign: "right" as const }, delay: 300 },
+    { text: "Higher",    pos: { left: "17.26%",  top: "19.5%" },                              delay: 0   },
+    { text: "Standard",  pos: { right: "14.71%", top: "19.5%", textAlign: "right" as const }, delay: 100 },
+    { text: "In hiring", pos: { left: "17.26%",  top: "87.5%" },                              delay: 200 },
+    { text: "People",    pos: { right: "14.71%", top: "87.5%", textAlign: "right" as const }, delay: 300 },
   ];
 
-  // Mobile: overlay opacity 0; Desktop: burst slides, overlay stays solid until unmount
   const isMobile = typeof window !== "undefined" && window.innerWidth < 1020;
 
   return (
@@ -267,49 +269,69 @@ function IntroAnimation({ onComplete }: { onComplete: () => void }) {
       <div style={{
         position: "relative",
         width: "min(687px, 90vw)",
-        height: "min(756px, 90vh)",
         transform: phase === 3 ? burstTransform : "none",
-        transition: phase === 3 ? "transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)" : "none",
+        transition: phase === 3 ? "transform 0.85s cubic-bezier(0.4,0,0.2,1)" : "none",
         transformOrigin: "center center",
       }}>
-        {/* Rect placeholder — visible only in phase 0 */}
-        <div style={{
-          position: "absolute",
-          left: "17.26%", top: "22.43%", width: "67.03%", height: "63.4%",
-          border: "0.635px solid #4d453b",
-          opacity: phase === 0 ? 1 : 0,
-          transition: "opacity 0.3s ease",
-          pointerEvents: "none",
-        }} />
-        {/* Center dot */}
-        <div style={{
-          position: "absolute", left: "50%", top: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 5, height: 5, backgroundColor: "#4d453b", borderRadius: "50%",
-          opacity: phase === 0 ? 1 : 0,
-          transition: "opacity 0.3s ease",
-        }} />
-        {/* Arrow burst SVG */}
-        <img
-          src="/intro-burst.svg"
-          alt=""
-          className={phase >= 1 ? "animate-burst-grow" : ""}
-          style={{
-            position: "absolute", inset: 0, width: "100%", height: "100%",
-            clipPath: phase >= 1 ? undefined : "circle(0% at 51.09% 53.93%)",
-          }}
-        />
-        {/* Corner labels — fade out at phase 3 */}
-        {labels.map(({ text, style, delay }) => (
+        {/* ── Inline SVG burst ─────────────────────────────────────────────── */}
+        <svg
+          viewBox="0 0 686.049 736.525"
+          width="100%"
+          style={{ display: "block" }}
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {/* Rectangle — always visible (phase 0+) */}
+          <rect
+            x="118.415" y="165.103" width="466.677" height="466.677"
+            stroke="#4D453B" strokeWidth="0.634935"
+          />
+
+          {/* ── Wave 1 — cross lines (0 ms, 80 ms) ── */}
+          <path d="M350.484 164.785L348.651 167.96H352.317L350.484 164.785ZM350.167 631.5V631.817H350.802V631.5H350.484H350.167ZM350.484 167.642H350.167V631.5H350.484H350.802V167.642H350.484Z" fill="#4D453B" style={arrowStyle(0)} />
+          <path d="M118.098 396.854H117.78V397.489H118.098V397.171V396.854ZM582.871 397.171V396.854H118.098V397.171V397.489H582.871V397.171Z" fill="#4D453B" style={arrowStyle(80)} />
+
+          {/* ── Wave 2 — upper arrows (250 ms – 400 ms) ── */}
+          <path d="M429.216 45.4173L426.734 48.115L430.312 48.9157L429.216 45.4173ZM350.175 397.102L350.105 397.412L350.725 397.551L350.794 397.241L350.484 397.171L350.175 397.102ZM428.592 48.2055L428.282 48.1362L350.175 397.102L350.484 397.171L350.794 397.241L428.902 48.2749L428.592 48.2055Z" fill="#4D453B" style={arrowStyle(250)} />
+          <path d="M440.645 223.498L437.555 225.471L440.809 227.16L440.645 223.498ZM350.202 397.026L350.056 397.308L350.619 397.6L350.765 397.318L350.484 397.172L350.202 397.026ZM439.329 226.033L439.047 225.887L350.202 397.026L350.484 397.172L350.765 397.318L439.61 226.18L439.329 226.033Z" fill="#4D453B" style={arrowStyle(330)} />
+          <path d="M393.025 150.817L390.679 153.633L394.291 154.257L393.025 150.817ZM350.172 397.117L350.118 397.43L350.744 397.538L350.798 397.226L350.485 397.172L350.172 397.117ZM392.539 153.632L392.226 153.578L350.172 397.117L350.485 397.172L350.798 397.226L392.852 153.686L392.539 153.632Z" fill="#4D453B" style={arrowStyle(410)} />
+
+          {/* ── Wave 3 — lower-left + right arrows (550 ms – 700 ms) ── */}
+          <path d="M271.752 736.525L274.255 733.847L270.684 733.018L271.752 736.525ZM350.793 397.243L350.865 396.934L350.246 396.791L350.174 397.1L350.484 397.172L350.793 397.243ZM272.398 733.742L272.707 733.814L350.793 397.243L350.484 397.172L350.174 397.1L272.089 733.67L272.398 733.742Z" fill="#4D453B" style={arrowStyle(550)} />
+          <path d="M275.559 634.14L278.264 631.666L274.769 630.56L275.559 634.14ZM350.787 397.267L350.883 396.964L350.277 396.773L350.182 397.076L350.484 397.171L350.787 397.267ZM276.421 631.416L276.724 631.511L350.787 397.267L350.484 397.171L350.182 397.076L276.118 631.32L276.421 631.416Z" fill="#4D453B" style={arrowStyle(630)} />
+          <path d="M591.125 480.983L588.73 478.208L587.524 481.67L591.125 480.983ZM350.588 396.872L350.288 396.768L350.079 397.367L350.379 397.472L350.484 397.172L350.588 396.872ZM588.427 480.043L588.531 479.743L350.588 396.872L350.484 397.172L350.379 397.472L588.322 480.343L588.427 480.043Z" fill="#4D453B" style={arrowStyle(710)} />
+
+          {/* ── Wave 4 — mid-ring arrows (850 ms – 1100 ms) ── */}
+          <path d="M86.9861 348.916L89.7787 351.291L90.4391 347.685L86.9861 348.916ZM350.426 397.484L350.738 397.541L350.852 396.916L350.54 396.859L350.483 397.171L350.426 397.484ZM89.7966 349.431L89.7394 349.743L350.426 397.484L350.483 397.171L350.54 396.859L89.8538 349.119L89.7966 349.431Z" fill="#4D453B" style={arrowStyle(850)} />
+          <path d="M330.166 586.382L332.328 583.421L328.683 583.03L330.166 586.382ZM350.799 397.205L350.833 396.89L350.201 396.822L350.167 397.138L350.483 397.171L350.799 397.205ZM330.471 583.541L330.787 583.575L350.799 397.205L350.483 397.171L350.167 397.138L330.156 583.507L330.471 583.541Z" fill="#4D453B" style={arrowStyle(930)} />
+          <path d="M540.33 594.636L539.451 591.078L536.808 593.618L540.33 594.636ZM350.712 396.951L350.492 396.723L350.034 397.163L350.254 397.392L350.483 397.171L350.712 396.951ZM538.35 592.577L538.579 592.357L350.712 396.951L350.483 397.171L350.254 397.392L538.121 592.797L538.35 592.577Z" fill="#4D453B" style={arrowStyle(1010)} />
+          <path d="M511.123 421.299L508.256 419.015L507.711 422.64L511.123 421.299ZM350.53 396.858L350.216 396.811L350.122 397.439L350.436 397.486L350.483 397.172L350.53 396.858ZM508.297 420.875L508.345 420.561L350.53 396.858L350.483 397.172L350.436 397.486L508.25 421.189L508.297 420.875Z" fill="#4D453B" style={arrowStyle(1090)} />
+          <path d="M263.498 350.821L265.438 353.932L267.162 350.697L263.498 350.821ZM350.334 397.452L350.614 397.601L350.913 397.041L350.632 396.892L350.483 397.172L350.334 397.452ZM266.02 352.165L265.87 352.445L350.334 397.452L350.483 397.172L350.632 396.892L266.169 351.885L266.02 352.165Z" fill="#4D453B" style={arrowStyle(1170)} />
+
+          {/* ── Wave 5 — outer / diagonal arrows (1300 ms – 1600 ms) ── */}
+          <path d="M222.862 594.3L226.126 592.631L223.049 590.639L222.862 594.3ZM350.751 397.343L350.924 397.077L350.391 396.732L350.218 396.998L350.485 397.171L350.751 397.343ZM224.415 591.901L224.681 592.074L350.751 397.343L350.485 397.171L350.218 396.998L224.148 591.729L224.415 591.901Z" fill="#4D453B" style={arrowStyle(1300)} />
+          <path d="M295.882 287.326L295.646 290.984L298.932 289.36L295.882 287.326ZM480.427 607.809C480.598 607.849 480.769 607.743 480.809 607.573L481.461 604.791C481.501 604.62 481.395 604.449 481.225 604.409C481.054 604.369 480.883 604.475 480.843 604.646L480.263 607.118L477.79 606.538C477.62 606.498 477.449 606.604 477.409 606.775C477.369 606.946 477.475 607.117 477.645 607.157L480.427 607.809ZM350.488 397.806L350.203 397.946L350.21 397.96L350.218 397.973L350.488 397.806ZM297.148 289.888L296.864 290.028L350.203 397.946L350.488 397.806L350.772 397.665L297.433 289.747L297.148 289.888ZM350.488 397.806L350.218 397.973L480.23 607.667L480.5 607.5L480.769 607.333L350.757 397.638L350.488 397.806Z" fill="#4D453B" style={arrowStyle(1380)} />
+          <path d="M212.068 189.211L212.296 192.87L215.351 190.843L212.068 189.211ZM350.221 397.981L350.396 398.246L350.925 397.895L350.75 397.63L350.485 397.806L350.221 397.981ZM213.648 191.592L213.384 191.767L350.221 397.981L350.485 397.806L350.75 397.63L213.913 191.416L213.648 191.592Z" fill="#4D453B" style={arrowStyle(1460)} />
+          <path d="M295.883 287.326L295.646 290.984L298.933 289.36L295.883 287.326ZM476.875 712.292C477.037 712.361 477.223 712.286 477.292 712.124L478.411 709.496C478.48 709.334 478.405 709.148 478.244 709.079C478.082 709.01 477.896 709.086 477.827 709.247L476.832 711.584L474.496 710.588C474.334 710.52 474.148 710.595 474.079 710.756C474.01 710.917 474.085 711.104 474.247 711.173L476.875 712.292ZM350.488 397.806L350.783 397.687L350.778 397.676L350.773 397.665L350.488 397.806ZM297.149 289.887L296.864 290.028L350.203 397.946L350.488 397.806L350.773 397.665L297.433 289.747L297.149 289.887ZM350.488 397.806L350.194 397.924L476.705 712.119L477 712L477.294 711.881L350.783 397.687L350.488 397.806Z" fill="#4D453B" style={arrowStyle(1540)} />
+          <path d="M0 48.592L0.955192 52.1312L3.5426 49.5344L0 48.592ZM350.895 398.666L351.12 398.89L351.568 398.441L351.343 398.216L351.119 398.441L350.895 398.666ZM2.02401 50.6087L1.79993 50.8336L350.895 398.666L351.119 398.441L351.343 398.216L2.24808 50.3838L2.02401 50.6087Z" fill="#4D453B" style={arrowStyle(1620)} />
+          <path d="M686.048 62.8304C686.048 62.6551 685.906 62.513 685.73 62.5131L682.873 62.5142C682.698 62.5143 682.556 62.6565 682.556 62.8318C682.556 63.0071 682.698 63.1492 682.873 63.1491L685.413 63.1482L685.414 65.6879C685.414 65.8632 685.556 66.0053 685.732 66.0052C685.907 66.0052 686.049 65.863 686.049 65.6877L686.048 62.8304ZM118.276 630.276L118.051 630.5L118.5 630.949L118.725 630.725L118.5 630.5L118.276 630.276ZM685.73 62.8306L685.506 62.6062L118.276 630.276L118.5 630.5L118.725 630.725L685.955 63.055L685.73 62.8306Z" fill="#4D453B" style={arrowStyle(1700)} />
+          <path d="M667.951 261.458L664.31 261.033L665.762 264.399L667.951 261.458ZM111.749 501.465L115.39 501.89L113.937 498.524L111.749 501.465ZM665.328 262.59L665.202 262.299L114.246 500.041L114.372 500.333L114.498 500.624L665.454 262.882L665.328 262.59Z" fill="#4D453B" style={arrowStyle(1780)} />
+
+          {/* Centre dot — always on top */}
+          <circle cx="350.484" cy="397.171" r="4.76201" fill="#FFEDD7" stroke="#4D453B" strokeWidth="0.634935" />
+        </svg>
+
+        {/* Corner labels — appear at phase 2, fade at phase 3 */}
+        {labels.map(({ text, pos, delay }) => (
           <p key={text} style={{
             ...STYLE_DISPLAY,
             fontSize: "clamp(16px, 3.7vw, 25.4px)",
             color: "black",
             position: "absolute",
-            ...style,
+            ...pos,
             opacity: phase >= 2 && phase < 3 ? 1 : 0,
             transform: phase >= 2 && phase < 3 ? "translateY(0)" : "translateY(8px)",
-            transition: `opacity 0.4s ease ${delay}ms, transform 0.4s ease ${delay}ms`,
+            transition: `opacity 0.45s ease ${delay}ms, transform 0.45s ease ${delay}ms`,
           }}>{text}</p>
         ))}
       </div>
@@ -895,7 +917,7 @@ function RolesSection() {
 const TESTIMONIALS = [
   {
     name: "Tom Picarony", title: "Head of Expansion",
-    photo: null as string | null, bg: "#edead6",
+    photo: "/photo_tom.jpeg" as string | null, bg: "#edead6",
     text: [
       "Thanks to Tiffany's invaluable assistance, we've successfully hired our UK team.",
       "Her leadership, strategic insight, and dedication were instrumental in assembling a top-notch team ready to tackle any challenge.",
@@ -911,7 +933,7 @@ const TESTIMONIALS = [
   },
   {
     name: "Ruben Tadmor", title: "Founder",
-    photo: null as string | null, bg: "#90b0bb",
+    photo: "/photo_ruben.jpeg" as string | null, bg: "#90b0bb",
     text: [
       "Tiffany is by far the best experience I've had working with external support for recruitment — really felt like an extension of the hiring team.",
     ],
@@ -935,7 +957,7 @@ const TESTIMONIALS = [
   },
   {
     name: "Martin Leguay", title: "CEO, Touchnote",
-    photo: null as string | null, bg: "#edead6",
+    photo: "/photo_martin.jpeg" as string | null, bg: "#edead6",
     text: [
       "Working with Tiffany has been great, she's helped us on multiple briefs and has been so effective in providing the right candidates within such a fast turnaround.",
       "Whether for full time or temp requirements, Tiffany has a vast network of quality candidates to reach out to.",
@@ -951,7 +973,7 @@ const TESTIMONIALS = [
   },
   {
     name: "Haralds Gabrans Zukovs", title: "Head of Growth, Mindgard",
-    photo: null as string | null, bg: "#e0e0e0",
+    photo: "/photo_haralds.jpeg" as string | null, bg: "#e0e0e0",
     text: [
       "Tiffany's expert guidance was invaluable in navigating my career transition.",
       "Her personalised advice and unwavering support empowered me to confidently land the perfect next step. I highly recommend her services to anyone seeking a career change partner.",
