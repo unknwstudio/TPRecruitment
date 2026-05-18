@@ -387,11 +387,7 @@ function Navbar() {
     <>
       <div
         className="sticky top-0 z-50 flex items-center justify-between px-[16px] md:px-[30px] py-[14px] md:py-[20px] w-full"
-        style={{
-          backgroundColor: scrolled ? "#ffffff" : "#ffedd7",
-          boxShadow: scrolled ? "0 1px 8px rgba(0,0,0,0.06)" : "none",
-          transition: "background-color 0.35s ease, box-shadow 0.35s ease",
-        }}
+        style={{ backgroundColor: "transparent" }}
       >
 
         {/* Logo — custom SVG for all breakpoints */}
@@ -403,14 +399,16 @@ function Navbar() {
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         />
 
-        {/* Desktop CTA — fades out when the contact form is in view */}
+        {/* Desktop CTA — white on hero, orange after scroll; hidden when contact form visible */}
         <div
           className="hidden lg:flex flex-col items-start p-[6px]"
           style={{
-            backgroundColor: navHov ? "#FF9A6A" : "#fb8349",
+            backgroundColor: scrolled
+              ? (navHov ? "#FF9A6A" : "#fb8349")   // orange after scroll
+              : (navHov ? "#ececec"  : "#ffffff"),  // white on hero
             opacity: ctaHidden ? 0 : 1,
             pointerEvents: ctaHidden ? "none" : "auto",
-            transition: "background-color 0.2s ease, opacity 0.3s ease",
+            transition: "background-color 0.35s ease, opacity 0.3s ease",
           }}
           onMouseEnter={() => setNavHov(true)}
           onMouseLeave={() => setNavHov(false)}
@@ -1027,6 +1025,101 @@ const TESTIMONIALS_SCATTER = [
   { idx: 7, left: "949px", top: "630px", width: "380px", rotate: 0      },
 ];
 
+// Scatter card with hover-lift interaction.
+// `entered` tracks when each card's entrance animation has fully played —
+// only after that do hover transitions switch to the snappy spring version.
+function ScatterCard({
+  t, left, top, width, rotate, baseZ, inView, delay,
+}: {
+  t: typeof TESTIMONIALS[0]; left: string; top: string; width: string;
+  rotate: number; baseZ: number; inView: boolean; delay: number;
+}) {
+  const [hov, setHov]       = useState(false);
+  const [entered, setEntered] = useState(false);
+
+  useEffect(() => {
+    if (!inView) return;
+    const id = setTimeout(() => setEntered(true), delay + 620);
+    return () => clearTimeout(id);
+  }, [inView, delay]);
+
+  const transform = !inView
+    ? `translateY(30px) rotate(${rotate}deg)`
+    : hov && entered
+      ? `translateY(-10px) scale(1.04) rotate(0deg)`
+      : `rotate(${rotate}deg)`;
+
+  const transition = entered
+    ? hov
+      ? "transform 0.3s cubic-bezier(0.34,1.3,0.64,1), box-shadow 0.25s ease"
+      : "transform 0.3s cubic-bezier(0.4,0,0.2,1), box-shadow 0.25s ease"
+    : `opacity 0.55s ease ${delay}ms, transform 0.55s cubic-bezier(0.4,0,0.2,1) ${delay}ms`;
+
+  return (
+    <div
+      style={{
+        position: "absolute", left, top, width,
+        opacity: inView ? 1 : 0,
+        transform,
+        zIndex: hov && entered ? 100 : baseZ,
+        boxShadow: hov && entered ? "0 24px 64px rgba(0,0,0,0.22)" : "none",
+        transition,
+        cursor: "default",
+      }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+    >
+      <TestimonialCardInner t={t} />
+    </div>
+  );
+}
+
+// Mobile hover card — same lift effect for grid layout
+function MobileTestimonialCard({
+  t, rotate, inView, delay,
+}: {
+  t: typeof TESTIMONIALS[0]; rotate: number; inView: boolean; delay: number;
+}) {
+  const [hov, setHov]       = useState(false);
+  const [entered, setEntered] = useState(false);
+
+  useEffect(() => {
+    if (!inView) return;
+    const id = setTimeout(() => setEntered(true), delay + 560);
+    return () => clearTimeout(id);
+  }, [inView, delay]);
+
+  const transform = !inView
+    ? `translateY(24px) rotate(${rotate}deg)`
+    : hov && entered
+      ? `translateY(-8px) scale(1.03) rotate(0deg)`
+      : `rotate(${rotate}deg)`;
+
+  const transition = entered
+    ? hov
+      ? "transform 0.28s cubic-bezier(0.34,1.3,0.64,1), box-shadow 0.25s ease"
+      : "transform 0.28s cubic-bezier(0.4,0,0.2,1), box-shadow 0.25s ease"
+    : `opacity 0.5s ease ${delay}ms, transform 0.5s ease ${delay}ms`;
+
+  return (
+    <div
+      style={{
+        opacity: inView ? 1 : 0,
+        transform,
+        boxShadow: hov && entered ? "0 16px 48px rgba(0,0,0,0.18)" : "none",
+        transition,
+        position: "relative",
+        zIndex: hov && entered ? 10 : 1,
+        cursor: "default",
+      }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+    >
+      <TestimonialCardInner t={t} />
+    </div>
+  );
+}
+
 function TestimonialsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [inView, setInView] = useState(false);
@@ -1049,42 +1142,29 @@ function TestimonialsSection() {
           Testimonials
         </p>
 
-        {/* Desktop xl+: absolute scatter layout */}
+        {/* Desktop xl+: absolute scatter layout with hover-lift */}
         <div className="hidden xl:block relative" style={{ minHeight: "980px" }}>
-          {TESTIMONIALS_SCATTER.map(({ idx, left, top, width, rotate }, layoutIdx) => {
-            const t = TESTIMONIALS[idx];
-            const delay = layoutIdx * 140;
-            return (
-              <div
-                key={t.name}
-                style={{
-                  position: "absolute",
-                  left, top, width,
-                  opacity: inView ? 1 : 0,
-                  transform: `translateY(${inView ? 0 : 30}px) rotate(${rotate}deg)`,
-                  transition: `opacity 0.55s ease ${delay}ms, transform 0.55s cubic-bezier(0.4,0,0.2,1) ${delay}ms`,
-                  zIndex: layoutIdx,
-                }}
-              >
-                <TestimonialCardInner t={t} />
-              </div>
-            );
-          })}
+          {TESTIMONIALS_SCATTER.map(({ idx, left, top, width, rotate }, layoutIdx) => (
+            <ScatterCard
+              key={TESTIMONIALS[idx].name}
+              t={TESTIMONIALS[idx]}
+              left={left} top={top} width={width}
+              rotate={rotate} baseZ={layoutIdx}
+              inView={inView} delay={layoutIdx * 140}
+            />
+          ))}
         </div>
 
-        {/* Mobile/tablet: 2-col grid with mild rotations */}
+        {/* Mobile/tablet: 2-col grid with hover-lift */}
         <div className="xl:hidden grid grid-cols-1 md:grid-cols-2 gap-[16px] md:gap-[20px]">
           {TESTIMONIALS.map((t, i) => (
-            <div
+            <MobileTestimonialCard
               key={t.name}
-              style={{
-                opacity: inView ? 1 : 0,
-                transform: `translateY(${inView ? 0 : 24}px) rotate(${i % 2 === 0 ? -0.8 : 0.8}deg)`,
-                transition: `opacity 0.5s ease ${i * 100}ms, transform 0.5s ease ${i * 100}ms`,
-              }}
-            >
-              <TestimonialCardInner t={t} />
-            </div>
+              t={t}
+              rotate={i % 2 === 0 ? -0.8 : 0.8}
+              inView={inView}
+              delay={i * 100}
+            />
           ))}
         </div>
       </div>
