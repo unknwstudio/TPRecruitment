@@ -266,15 +266,14 @@ function IntroAnimation({ onComplete }: { onComplete: () => void }) {
           opacity: phase === 0 ? 1 : 0,
           transition: "opacity 0.3s ease",
         }} />
-        {/* Arrow burst SVG */}
+        {/* Arrow burst SVG — grows from centre via clip-path circle reveal */}
         <img
           src="/intro-burst.svg"
           alt=""
+          className={phase >= 1 ? "animate-burst-grow" : ""}
           style={{
             position: "absolute", inset: 0, width: "100%", height: "100%",
-            opacity: phase >= 1 ? 1 : 0,
-            transform: `scale(${phase >= 1 ? 1 : 0.9})`,
-            transition: "opacity 1.5s ease, transform 1.5s cubic-bezier(0.4,0,0.2,1)",
+            clipPath: phase >= 1 ? undefined : "circle(0% at 51.09% 53.93%)",
           }}
         />
         {/* Corner text labels */}
@@ -335,14 +334,44 @@ function Navbar() {
     <>
       <div className="sticky top-0 z-50 flex items-center justify-between px-[16px] md:px-[30px] py-[14px] md:py-[20px] w-full">
 
-        {/* Logo — small SVG below 1020px, full logo at 1020px+ */}
-        <img
-          src="/TP_logo.svg"
-          alt="TPRecruitment"
-          className="hidden lg:block w-auto cursor-pointer"
-          style={{ height: "46px" }}
+        {/* Desktop logo — bordered cells: Higher Standard | tagline / Tiffany Philippou */}
+        <div
+          className="hidden lg:flex items-stretch bg-white p-[7px] cursor-pointer shrink-0"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        />
+          aria-label="Higher Standard – home"
+        >
+          {/* "Higher Standard" cell (left, rounded-l) */}
+          <div
+            className="flex items-center px-[11px] py-[14px] rounded-tl-[7px] rounded-bl-[7px]"
+            style={{ border: "1.252px solid black", marginRight: "-1.252px" }}
+          >
+            <span className="text-[32px] text-black whitespace-nowrap" style={{ ...STYLE_DISPLAY, letterSpacing: "-0.65px" }}>
+              Higher Standard
+            </span>
+          </div>
+          {/* Right column: tagline (top-right) + Tiffany (bottom-right) */}
+          <div className="flex flex-col">
+            <div
+              className="flex items-center px-[15px] py-[7px] rounded-tr-[7px]"
+              style={{ border: "1.252px solid black", marginBottom: "-1.252px", flex: 1 }}
+            >
+              <div className="text-[12px] text-black" style={{ ...STYLE_MONO, lineHeight: "1.1" }}>
+                <p>Hiring with depth</p>
+                <p>and rigour as a standard.</p>
+              </div>
+            </div>
+            <div
+              className="flex items-center px-[15px] py-[6px] rounded-br-[7px]"
+              style={{ border: "1.252px solid black", flex: 1 }}
+            >
+              <span className="text-[21px] text-black whitespace-nowrap font-script">
+                Tiffany Philippou
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile logo — small SVG */}
         <img
           src="/small_logo_TP.svg"
           alt="TPRecruitment"
@@ -455,89 +484,89 @@ function Navbar() {
 function HeroSection() {
   return (
     <section className="bg-[#ffedd7] w-full overflow-hidden">
-      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[80px] lg:pt-[120px] pb-[96px]">
 
-        {/* Headline — fades in immediately on mount */}
-        <Reveal y={20} className="mb-[52px] lg:mb-[80px]">
-          <p className="text-[40px] lg:text-[60px] text-black max-w-[1155px]" style={STYLE_DISPLAY}>
-            Recruitment is messy, human, and brutal. Most recruiters hide from that. I&nbsp;don&apos;t.
-          </p>
-        </Reveal>
+      {/* ── Desktop layout (≥1020px): fixed height, content left + illustration right ── */}
+      <div className="hidden lg:block relative" style={{ minHeight: "725px" }}>
+        <div className="max-w-[1440px] mx-auto px-[30px] relative h-full">
 
-        {/* Two equal-width cards — 675px each at 1440px viewport */}
-        <div className="flex flex-col lg:flex-row gap-[16px] lg:gap-[30px] lg:items-stretch">
+          {/* Left: headline + body + CTA */}
+          <div
+            className="absolute flex flex-col justify-between"
+            style={{ left: "0px", top: "119px", width: "799px", height: "445px" }}
+          >
+            {/* Top: headline + body */}
+            <div className="flex flex-col gap-[40px]">
+              <Reveal>
+                <p
+                  className="text-[60px] text-black"
+                  style={{ ...STYLE_DISPLAY, letterSpacing: "-3px", lineHeight: "1.1" }}
+                >
+                  The right hire changes everything that comes after it.
+                </p>
+              </Reveal>
+              <Reveal delay={120}>
+                <div className="text-[28px] text-black" style={{ ...STYLE_MONO, lineHeight: "1.1" }}>
+                  <p>I&apos;m Tiffany Philippou, founder of Higher Standard.</p>
+                  <p>I find the people who raise the bar for your whole company and shape the outcome, then I stay long after the offer is signed.</p>
+                </div>
+              </Reveal>
+            </div>
+            {/* Bottom: CTA */}
+            <Reveal delay={240}>
+              <OrangeBtn onClick={scrollToContact}>
+                <p className="text-[24px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
+                  Start working together
+                </p>
+              </OrangeBtn>
+            </Reveal>
+          </div>
 
-          {/* Left: Usual process */}
-          <Reveal delay={100} className="flex flex-1 min-w-0 lg:max-w-[675px] lg:self-stretch">
-            <HoverCard className="flex w-full">
-              <div className="bg-[#d1d1d1] flex flex-col w-full p-[10px]">
-                <div className="flex items-start shrink-0 w-full" style={{ marginBottom: "-1.372px" }}>
-                  <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] md:p-[30px] rounded-tl-[8px] rounded-tr-[8px]">
-                    <p className="shrink-0 text-[24px] md:text-[32px] text-black" style={STYLE_DISPLAY}>Usual process:</p>
-                  </div>
-                </div>
-                <div className="flex flex-1 min-h-0">
-                  <div className="border-[1.372px] border-black flex flex-1 flex-col gap-[24px] md:gap-[30px] items-start p-[20px] md:p-[30px] rounded-bl-[8px] rounded-br-[8px]">
-                    <div className="flex flex-col gap-[16px] md:gap-[20px] items-start w-full">
-                      {["You fill out a brief.", "You get CVs.", "You do the thinking."].map((t) => (
-                        <div key={t} className="flex gap-[16px] md:gap-[20px] items-start w-full">
-                          <div className="shrink-0 border border-[#4d453b] rounded-[2px] w-[18px] h-[18px] mt-[3px]" />
-                          <p className="flex-1 text-[18px] md:text-[24px] text-black" style={STYLE_MONO}>{t}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="w-full text-[18px] md:text-[24px] text-black" style={STYLE_MONO}>Sound familiar?</p>
-                  </div>
-                </div>
-              </div>
-            </HoverCard>
-          </Reveal>
-
-          {/* Right: Working with me */}
-          <Reveal delay={180} className="flex flex-1 min-w-0 lg:max-w-[675px] lg:self-stretch">
-            <HoverCard className="flex w-full">
-              <div className="bg-white flex flex-col w-full p-[10px]">
-                <div className="flex items-start shrink-0 w-full" style={{ marginBottom: "-1.372px" }}>
-                  <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] md:p-[30px] rounded-tl-[8px] rounded-tr-[8px]">
-                    <p className="flex-1 text-[24px] md:text-[32px] text-black" style={STYLE_DISPLAY}>Working with me:</p>
-                  </div>
-                </div>
-                <div className="flex flex-1 min-h-0">
-                  <div className="border-[1.372px] border-black flex flex-1 flex-col gap-[20px] md:gap-[40px] items-start p-[20px] md:p-[30px] rounded-bl-[8px] rounded-br-[8px]">
-                    <div className="flex flex-col gap-[14px] md:gap-[20px] items-start w-full">
-                      {["You have a conversation.", "You meet people I believe in."].map((t) => (
-                        <div key={t} className="flex gap-[16px] md:gap-[20px] items-start w-full">
-                          <OrangeCheckbox />
-                          <p className="flex-1 text-[18px] md:text-[24px] text-black" style={STYLE_MONO}>{t}</p>
-                        </div>
-                      ))}
-                      <div className="flex gap-[16px] md:gap-[20px] items-start w-full">
-                        <OrangeCheckbox />
-                        <div className="flex-1 text-[18px] md:text-[24px] text-black" style={{ ...STYLE_MONO, lineHeight: "1.1" }}>
-                          <p>The decision is up to you —</p>
-                          <p>but you never carry that weight alone.</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-[18px] md:text-[24px] text-black" style={{ ...STYLE_MONO, lineHeight: "1.1" }}>
-                      <p>Good hiring is a collaboration,</p>
-                      <p>not a transaction.</p>
-                    </div>
-                    <div className="md:mt-auto">
-                      <OrangeBtn onClick={scrollToContact}>
-                        <p className="text-[18px] md:text-[24px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
-                          Start working together
-                        </p>
-                      </OrangeBtn>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </HoverCard>
-          </Reveal>
+          {/* Right: illustration with corner labels */}
+          <div
+            className="absolute"
+            style={{ right: "0px", top: "50%", transform: "translateY(-50%)", width: "541px", height: "595px" }}
+          >
+            {/* SVG centred inside container */}
+            <div
+              className="absolute"
+              style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: "540px", height: "580px" }}
+            >
+              <img src="/hero-illustration.svg" alt="" style={{ width: "100%", height: "100%" }} />
+            </div>
+            {/* Corner labels */}
+            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "93px", top: "109px", letterSpacing: "-0.4px" }}>Higher</p>
+            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "342px", top: "109px", letterSpacing: "-0.4px" }}>Standard</p>
+            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "93px", top: "505px", letterSpacing: "-0.4px" }}>In hiring</p>
+            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "461px", top: "505px", letterSpacing: "-0.4px", transform: "translateX(-100%)" }}>People</p>
+          </div>
 
         </div>
       </div>
+
+      {/* ── Mobile layout (<1020px): stacked ── */}
+      <div className="lg:hidden px-[16px] md:px-[30px] pt-[60px] pb-[80px]">
+        <div className="flex flex-col gap-[40px]">
+          <Reveal>
+            <p className="text-[40px] md:text-[48px] text-black" style={{ ...STYLE_DISPLAY, letterSpacing: "-2px", lineHeight: "1.1" }}>
+              The right hire changes everything that comes after it.
+            </p>
+          </Reveal>
+          <Reveal delay={120}>
+            <div className="text-[18px] md:text-[22px] text-black" style={{ ...STYLE_MONO, lineHeight: "1.3" }}>
+              <p>I&apos;m Tiffany Philippou, founder of Higher Standard.</p>
+              <p className="mt-[10px]">I find the people who raise the bar for your whole company and shape the outcome, then I stay long after the offer is signed.</p>
+            </div>
+          </Reveal>
+          <Reveal delay={220}>
+            <OrangeBtn onClick={scrollToContact}>
+              <p className="text-[18px] md:text-[20px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
+                Start working together
+              </p>
+            </OrangeBtn>
+          </Reveal>
+        </div>
+      </div>
+
     </section>
   );
 }
@@ -736,8 +765,104 @@ function PartnersSection() {
 }
 
 // ── Roles ─────────────────────────────────────────────────────────────────────
-const ROLE_NAMES = ["Marketing", "Growth", "Product"];
 const ROLES_DESCRIPTION = "Venture-backed startups, from seed to Series B. Companies where every senior hire shapes the culture and the trajectory. I know this environment from the inside, and I know what the right person looks like at every stage of growth.";
+
+const ROLE_ACCORDION_DATA = [
+  { name: "Marketing", bg: "#ffffff", items: "CMO, VP Marketing, Head of Marketing." },
+  { name: "Growth",    bg: "#e0e0e0", items: "VP Growth, Head of Growth." },
+  { name: "Product",   bg: "#e0e0e0", items: "CPO, VP Product, Head of Product, Product Lead." },
+];
+
+function RoleAccordionRow({
+  role, index, isFirst, isLast,
+}: {
+  role: typeof ROLE_ACCORDION_DATA[0];
+  index: number;
+  isFirst: boolean;
+  isLast: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+
+  // Title border-radius:
+  // • First row always has rounded top corners
+  // • Last row (when closed) has rounded bottom corners; when open → sub-row gets them
+  const titleRadius = isFirst
+    ? "8px 8px 0 0"
+    : !isLast ? "0" : open ? "0" : "0 0 8px 8px";
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        // Next row overlaps this row's bottom border by 1.372px (shared-border trick)
+        marginTop: isFirst ? 0 : "-1.372px",
+        // When open, sit above sibling rows so sub-row isn't hidden
+        zIndex: open ? 10 : (ROLE_ACCORDION_DATA.length - index),
+        backgroundColor: role.bg,
+      }}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      {/* Title row */}
+      <div
+        className="flex items-center gap-[30px] p-[24px] md:p-[30px]"
+        style={{
+          border: "1.372px solid black",
+          borderRadius: titleRadius,
+          // Remove bottom border when open — sub-row provides continuity
+          borderBottom: open ? "none" : "1.372px solid black",
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
+        <p className="flex-1 text-[24px] md:text-[28px] text-black" style={STYLE_DISPLAY}>
+          {role.name}
+        </p>
+        {/* Arrow rotates 90° when open */}
+        <div
+          style={{
+            backgroundColor: "#fb8349",
+            width: 24, height: 24, flexShrink: 0,
+            position: "relative",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            transform: open ? "rotate(90deg)" : "rotate(0deg)",
+            transition: "transform 0.25s ease",
+          }}
+        >
+          <div style={{ position: "absolute", inset: 0, border: "0.4px solid black", borderRadius: "4px" }} />
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ position: "relative" }}>
+            <path d="M2 5H8M6 3L8 5L6 7" stroke="black" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Sub-row — slides open via CSS grid 0fr → 1fr */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateRows: open ? "1fr" : "0fr",
+          transition: "grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
+      >
+        <div style={{ overflow: "hidden", backgroundColor: role.bg }}>
+          <div
+            className="p-[24px] md:p-[30px]"
+            style={{
+              border: "1.372px solid black",
+              borderTop: "none",
+              borderRadius: isLast ? "0 0 8px 8px" : "0",
+              backgroundColor: role.bg,
+            }}
+          >
+            <p className="text-[20px] md:text-[24px] text-black" style={STYLE_MONO}>
+              {role.items}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function RolesSection() {
   return (
@@ -750,28 +875,19 @@ function RolesSection() {
         </Reveal>
 
         <div className="flex flex-col xl:flex-row gap-[30px] items-start">
-          {/* Left: role list card */}
+          {/* Left: accordion role list */}
           <Reveal className="xl:w-[671px] xl:shrink-0 w-full">
-            <HoverCard className="w-full">
-              <div className="bg-white p-[10px]">
-                {ROLE_NAMES.map((name, i) => (
-                  <div
-                    key={name}
-                    className="flex items-center gap-[30px] p-[24px] md:p-[30px]"
-                    style={{
-                      border: "1.372px solid black",
-                      borderRadius: i === 0 ? "8px 8px 0 0" : i === ROLE_NAMES.length - 1 ? "0 0 8px 8px" : "0",
-                      marginBottom: i < ROLE_NAMES.length - 1 ? "-1.372px" : 0,
-                      position: "relative",
-                      zIndex: i,
-                    }}
-                  >
-                    <p className="flex-1 text-[24px] md:text-[28px] text-black" style={STYLE_DISPLAY}>{name}</p>
-                    <ArrowBtn onClick={scrollToContact} />
-                  </div>
-                ))}
-              </div>
-            </HoverCard>
+            <div className="bg-white p-[10px]">
+              {ROLE_ACCORDION_DATA.map((role, i) => (
+                <RoleAccordionRow
+                  key={role.name}
+                  role={role}
+                  index={i}
+                  isFirst={i === 0}
+                  isLast={i === ROLE_ACCORDION_DATA.length - 1}
+                />
+              ))}
+            </div>
           </Reveal>
 
           {/* Right: description + CTA */}
@@ -996,6 +1112,26 @@ function TestimonialsSection() {
 }
 
 // ── Newsletter ────────────────────────────────────────────────────────────────
+// Subscribe button: explicitly 50px tall (matches the email input height)
+function SubscribeBtn() {
+  const [hov, setHov] = useState(false);
+  return (
+    <div
+      className="flex flex-col items-start p-[6px] w-fit shrink-0 h-[50px]"
+      style={{ backgroundColor: hov ? "#FF9A6A" : "#fb8349", transition: "background-color 0.2s ease" }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+    >
+      <button
+        className="border border-black flex flex-1 items-center px-[14px] rounded-[4px] cursor-pointer"
+        style={{ backgroundColor: "transparent" }}
+      >
+        <p className="text-[18px] md:text-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>Subscribe</p>
+      </button>
+    </div>
+  );
+}
+
 const NEWSLETTER_ARTICLES = [
   {
     title: "Why great hires fail after six months",
@@ -1027,16 +1163,15 @@ function NewsletterSection() {
         </Reveal>
 
         {/* Email subscribe row */}
-        <Reveal delay={60} className="flex flex-col sm:flex-row gap-[10px] items-stretch sm:items-end justify-center mb-[52px] md:mb-[60px]">
+        <Reveal delay={60} className="flex flex-col sm:flex-row gap-[10px] items-stretch sm:items-center justify-center mb-[52px] md:mb-[60px]">
           <input
             type="email"
             placeholder="Enter your email"
-            className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full sm:w-[403px] text-[16px] bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200"
-            style={{ ...STYLE_DISPLAY, color: "#767676" }}
+            className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full sm:w-[403px] text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
+            style={STYLE_DISPLAY}
           />
-          <OrangeBtn>
-            <p className="text-[18px] md:text-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>Subscribe</p>
-          </OrangeBtn>
+          {/* Subscribe button — explicitly 50px tall to match the input */}
+          <SubscribeBtn />
         </Reveal>
 
         {/* Article cards — 3 columns desktop, 1 column mobile */}
@@ -1165,25 +1300,56 @@ function CTASection() {
 // ── Footer ────────────────────────────────────────────────────────────────────
 function Footer() {
   return (
-    <footer className="bg-[#4d453b] w-full overflow-hidden relative" style={{ minHeight: "200px", height: "clamp(200px,28vw,400px)" }}>
-      <img src="/TPRecruitment_FooterLogo.svg" alt="TPRecruitment"
-           className="absolute left-[16px] right-[16px] md:left-[30px] md:right-[30px]"
-           style={{ top: "20px", width: "calc(100% - 32px)", height: "auto" }} />
-      <div className="absolute bottom-[16px] md:bottom-[30px] left-[16px] right-[16px] md:left-[30px] md:right-[30px] flex flex-col md:flex-row items-start md:items-baseline gap-[6px] text-white">
-        {/* Left — flex-1 so center is truly centered */}
+    <footer
+      className="bg-[#4d453b] w-full overflow-hidden relative"
+      style={{ minHeight: "200px", height: "clamp(200px, 28vw, 400px)" }}
+    >
+      {/* Large "Higher Standard" wordmark */}
+      <p
+        className="absolute left-[16px] md:left-[30px] top-[20px] md:top-[30px] text-[#eaeae5] whitespace-nowrap"
+        style={{
+          ...STYLE_DISPLAY,
+          fontSize: "clamp(36px, 8.75vw, 126px)",
+          letterSpacing: "clamp(-0.72px, -0.2vw, -2.52px)",
+          lineHeight: 1,
+        }}
+      >
+        Higher Standard
+      </p>
+
+      {/* Bottom bar */}
+      <div
+        className="absolute bottom-[16px] md:bottom-[30px] left-[16px] right-[16px] md:left-[30px] md:right-[30px] flex flex-col md:flex-row items-start md:items-end gap-[6px] text-white"
+      >
+        {/* Left */}
         <div className="md:flex-1">
-          <p className="text-[11px] md:text-[14px]" style={STYLE_DISPLAY}>All rights reserved.</p>
+          <p
+            className="text-[11px] md:text-[14px] text-[#eaeae5]"
+            style={{ ...STYLE_DISPLAY, letterSpacing: "-0.42px" }}
+          >
+            All rights reserved.
+          </p>
         </div>
-        {/* Center — copyright, centered on desktop */}
+        {/* Centre — copyright */}
         <div className="flex gap-[4px] md:gap-[6px] items-baseline md:justify-center md:flex-1">
-          <span className="text-[18px] md:text-[28px]" style={STYLE_DISPLAY}>©</span>
-          <span className="text-[13px] md:text-[20px]" style={STYLE_DISPLAY}>2026 TP Recruitment</span>
+          <span className="text-[18px] md:text-[28px] text-[#eaeae5]" style={STYLE_DISPLAY}>©</span>
+          <span
+            className="text-[13px] md:text-[20px] text-[#eaeae5]"
+            style={{ ...STYLE_DISPLAY, letterSpacing: "-1px" }}
+          >
+            2026 Higher Standards
+          </span>
         </div>
-        {/* Right — flex-1, right-aligned */}
+        {/* Right */}
         <div className="md:flex-1 md:flex md:justify-end">
-          <a className="text-[11px] md:text-[14px] hover:opacity-60 transition-opacity duration-150"
-             href="https://www.unknw.com/" target="_blank" rel="noopener noreferrer" style={STYLE_DISPLAY}>
-            designed by UNKWN
+          <a
+            className="text-[11px] md:text-[14px] text-[#eaeae5] hover:opacity-60 transition-opacity duration-150"
+            href="https://www.unknw.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ ...STYLE_DISPLAY, letterSpacing: "-0.7px" }}
+          >
+            designed by UNKNW
           </a>
         </div>
       </div>
