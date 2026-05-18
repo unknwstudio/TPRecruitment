@@ -121,6 +121,31 @@ function OrangeCheckbox() {
   );
 }
 
+function DarkMinusIcon() {
+  return (
+    <div className="shrink-0 bg-[#4d453b] rounded-[2px] w-[18px] h-[18px] mt-[3px] flex items-center justify-center">
+      <svg width="10" height="2" viewBox="0 0 10 2" fill="none">
+        <path d="M1 1H9" stroke="white" strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+    </div>
+  );
+}
+
+// Orange arrow button (for Roles rows)
+function ArrowBtn({ onClick }: { onClick?: () => void }) {
+  return (
+    <div
+      onClick={onClick}
+      style={{ backgroundColor: "#fb8349", width: 24, height: 24, flexShrink: 0, position: "relative", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+    >
+      <div style={{ position: "absolute", inset: 0, border: "0.4px solid black", borderRadius: "4px" }} />
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ position: "relative" }}>
+        <path d="M2 5H8M6 3L8 5L6 7" stroke="black" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    </div>
+  );
+}
+
 function CheckItem({ text, icon = "check" }: { text: string; icon?: "check" | "cross" }) {
   return (
     <div className="flex gap-[14px] items-start w-full">
@@ -176,12 +201,106 @@ function OrangeBtn({ onClick, children, className = "" }: { onClick?: () => void
   );
 }
 
+// ── Intro animation ───────────────────────────────────────────────────────────
+// Phase 0 (0ms):    Rectangle border appears
+// Phase 1 (700ms):  Arrow-burst SVG fades in, rect border hidden (SVG has it)
+// Phase 2 (2200ms): Corner text labels appear
+// Phase 3 (4200ms): Everything fades out
+// onComplete (5000ms): parent removes overlay, main page revealed
+function IntroAnimation({ onComplete }: { onComplete: () => void }) {
+  const [phase, setPhase] = useState<0 | 1 | 2 | 3>(0);
+
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => setPhase(1), 700),
+      setTimeout(() => setPhase(2), 2200),
+      setTimeout(() => setPhase(3), 4200),
+      setTimeout(onComplete, 5000),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, [onComplete]);
+
+  // Positions derived from Figma node 515:355 (container 687 × 755.573px)
+  // Rectangle 21: x=118.415 y=165.103 w=466.677 h=466.677  (scaled from 540×580 group)
+  // But the SVG viewBox="0 0 686.049 736.525" and the rect in SVG: x=118.415 y=165.103 w=466.677 h=466.677
+  // So as percentages of 686×736: left=17.26%, top=22.43%, right=right edge=84.26%, bottom=85.83%
+  // Text positions in the 687×755 container:
+  //   "Higher":   left=118.1/687=17.19%  top=138.42/755.573=18.32%
+  //   "Standard": left=434.3/687=63.22%  top=18.32%
+  //   "In hiring":left=118.1/687=17.19%  top=641.28/755.573=84.87%
+  //   "People":   right edge at left=585.12px → right = (687-585.12)/687=14.83% from right
+  const labels = [
+    { text: "Higher",    style: { left: "17.19%", top: "18.32%" },                    delay: 0   },
+    { text: "Standard",  style: { left: "63.22%", top: "18.32%" },                    delay: 100 },
+    { text: "In hiring", style: { left: "17.19%", top: "84.87%" },                    delay: 200 },
+    { text: "People",    style: { right: "14.83%", top: "84.87%", textAlign: "right" as const }, delay: 300 },
+  ];
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 1000,
+      backgroundColor: "#ffedd7",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      opacity: phase === 3 ? 0 : 1,
+      transition: phase === 3 ? "opacity 0.8s ease" : "none",
+      pointerEvents: phase === 3 ? "none" : "auto",
+    }}>
+      <div style={{ position: "relative", width: "min(687px, 90vw)", height: "min(756px, 90vh)" }}>
+        {/* Rect placeholder — visible only in phase 0 before SVG loads */}
+        <div style={{
+          position: "absolute",
+          left: "17.26%", top: "22.43%", width: "67.03%", height: "63.4%",
+          border: "0.635px solid #4d453b",
+          opacity: phase === 0 ? 1 : 0,
+          transition: "opacity 0.3s ease",
+          pointerEvents: "none",
+        }} />
+        {/* Center dot */}
+        <div style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 5, height: 5,
+          backgroundColor: "#4d453b",
+          borderRadius: "50%",
+          opacity: phase === 0 ? 1 : 0,
+          transition: "opacity 0.3s ease",
+        }} />
+        {/* Arrow burst SVG */}
+        <img
+          src="/intro-burst.svg"
+          alt=""
+          style={{
+            position: "absolute", inset: 0, width: "100%", height: "100%",
+            opacity: phase >= 1 ? 1 : 0,
+            transform: `scale(${phase >= 1 ? 1 : 0.9})`,
+            transition: "opacity 1.5s ease, transform 1.5s cubic-bezier(0.4,0,0.2,1)",
+          }}
+        />
+        {/* Corner text labels */}
+        {labels.map(({ text, style, delay }) => (
+          <p key={text} style={{
+            ...STYLE_DISPLAY,
+            fontSize: "clamp(16px, 3.7vw, 25.4px)",
+            color: "black",
+            position: "absolute",
+            ...style,
+            opacity: phase >= 2 ? 1 : 0,
+            transform: phase >= 2 ? "translateY(0)" : "translateY(10px)",
+            transition: `opacity 0.5s ease ${delay}ms, transform 0.5s ease ${delay}ms`,
+          }}>{text}</p>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Navbar ────────────────────────────────────────────────────────────────────
 const NAV_LINKS = [
-  { label: "What's working", href: "working" },
-  { label: "Partners",       href: "partners" },
-  { label: "Roles",          href: "roles" },
-  { label: "Testimonials",   href: "testimonials" },
+  { label: "How I work",    href: "working" },
+  { label: "Partners",      href: "partners" },
+  { label: "Roles",         href: "roles" },
+  { label: "Testimonials",  href: "testimonials" },
 ];
 
 function Navbar() {
@@ -423,46 +542,31 @@ function HeroSection() {
   );
 }
 
-// ── What's Working ────────────────────────────────────────────────────────────
-const WORKING_CARDS = [
-  { title: "My standards",   icon: "check" as const, items: [
-    "Personally understand and assess every candidate before sharing their name.",
-    "Hire through the lens of fast-moving company experience.",
-    "Only hand over work I can fully stand behind.",
-    "Treat candidates and hiring managers as people, not profiles or clients.",
-  ]},
-  { title: "Communication",  icon: "check" as const, items: [
-    "Start with your reality, not just the brief.",
-    "Understand your culture, chaos level, stage, and what the right hire actually looks like.",
-    "Tell you what the market says, even when it is not what you want to hear.",
-    "Give honest feedback throughout.",
-  ]},
-  { title: "After the offer", icon: "check" as const, items: [
-    "Stay involved after placement.",
-    "Measure outcomes, not speed.",
-    "Prioritize people over pipeline.",
-    "Prioritize outcomes over optics.",
-  ]},
-  { title: "What I won't do", icon: "cross" as const, items: [
-    "Send 20 CVs by Friday just to fill a quota.",
-    "Drop names and disappear.",
-    "Place people who look right on paper but cannot survive the reality.",
-    "Write generic job descriptions.",
-    "Mistake activity for judgment.",
-  ]},
+// ── What Higher Standard means in practice ───────────────────────────────────
+const WHAT_STANDARD_ITEMS = [
+  "Hire through the lens of fast-moving company experience.",
+  "Start with your reality, not just the brief.",
+  "Work on only a handful of roles at a time to focus on quality, bring the best value to the companies I work with.",
+  "Personally understand and assess every person before sharing their name.",
+  "Treat everyone I work with as a person, not a profile.",
+  "Handle every step from offer to acceptance with care. The most delicate part of any hire is rarely the interview.",
+  "Prioritise people over pipeline, outcomes over optics.",
+  "Hire for mindset, not pedigree.",
 ];
 
-const BODY_TEXT = (
-  <>
-    <p className="mb-[1.08em]">
-      I know that growth asks a lot of a company. The pace. The pressure. The decisions that shape what comes next. None of it works without the right people around the table.
-    </p>
-    <p className="mb-[1.08em]">
-      That&apos;s why I work in partnership with ambitious teams to find the people who can carry that responsibility, people who bring judgement, energy and ownership, people who understand what it takes to build inside a fast-moving company, people who can help shape the outcome.
-    </p>
-    <p>The strongest teams are built in collaboration.</p>
-  </>
-);
+const WHAT_WONT_DO_ITEMS = [
+  "Send 20 CVs by Friday just to fill a quota.",
+  "Drop names and disappear.",
+  "Place people who look right on paper but cannot survive the reality.",
+  "Write generic job descriptions.",
+  "Mistake activity for judgment.",
+];
+
+// Mobile cards data (sticky stacking on small screens)
+const WORKING_MOBILE_CARDS = [
+  { title: "Every brief I take on is held to the same bar.", items: WHAT_STANDARD_ITEMS,   icon: "check" as const },
+  { title: "What I won't do",                               items: WHAT_WONT_DO_ITEMS,     icon: "dash"  as const },
+];
 
 function WhatWorkingSection() {
   return (
@@ -470,18 +574,17 @@ function WhatWorkingSection() {
 
       {/* ── Mobile / tablet ── */}
       <div className="lg:hidden">
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[96px] pb-[64px]">
-          <Reveal className="flex flex-col gap-[24px]">
-            <div className="text-[40px] text-black" style={STYLE_DISPLAY}>
-              <p>What&apos;s working</p>
-              <p>with me looks like</p>
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[96px] pb-[48px]">
+          <Reveal>
+            <div className="text-[40px] md:text-[44px] text-black" style={STYLE_DISPLAY}>
+              <p>What</p>
+              <p>Higher Standard</p>
+              <p>means in practice</p>
             </div>
-            <div className="text-[16px] text-black" style={STYLE_MONO}>{BODY_TEXT}</div>
           </Reveal>
         </div>
-
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
-          {WORKING_CARDS.map((card, idx) => (
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[96px]">
+          {WORKING_MOBILE_CARDS.map((card, idx) => (
             <div
               key={card.title}
               style={{
@@ -492,11 +595,21 @@ function WhatWorkingSection() {
               }}
             >
               <HoverCard>
-                <SectionCard title={card.title} expanded>
-                  <div className="flex flex-col gap-[16px] items-start w-full">
-                    {card.items.map((t) => <CheckItem key={t} icon={card.icon} text={t} />)}
+                <div className="bg-white flex flex-col p-[10px]">
+                  <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
+                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] md:p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
+                      <p className="text-[20px] md:text-[24px] text-black" style={STYLE_DISPLAY}>{card.title}</p>
+                    </div>
                   </div>
-                </SectionCard>
+                  <div className="border-[1.372px] border-black p-[16px] md:p-[20px] rounded-bl-[8px] rounded-br-[8px] flex flex-col gap-[16px]">
+                    {card.items.map((t) => (
+                      <div key={t} className="flex gap-[14px] items-start">
+                        {card.icon === "check" ? <OrangeCheckbox /> : <DarkMinusIcon />}
+                        <p className="flex-1 text-[16px] md:text-[18px] text-black" style={STYLE_MONO}>{t}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </HoverCard>
             </div>
           ))}
@@ -504,45 +617,65 @@ function WhatWorkingSection() {
         </div>
       </div>
 
-      {/* ── Desktop: two equal columns (each 675px at 1440px viewport) ── */}
+      {/* ── Desktop: title left, two cards right ── */}
       <div
         className="hidden lg:flex max-w-[1440px] mx-auto"
         style={{ gap: "30px", padding: "96px 30px", alignItems: "flex-start" }}
       >
-        {/* Left: sticky text — flex-1 = 675px at 1440px */}
-        <Reveal
-          className="flex-1 min-w-0 flex flex-col gap-[40px] items-start"
-          style={{ position: "sticky", top: "var(--stack-top)" }}
-        >
-          <div className="text-[52px] text-black" style={STYLE_DISPLAY}>
-            <p>What&apos;s working</p>
-            <p>with me looks like</p>
-          </div>
-          <div className="text-[24px] text-black" style={STYLE_MONO}>{BODY_TEXT}</div>
-        </Reveal>
-
-        {/* Right: sticky stacking cards — flex-1 = 675px at 1440px */}
-        <div className="flex-1 min-w-0">
-          {WORKING_CARDS.map((card, idx) => (
-            <div
-              key={card.title}
-              style={{
-                position: "sticky",
-                top: `calc(var(--stack-top) + ${idx} * var(--stack-step))`,
-                marginTop: idx === 0 ? 0 : "var(--stack-gap)",
-                zIndex: idx + 1,
-              }}
-            >
-              <HoverCard>
-                <SectionCard title={card.title} expanded>
-                  <div className="flex flex-col gap-[20px] items-start w-full">
-                    {card.items.map((t) => <CheckItem key={t} icon={card.icon} text={t} />)}
-                  </div>
-                </SectionCard>
-              </HoverCard>
+        {/* Left: sticky title — ~673px wide */}
+        <div style={{ width: "673px", flexShrink: 0, position: "sticky", top: "var(--stack-top)" }}>
+          <Reveal>
+            <div className="text-[52px] text-black" style={STYLE_DISPLAY}>
+              <p>What</p>
+              <p>Higher Standard</p>
+              <p>means in practice</p>
             </div>
-          ))}
-          <div style={{ height: "600px" }} />
+          </Reveal>
+        </div>
+
+        {/* Right: two card panels stacked */}
+        <div className="flex-1 min-w-0 flex flex-col gap-[20px]">
+          {/* Card 1 */}
+          <Reveal>
+            <HoverCard>
+              <div className="bg-white flex flex-col p-[10px]">
+                <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
+                  <div className="border-[1.372px] border-black flex flex-1 items-start p-[30px] rounded-tl-[8px] rounded-tr-[8px]">
+                    <p className="text-[32px] text-black" style={STYLE_DISPLAY}>Every brief I take on is held to the same bar.</p>
+                  </div>
+                </div>
+                <div className="border-[1.372px] border-black p-[30px] rounded-bl-[8px] rounded-br-[8px] flex flex-col gap-[20px]">
+                  {WHAT_STANDARD_ITEMS.map((t) => (
+                    <div key={t} className="flex gap-[20px] items-start">
+                      <OrangeCheckbox />
+                      <p className="flex-1 text-[20px] text-black" style={STYLE_MONO}>{t}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </HoverCard>
+          </Reveal>
+
+          {/* Card 2 */}
+          <Reveal delay={80}>
+            <HoverCard>
+              <div className="bg-white flex flex-col p-[10px]">
+                <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
+                  <div className="border-[1.372px] border-black flex flex-1 items-start p-[30px] rounded-tl-[8px] rounded-tr-[8px]">
+                    <p className="text-[32px] text-black" style={STYLE_DISPLAY}>What I won&apos;t do</p>
+                  </div>
+                </div>
+                <div className="border-[1.372px] border-black p-[30px] rounded-bl-[8px] rounded-br-[8px] flex flex-col gap-[20px]">
+                  {WHAT_WONT_DO_ITEMS.map((t) => (
+                    <div key={t} className="flex gap-[20px] items-start">
+                      <DarkMinusIcon />
+                      <p className="flex-1 text-[20px] text-black" style={STYLE_MONO}>{t}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </HoverCard>
+          </Reveal>
         </div>
       </div>
 
@@ -603,14 +736,8 @@ function PartnersSection() {
 }
 
 // ── Roles ─────────────────────────────────────────────────────────────────────
-const ROLES = [
-  { title: "Commercial, Growth & Go-to-market",
-    description: "Experienced leaders who drive ambitious revenue results — not just manage them." },
-  { title: "Early-stage & First-Function Hires",
-    description: "The entrepreneurial mindset isn't common. I find the person with it to build — not just execute even when the structure isn't there yet." },
-  { title: "Marketing, Creative & Design",
-    description: "Full-time and contract. The people who make what you're building impossible to ignore and support your growth." },
-];
+const ROLE_NAMES = ["Marketing", "Growth", "Product"];
+const ROLES_DESCRIPTION = "Venture-backed startups, from seed to Series B. Companies where every senior hire shapes the culture and the trajectory. I know this environment from the inside, and I know what the right person looks like at every stage of growth.";
 
 function RolesSection() {
   return (
@@ -622,51 +749,313 @@ function RolesSection() {
           </p>
         </Reveal>
 
-        {/* Mobile: sticky stacking */}
-        <div className="xl:hidden">
-          {ROLES.map((role, i) => (
-            <div
-              key={role.title}
-              style={{
-                position: "sticky",
-                top: `calc(var(--stack-top) + ${i} * var(--stack-step))`,
-                marginTop: i === 0 ? 0 : "var(--stack-gap)",
-                zIndex: i + 1,
-              }}
-            >
-              <HoverCard>
-                <div className="bg-white flex flex-col p-[10px]">
-                  <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
-                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] rounded-tl-[8px] rounded-tr-[8px]">
-                      <p className="flex-1 text-[22px] text-black" style={STYLE_DISPLAY}>{role.title}</p>
-                    </div>
+        <div className="flex flex-col xl:flex-row gap-[30px] items-start">
+          {/* Left: role list card */}
+          <Reveal className="xl:w-[671px] xl:shrink-0 w-full">
+            <HoverCard className="w-full">
+              <div className="bg-white p-[10px]">
+                {ROLE_NAMES.map((name, i) => (
+                  <div
+                    key={name}
+                    className="flex items-center gap-[30px] p-[24px] md:p-[30px]"
+                    style={{
+                      border: "1.372px solid black",
+                      borderRadius: i === 0 ? "8px 8px 0 0" : i === ROLE_NAMES.length - 1 ? "0 0 8px 8px" : "0",
+                      marginBottom: i < ROLE_NAMES.length - 1 ? "-1.372px" : 0,
+                      position: "relative",
+                      zIndex: i,
+                    }}
+                  >
+                    <p className="flex-1 text-[24px] md:text-[28px] text-black" style={STYLE_DISPLAY}>{name}</p>
+                    <ArrowBtn onClick={scrollToContact} />
                   </div>
-                  <div className="flex">
-                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] rounded-bl-[8px] rounded-br-[8px]">
-                      <p className="w-full text-[18px] text-black" style={STYLE_MONO}>{role.description}</p>
-                    </div>
-                  </div>
-                </div>
-              </HoverCard>
-            </div>
-          ))}
-          <div style={{ height: "80px" }} />
+                ))}
+              </div>
+            </HoverCard>
+          </Reveal>
+
+          {/* Right: description + CTA */}
+          <Reveal delay={100} className="flex-1 flex flex-col gap-[30px] md:gap-[40px]">
+            <p className="text-[18px] md:text-[24px] xl:text-[28px] text-black" style={STYLE_MONO}>
+              {ROLES_DESCRIPTION}
+            </p>
+            <OrangeBtn onClick={scrollToContact}>
+              <p className="text-[18px] md:text-[20px] xl:text-[24px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
+                Start working together
+              </p>
+            </OrangeBtn>
+          </Reveal>
         </div>
 
-        {/* Desktop: horizontal flex row */}
-        <div className="hidden xl:flex flex-row gap-[30px] items-stretch">
-          {ROLES.map((role, i) => (
-            <Reveal key={role.title} delay={i * 80} className="flex-1 basis-0 min-w-0">
+      </div>
+    </section>
+  );
+}
+
+// ── Testimonials ─────────────────────────────────────────────────────────────
+// All 8 testimonials — shown in scattered grid on desktop, carousel on mobile
+const TESTIMONIALS = [
+  {
+    name: "Tom Picarony", title: "Head of Expansion",
+    photo: null as string | null, bg: "#e0ddd3",
+    text: [
+      "Thanks to Tiffany's invaluable assistance, we've successfully hired our UK team.",
+      "Her leadership, strategic insight, and dedication were instrumental in assembling a top-notch team ready to tackle any challenge.",
+    ],
+  },
+  {
+    name: "Maria Monks", title: "Fractional CMO",
+    photo: "/photo_maria.jpeg" as string | null, bg: "#edead6",
+    text: [
+      "Tiffany has been instrumental in helping me with marketing leadership hires across multiple startups. I have enjoyed working with her for years —her passion and professionalism is outstanding.",
+      "She also offers a great personalised service to both individual companies, and me, and I often seek her advice on everything recruitment.",
+    ],
+  },
+  {
+    name: "Ruben Tadmor", title: "Founder",
+    photo: null as string | null, bg: "#d4dde0",
+    text: [
+      "Tiffany is by far the best experience I've had working with external support for recruitment — really felt like an extension of the hiring team.",
+    ],
+  },
+  {
+    name: "Gastón Tourn", title: "Chief Growth Officer, Oddbox",
+    photo: "/photo_gaston.jpeg" as string | null, bg: "#c1c497",
+    text: [
+      "Tiffany is an outstanding talent professional with a thoughtful, personal approach. She spends significant time understanding candidates and ensuring opportunities align perfectly with their goals.",
+      "I highly recommend Tiffany for her exceptional ability to identify and engage top talent. If you're looking for a dedicated ambassador for your startup, she is the professional you need. Tiffany excels at finding candidates who may not be actively seeking a change and persuading them to consider new, exciting opportunities.",
+    ],
+  },
+  {
+    name: "Govind Balakrishnan", title: "Co-founder, Gibran",
+    photo: "/photo_govind.jpeg" as string | null, bg: "#ffffff",
+    text: [
+      "We've loved working with Tiffany over several years on multiple senior hires. Our requirements are often atypical, and she takes a very hands-on and considered approach.",
+      "Thanks to our collaboration, we have a phenomenal tight-knit team, investment from tier 1 Silicon Valley investors and partnerships with top media outlets. We trust her fully and will work with her again.",
+    ],
+  },
+  {
+    name: "Martin Leguay", title: "CEO, Touchnote",
+    photo: null as string | null, bg: "#d0c8c0",
+    text: [
+      "Working with Tiffany has been great, she's helped us on multiple briefs and has been so effective in providing the right candidates within such a fast turnaround.",
+      "Whether for full time or temp requirements, Tiffany has a vast network of quality candidates to reach out to.",
+    ],
+  },
+  {
+    name: "Jonathan Canizales", title: "Chief of Staff, Mindgard",
+    photo: "/photo_jonathan.jpeg" as string | null, bg: "#90b0bb",
+    text: [
+      "I had the pleasure of working with Tiffany as my recruiter, and I couldn't be more impressed, she has been the best by far. She did an outstanding job from start to finish. Tiffany was super communicative, keeping me informed at every step of the process.",
+      "Her honesty and openness was refreshing and made me feel confident throughout the process. I always felt I could trust her, and I truly appreciated how she checked up on me throughout the process.",
+    ],
+  },
+  {
+    name: "Haralds Gabrans Zukovs", title: "Head of Growth, Mindgard",
+    photo: null as string | null, bg: "#c8d4c8",
+    text: [
+      "Tiffany's expert guidance was invaluable in navigating my career transition.",
+      "Her personalised advice and unwavering support empowered me to confidently land the perfect next step. I highly recommend her services to anyone seeking a career change partner.",
+    ],
+  },
+];
+
+// Shared card inner layout (used on both desktop grid and mobile carousel)
+function TestimonialCardInner({ t }: { t: typeof TESTIMONIALS[0] }) {
+  const initials = t.name.split(" ").map((w) => w[0]).join("").slice(0, 2);
+  return (
+    <div style={{ backgroundColor: t.bg, padding: "6px", height: "100%" }}>
+      {/* Header: photo + name/title */}
+      <div style={{ display: "flex", marginBottom: "-0.823px", flexShrink: 0 }}>
+        <div style={{ width: 110, height: 96, flexShrink: 0, border: "0.6px solid black", borderRadius: "4.8px 0 0 0", overflow: "hidden" }}>
+          {t.photo ? (
+            <img src={t.photo} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
+          ) : (
+            <div style={{ width: "100%", height: "100%", backgroundColor: "#4d453b", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ ...STYLE_DISPLAY, fontSize: 24, color: "white" }}>{initials}</span>
+            </div>
+          )}
+        </div>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <div style={{ border: "0.823px solid black", borderLeft: "none", borderBottom: "none", borderRadius: "0 4.8px 0 0", flex: 1, display: "flex", alignItems: "center", padding: "0 14px" }}>
+            <p style={{ ...STYLE_DISPLAY, fontSize: 15, color: "black", lineHeight: 1.1 }}>{t.name}</p>
+          </div>
+          <div style={{ border: "0.823px solid black", borderLeft: "none", flex: 1, display: "flex", alignItems: "center", padding: "0 14px" }}>
+            <p style={{ ...STYLE_DISPLAY, fontSize: 13, color: "black", lineHeight: 1.1 }}>{t.title}</p>
+          </div>
+        </div>
+      </div>
+      {/* Text body */}
+      <div style={{ border: "0.6px solid black", borderTop: "none", borderRadius: "0 0 4.8px 4.8px", padding: "14px", display: "flex", flexDirection: "column", gap: "10px" }}>
+        {t.text.map((para, i) => (
+          <p key={i} style={{ ...STYLE_MONO, fontSize: 14, color: "black", lineHeight: 1.45 }}>{para}</p>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Desktop: single card with hover-to-foreground
+function TestimonialCard({ t, delay = 0 }: { t: typeof TESTIMONIALS[0]; delay?: number }) {
+  const [hov, setHov] = useState(false);
+  const [ref, inView] = useInView(0.05);
+  return (
+    <div
+      ref={ref}
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: inView ? "translateY(0)" : "translateY(24px)",
+        transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms`,
+        position: "relative",
+        zIndex: hov ? 10 : 1,
+      }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+    >
+      <div style={{
+        transform: hov ? "scale(1.03) translateY(-5px)" : "scale(1)",
+        boxShadow: hov ? "0 16px 48px rgba(0,0,0,0.14)" : "none",
+        transition: "transform 0.25s ease, box-shadow 0.25s ease",
+      }}>
+        <TestimonialCardInner t={t} />
+      </div>
+    </div>
+  );
+}
+
+// Mobile: swipeable carousel
+function TestimonialsCarousel() {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [dragStart, setDragStart] = useState(0);
+  const [dragDelta, setDragDelta] = useState(0);
+  const [dragging,  setDragging]  = useState(false);
+  const go = (i: number) => setActiveIdx(Math.max(0, Math.min(TESTIMONIALS.length - 1, i)));
+
+  return (
+    <div className="pb-[60px]">
+      <div
+        className="overflow-hidden"
+        onTouchStart={(e) => { setDragStart(e.touches[0].clientX); setDragging(true); }}
+        onTouchMove={(e)  => { if (dragging) setDragDelta(e.touches[0].clientX - dragStart); }}
+        onTouchEnd={() => {
+          if (dragDelta > 60) go(activeIdx - 1);
+          else if (dragDelta < -60) go(activeIdx + 1);
+          setDragDelta(0); setDragging(false);
+        }}
+      >
+        <div style={{
+          display: "flex",
+          transform: `translateX(calc(-${activeIdx * 100}% + ${dragDelta}px))`,
+          transition: dragging ? "none" : "transform 0.4s cubic-bezier(0.4,0,0.2,1)",
+        }}>
+          {TESTIMONIALS.map((t) => (
+            <div key={t.name} style={{ minWidth: "100%" }}>
+              <TestimonialCardInner t={t} />
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Dots navigation */}
+      <div className="flex items-center justify-center gap-[8px] pt-[20px]">
+        {TESTIMONIALS.map((_, i) => (
+          <button key={i} onClick={() => go(i)}
+            className="rounded-full transition-all duration-250"
+            style={{ width: i === activeIdx ? "20px" : "8px", height: "8px", backgroundColor: i === activeIdx ? "#000" : "rgba(0,0,0,0.25)" }}
+            aria-label={`Go to ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TestimonialsSection() {
+  return (
+    <section id="testimonials" className="bg-[#ffedd7] w-full py-[96px]">
+      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
+        <Reveal>
+          <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
+            Testimonials
+          </p>
+        </Reveal>
+
+        {/* Desktop: 4-column scattered grid, hover brings card to foreground */}
+        <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-[12px] lg:gap-[16px]">
+          {TESTIMONIALS.map((t, i) => (
+            <TestimonialCard key={t.name} t={t} delay={i * 80} />
+          ))}
+        </div>
+
+        {/* Mobile: swipe carousel */}
+        <div className="md:hidden">
+          <TestimonialsCarousel />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Newsletter ────────────────────────────────────────────────────────────────
+const NEWSLETTER_ARTICLES = [
+  {
+    title: "Why great hires fail after six months",
+    excerpt: "The VP Product who left, the questions worth asking first, and this week's classifieds.",
+  },
+  {
+    title: "Good people leave quietly",
+    excerpt: "On the hire that breaks startups and the kind of leader that holds them together",
+  },
+  {
+    title: "Mindset is\nnon-negotiable",
+    excerpt: "Why the unobvious hire usually wins",
+  },
+];
+
+function NewsletterSection() {
+  return (
+    <section className="bg-[#ffedd7] w-full py-[96px]">
+      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
+
+        {/* Centred header */}
+        <Reveal className="flex flex-col items-center gap-[32px] md:gap-[40px] mb-[52px] md:mb-[60px]">
+          <p className="text-[36px] md:text-[52px] text-black text-center" style={STYLE_DISPLAY}>
+            Newsletter Higher
+          </p>
+          <p className="text-[18px] md:text-[24px] text-black text-center" style={STYLE_MONO}>
+            Honest writing about growth, leadership and building<br />inside fast-moving companies.
+          </p>
+        </Reveal>
+
+        {/* Email subscribe row */}
+        <Reveal delay={60} className="flex flex-col sm:flex-row gap-[10px] items-stretch sm:items-end justify-center mb-[52px] md:mb-[60px]">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full sm:w-[403px] text-[16px] bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200"
+            style={{ ...STYLE_DISPLAY, color: "#767676" }}
+          />
+          <OrangeBtn>
+            <p className="text-[18px] md:text-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>Subscribe</p>
+          </OrangeBtn>
+        </Reveal>
+
+        {/* Article cards — 3 columns desktop, 1 column mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-[16px] md:gap-[30px]">
+          {NEWSLETTER_ARTICLES.map((article, i) => (
+            <Reveal key={article.title} delay={i * 80}>
               <HoverCard className="h-full">
-                <div className="bg-white flex flex-col h-full p-[10px]">
-                  <div className="flex items-start mb-[-1.372px]">
-                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] xl:p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                      <p className="flex-1 text-[22px] xl:text-[28px] text-black" style={STYLE_DISPLAY}>{role.title}</p>
+                <div className="bg-white flex flex-col p-[10px] h-full">
+                  <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
+                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
+                      <p className="text-[20px] md:text-[24px] text-black whitespace-pre-line" style={STYLE_DISPLAY}>{article.title}</p>
                     </div>
                   </div>
-                  <div className="flex flex-1">
-                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] xl:p-[20px] rounded-bl-[8px] rounded-br-[8px]">
-                      <p className="w-full text-[18px] xl:text-[20px] text-black" style={STYLE_MONO}>{role.description}</p>
+                  <div className="border-[1.372px] border-black flex flex-1 flex-col justify-between p-[20px] rounded-bl-[8px] rounded-br-[8px] gap-[20px]">
+                    <p className="text-[16px] md:text-[20px] text-black" style={STYLE_MONO}>{article.excerpt}</p>
+                    <div className="bg-[#ffedd7] p-[4px] self-start">
+                      <button className="border border-black rounded-[4px] px-[12px] py-[10px] bg-[#ffedd7] cursor-pointer hover:bg-[#f0e4cf] transition-colors duration-150">
+                        <p className="text-[16px] md:text-[18px] text-black whitespace-nowrap" style={STYLE_MONO}>read now</p>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -680,234 +1069,6 @@ function RolesSection() {
   );
 }
 
-// ── Testimonials ─────────────────────────────────────────────────────────────
-const TESTIMONIALS = [
-  {
-    name: "Gastón Tourn", title: "Chief Growth Officer, Oddbox",
-    photo: "/photo_gaston.jpeg", bg: "#c1c497",
-    text: [
-      "Tiffany is an outstanding talent professional with a thoughtful, personal approach. She spends significant time understanding candidates and ensuring opportunities align perfectly with their goals.",
-      "I highly recommend Tiffany for her exceptional ability to identify and engage top talent. If you're looking for a dedicated ambassador for your startup, she is the professional you need. Tiffany excels at finding candidates who may not be actively seeking a change and persuading them to consider new, exciting opportunities.",
-    ],
-  },
-  {
-    name: "Jonathan Canizales", title: "Chief of Staff, Mindgard",
-    photo: "/photo_jonathan.jpeg", bg: "#90b0bb",
-    text: [
-      "I had the pleasure of working with Tiffany as my recruiter, and I couldn't be more impressed, she has been the best by far. She did an outstanding job from start to finish. Tiffany was super communicative, keeping me informed at every step of the process.",
-      "Her honesty and openness was refreshing and made me feel confident throughout the process.",
-      "I always felt I could trust her, and I truly appreciated how she checked up on me throughout the process. Most importantly, the entire process was incredibly fast, which was a huge plus. I would definitely work with Tiffany again and highly recommend her to anyone in need of a top-notch recruiter.",
-    ],
-  },
-  {
-    name: "Maria Monks", title: "Fractional CMO",
-    photo: "/photo_maria.jpeg", bg: "#edead6",
-    text: [
-      "Tiffany has been instrumental in helping me with marketing leadership hires across multiple startups. I have enjoyed working with her for years —her passion and professionalism is outstanding.",
-      "She also offers a great personalised service to both individual companies, and me, and I often seek her advice on everything recruitment.",
-    ],
-  },
-  {
-    name: "Govind Balakrishnan", title: "Co-founder, Gibran",
-    photo: "/photo_govind.jpeg", bg: "#ffffff",
-    text: [
-      "We've loved working with Tiffany over several years on multiple senior hires. Our requirements are often atypical, and she takes a very hands-on and considered approach.",
-      "Thanks to our collaboration, we have a phenomenal tight-knit team, investment from tier 1 Silicon Valley investors and partnerships with top media outlets. We trust her fully and will work with her again.",
-    ],
-  },
-];
-
-// Tablet + desktop: hover-expand row (thefirstthelast.agency style)
-// Uses CSS grid-template-rows trick for buttery-smooth height animation.
-function TestimonialRow({ t, idx }: { t: typeof TESTIMONIALS[0]; idx: number }) {
-  const [hov, setHov] = useState(false);
-
-  return (
-    <div
-      style={{ borderTop: "1.372px solid black", position: "relative", cursor: "default" }}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-    >
-      {/* Background — scaleY(0→1) from bottom: never overflows into adjacent rows */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundColor: t.bg,
-          transform: hov ? "scaleY(1)" : "scaleY(0)",
-          transformOrigin: "bottom center",
-          transition: "transform 0.55s cubic-bezier(0.4,0,0.2,1)",
-          zIndex: 0,
-          pointerEvents: "none",
-        }}
-      />
-
-      {/* Row header: index · name · title */}
-      <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", padding: "clamp(18px,2vw,28px) 30px" }}>
-        <span style={{ ...STYLE_MONO, fontSize: "15px", color: "black", opacity: 0.4, width: "clamp(44px,4.5vw,72px)", flexShrink: 0 }}>
-          {String(idx + 1).padStart(2, "0")}.
-        </span>
-
-        <p style={{ ...STYLE_DISPLAY, fontSize: "clamp(22px, 3.2vw, 52px)", color: "black", flex: 1 }}>
-          {t.name}
-        </p>
-
-        <p style={{ ...STYLE_MONO, fontSize: "clamp(12px,1.1vw,15px)", color: "black", opacity: hov ? 0 : 0.5, transition: "opacity 0.3s ease", flexShrink: 0, maxWidth: "clamp(140px,20vw,280px)", textAlign: "right" }}>
-          {t.title}
-        </p>
-      </div>
-
-      {/* Expanded content — CSS grid trick: 0fr → 1fr animates to EXACT content height, no jumpiness */}
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          display: "grid",
-          gridTemplateRows: hov ? "1fr" : "0fr",
-          transition: "grid-template-rows 0.55s cubic-bezier(0.4,0,0.2,1)",
-        }}
-      >
-        <div style={{ overflow: "hidden" }}>
-          <div style={{ display: "flex", gap: "clamp(16px,2vw,28px)", padding: "20px 30px 36px clamp(74px, calc(30px + 4.5vw), 102px)", alignItems: "flex-start" }}>
-            <img
-              src={t.photo}
-              alt={t.name}
-              style={{ width: "clamp(120px,14vw,200px)", height: "clamp(120px,14vw,200px)", objectFit: "cover", objectPosition: "top center", flexShrink: 0, border: "1.372px solid black", borderRadius: "4px" }}
-            />
-            <div style={{ flex: 1, maxWidth: "75%", display: "flex", flexDirection: "column", gap: "12px" }}>
-              {t.text.map((para, i) => (
-                <p key={i} style={{ ...STYLE_MONO, fontSize: "clamp(14px,1.15vw,17px)", color: "black", lineHeight: "1.55" }}>{para}</p>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TestimonialsCarousel() {
-  const [activeIdx, setActiveIdx] = useState(0);
-  const [dragStart,  setDragStart]  = useState(0);
-  const [dragDelta,  setDragDelta]  = useState(0);
-  const [dragging,   setDragging]   = useState(false);
-
-  const go = (i: number) => setActiveIdx(Math.max(0, Math.min(TESTIMONIALS.length - 1, i)));
-
-  return (
-    <div className="pb-[60px]">
-      <div
-        className="overflow-hidden"
-        style={{ borderTop: "1.372px solid black" }}
-        onTouchStart={(e) => { setDragStart(e.touches[0].clientX); setDragging(true); }}
-        onTouchMove={(e)  => { if (dragging) setDragDelta(e.touches[0].clientX - dragStart); }}
-        onTouchEnd={() => {
-          if (dragDelta > 60) go(activeIdx - 1);
-          else if (dragDelta < -60) go(activeIdx + 1);
-          setDragDelta(0); setDragging(false);
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "stretch",
-            transform: `translateX(calc(-${activeIdx * 100}% + ${dragDelta}px))`,
-            transition: dragging ? "none" : "transform 0.4s cubic-bezier(0.4,0,0.2,1)",
-          }}
-        >
-          {TESTIMONIALS.map((t) => (
-            <div key={t.name} style={{ minWidth: "100%", backgroundColor: t.bg, display: "flex", flexDirection: "column" }}>
-              <div style={{ padding: "10px", flex: 1, display: "flex", flexDirection: "column" }}>
-                {/* Header: photo + name/title */}
-                <div style={{ display: "flex", alignItems: "stretch", marginBottom: "-1px", flexShrink: 0 }}>
-                  <div style={{ width: "110px", height: "110px", flexShrink: 0, border: "1px solid black", borderRadius: "8px 0 0 0", overflow: "hidden" }}>
-                    <img src={t.photo} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }} />
-                  </div>
-                  <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                    <div style={{ border: "1px solid black", borderLeft: "none", borderBottom: "none", borderRadius: "0 8px 0 0", flex: 1, display: "flex", alignItems: "center", padding: "0 16px" }}>
-                      <p style={{ ...STYLE_DISPLAY, fontSize: "20px", color: "black" }}>{t.name}</p>
-                    </div>
-                    <div style={{ border: "1px solid black", borderLeft: "none", flex: 1, display: "flex", alignItems: "center", padding: "0 16px" }}>
-                      <p style={{ ...STYLE_DISPLAY, fontSize: "14px", color: "black" }}>{t.title}</p>
-                    </div>
-                  </div>
-                </div>
-                {/* Body — fills remaining height like "Usual process" card */}
-                <div style={{ border: "1px solid black", borderTop: "none", borderRadius: "0 0 8px 8px", padding: "16px", flex: 1, display: "flex", flexDirection: "column", gap: "12px" }}>
-                  {t.text.map((para, i) => (
-                    <p key={i} style={{ ...STYLE_MONO, fontSize: "16px", color: "black" }}>{para}</p>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <div className="flex items-center justify-center gap-[20px] pt-[20px]">
-        <button
-          onClick={() => go(activeIdx - 1)}
-          disabled={activeIdx === 0}
-          className="w-[36px] h-[36px] border border-black rounded-full flex items-center justify-center transition-colors duration-150 disabled:opacity-30 hover:bg-[#FF9A6A] hover:border-[#FF9A6A]"
-          aria-label="Previous"
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M9 2L4 7L9 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-        <div className="flex gap-[8px] items-center">
-          {TESTIMONIALS.map((_, i) => (
-            <button key={i} onClick={() => go(i)}
-              className="rounded-full transition-all duration-250"
-              style={{ width: i === activeIdx ? "20px" : "8px", height: "8px", backgroundColor: i === activeIdx ? "#000" : "rgba(0,0,0,0.25)" }}
-              aria-label={`Go to ${i + 1}`}
-            />
-          ))}
-        </div>
-        <button
-          onClick={() => go(activeIdx + 1)}
-          disabled={activeIdx === TESTIMONIALS.length - 1}
-          className="w-[36px] h-[36px] border border-black rounded-full flex items-center justify-center transition-colors duration-150 disabled:opacity-30 hover:bg-[#FF9A6A] hover:border-[#FF9A6A]"
-          aria-label="Next"
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M5 2L10 7L5 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function TestimonialsSection() {
-  return (
-    <section id="testimonials" className="bg-[#ffedd7] w-full">
-      <div className="px-[16px] md:px-[30px] pt-[96px] pb-[40px] md:pb-[60px]">
-        <Reveal>
-          <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black" style={STYLE_DISPLAY}>
-            I could keep going.<br />But they&apos;ll say it better.
-          </p>
-        </Reveal>
-      </div>
-
-      {/* Mobile only: swipe carousel */}
-      <div className="md:hidden">
-        <TestimonialsCarousel />
-      </div>
-
-      {/* Tablet + desktop: hover-expand rows */}
-      <Reveal y={16} className="hidden md:block pb-[40px]">
-        <div style={{ borderBottom: "1.372px solid black" }}>
-          {TESTIMONIALS.map((t, idx) => (
-            <TestimonialRow key={t.name} t={t} idx={idx} />
-          ))}
-        </div>
-      </Reveal>
-    </section>
-  );
-}
-
 // ── CTA ───────────────────────────────────────────────────────────────────────
 function CTASection() {
   return (
@@ -917,10 +1078,8 @@ function CTASection() {
         {/* TOP ROW: Headline (left) + Subtitle (right, bottom-aligned on desktop) */}
         <div className="flex flex-col lg:flex-row lg:items-end gap-[24px] lg:gap-[35px] mb-[52px] lg:mb-[80px]">
           <Reveal className="lg:shrink-0 lg:w-[655px]">
-            <div className="text-[36px] md:text-[44px] lg:text-[52px] text-black" style={STYLE_DISPLAY}>
-              <p>If you&apos;ve read</p>
-              <p>this far, we should</p>
-              <p>probably talk</p>
+            <div className="text-[48px] md:text-[52px] lg:text-[60px] text-black" style={STYLE_DISPLAY}>
+              Let&apos;s talk
             </div>
           </Reveal>
           <Reveal delay={80} className="flex-1">
@@ -939,8 +1098,8 @@ function CTASection() {
             <div className="flex flex-col gap-[16px]">
               <p style={STYLE_DISPLAY}>Contacts</p>
               <div className="flex flex-col gap-[10px]" style={STYLE_MONO}>
-                <a href="https://tprecruitment.co" className="hover:underline underline-offset-2 transition-all duration-150">tprecruitment.co</a>
-                <a href="mailto:tiffany@tprecruitment.co" className="hover:underline underline-offset-2 transition-all duration-150">tiffany@tprecruitment.co</a>
+                <a href="https://higherstandard.co" className="hover:underline underline-offset-2 transition-all duration-150">higherstandard.co</a>
+                <a href="mailto:tiffany@higherstandard.co" className="hover:underline underline-offset-2 transition-all duration-150">tiffany@higherstandard.co</a>
               </div>
             </div>
             <div className="flex flex-col gap-[16px]">
@@ -951,8 +1110,8 @@ function CTASection() {
               <p style={STYLE_DISPLAY}>Socials</p>
               <div className="flex flex-col gap-[6px]">
                 {[
-                  { href: "https://www.linkedin.com/company/tp-recruitment/", label: "TP Recruitment" },
-                  { href: "https://www.linkedin.com/in/tiffany-philippou/",   label: "Tiffany Philippou" },
+                  { href: "https://www.linkedin.com/company/higher-standard/", label: "Higher Standard" },
+                  { href: "https://www.linkedin.com/in/tiffany-philippou/",    label: "Tiffany Philippou" },
                 ].map((l) => (
                   <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer"
                      className="flex gap-[6px] items-center hover:opacity-60 transition-opacity duration-150" style={STYLE_MONO}>
@@ -1034,16 +1193,31 @@ function Footer() {
 
 // ── App ───────────────────────────────────────────────────────────────────────
 export default function App() {
+  const [introComplete, setIntroComplete] = useState(false);
+
   return (
-    <div className="flex flex-col w-full">
-      <Navbar />
-      <HeroSection />
-      <WhatWorkingSection />
-      <PartnersSection />
-      <RolesSection />
-      <TestimonialsSection />
-      <CTASection />
-      <Footer />
-    </div>
+    <>
+      {!introComplete && (
+        <IntroAnimation onComplete={() => setIntroComplete(true)} />
+      )}
+      <div
+        className="flex flex-col w-full"
+        style={{
+          opacity: introComplete ? 1 : 0,
+          transition: "opacity 0.8s ease",
+          pointerEvents: introComplete ? "auto" : "none",
+        }}
+      >
+        <Navbar />
+        <HeroSection />
+        <WhatWorkingSection />
+        <PartnersSection />
+        <RolesSection />
+        <TestimonialsSection />
+        <NewsletterSection />
+        <CTASection />
+        <Footer />
+      </div>
+    </>
   );
 }
