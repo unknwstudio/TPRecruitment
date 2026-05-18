@@ -618,7 +618,7 @@ function WhatWorkingSection() {
 
       {/* ── Mobile / tablet ── */}
       <div className="lg:hidden">
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[96px] pb-[48px]">
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[134px] pb-[67px]">
           <Reveal>
             <div className="text-[40px] md:text-[44px] text-black" style={STYLE_DISPLAY}>
               <p>What</p>
@@ -664,7 +664,7 @@ function WhatWorkingSection() {
       {/* ── Desktop: title left, two cards right ── */}
       <div
         className="hidden lg:flex max-w-[1440px] mx-auto"
-        style={{ gap: "30px", padding: "96px 30px", alignItems: "flex-start" }}
+        style={{ gap: "30px", padding: "134px 30px", alignItems: "flex-start" }}
       >
         {/* Left: sticky title — 675px (matches right card width exactly) */}
         <div style={{ width: "675px", maxWidth: "675px", flexShrink: 0, position: "sticky", top: "var(--stack-top)" }}>
@@ -755,7 +755,7 @@ function PartnersSection() {
   }, []);
 
   return (
-    <section id="partners" className="bg-[#ffedd7] w-full overflow-hidden py-[40px]">
+    <section id="partners" className="bg-[#ffedd7] w-full overflow-hidden py-[56px]">
       <div className="flex border-t border-b border-black overflow-hidden mb-[-1px]">
         <div className="flex animate-marquee">
           {[...partnerLogosRow1, ...partnerLogosRow1].map((src, i) => <PartnerLogo key={i} src={src} small={small} />)}
@@ -864,7 +864,7 @@ function RolesSection() {
   const [openRole, setOpenRole] = useState<string | null>(null);
 
   return (
-    <section id="roles" className="bg-[#ffedd7] w-full py-[96px]">
+    <section id="roles" className="bg-[#ffedd7] w-full py-[134px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
         <Reveal>
           <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
@@ -1136,9 +1136,9 @@ function TestimonialsSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="testimonials" className="bg-[#ffedd7] w-full py-[96px] overflow-hidden">
+    <section ref={sectionRef} id="testimonials" className="bg-[#ffedd7] w-full py-[134px] overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
-        <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
+        <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[41px] md:mb-[61px]" style={STYLE_DISPLAY}>
           Testimonials
         </p>
 
@@ -1210,7 +1210,7 @@ const NEWSLETTER_ARTICLES = [
 
 function NewsletterSection() {
   return (
-    <section className="bg-[#ffedd7] w-full py-[96px]">
+    <section className="bg-[#ffedd7] w-full py-[134px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
         {/* Centred header */}
@@ -1268,7 +1268,7 @@ function NewsletterSection() {
 // ── CTA ───────────────────────────────────────────────────────────────────────
 function CTASection() {
   return (
-    <section id="contact" className="bg-[#eaeae5] w-full overflow-hidden py-[96px]">
+    <section id="contact" className="bg-[#eaeae5] w-full overflow-hidden py-[134px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
         {/* TOP ROW: Headline (left) + Subtitle (right, bottom-aligned on desktop) */}
@@ -1361,20 +1361,27 @@ function CTASection() {
 // ── Footer ────────────────────────────────────────────────────────────────────
 function Footer() {
   return (
-    <footer className="bg-[#4d453b] w-full relative">
-      {/* Logo spans full footer width — aspect ratio 1351:126 ≈ 10.7:1 */}
-      <div className="w-full px-[16px] md:px-[30px] pt-[24px] md:pt-[40px] pb-[56px] md:pb-[80px]">
-        <img
-          src="/footer-logo.svg"
-          alt="Higher Standard"
-          style={{ width: "100%", height: "auto", display: "block" }}
-        />
-      </div>
-
-      {/* Bottom bar */}
-      <div
-        className="absolute bottom-[16px] md:bottom-[30px] left-[16px] right-[16px] md:left-[30px] md:right-[30px] flex flex-col md:flex-row items-start md:items-end gap-[6px] text-white"
+    <footer
+      className="bg-[#4d453b] w-full relative overflow-hidden"
+      style={{ height: "400px" }}
+    >
+      {/* "Higher Standard" — large display text, Figma 520:892: 126px, top 30px left 30px */}
+      <p
+        className="absolute text-[#eaeae5] whitespace-nowrap"
+        style={{
+          ...STYLE_DISPLAY,
+          fontSize: "clamp(52px, 8.75vw, 126px)",
+          letterSpacing: "-0.02em",
+          left: "clamp(16px, 2.08vw, 30px)",
+          top: "clamp(16px, 2.08vw, 30px)",
+          lineHeight: 1,
+        }}
       >
+        Higher Standard
+      </p>
+
+      {/* Bottom bar — pinned to footer bottom */}
+      <div className="absolute bottom-[16px] md:bottom-[30px] left-[16px] right-[16px] md:left-[30px] md:right-[30px] flex flex-col md:flex-row items-start md:items-end gap-[6px]">
         {/* Left */}
         <div className="md:flex-1">
           <p
@@ -1390,7 +1397,7 @@ function Footer() {
             className="text-[14px] md:text-[20px] text-[#eaeae5]"
             style={{ ...STYLE_DISPLAY, letterSpacing: "-1px" }}
           >
-            © Higher Standard
+            © 2026 Higher Standard
           </span>
         </div>
         {/* Right */}
