@@ -405,7 +405,7 @@ function HeroSection() {
           className="absolute pointer-events-none"
           style={{
             left: "calc(50% + 15.5px)",
-            top: "-20px",
+            top: "272px",
             width: "1289px",
             height: "730px",
             transform: "translateX(-50%)",
@@ -417,7 +417,7 @@ function HeroSection() {
             style={{
               width: "100%", height: "100%", display: "block",
               clipPath: heroReady ? "circle(200% at 48.5% 100%)" : "circle(0% at 48.5% 100%)",
-              transition: heroReady ? "clip-path 2.2s cubic-bezier(0,0,0.2,1)" : "none",
+              transition: heroReady ? "clip-path 3.5s cubic-bezier(0,0,0.2,1)" : "none",
             }}
           />
         </div>
@@ -646,7 +646,7 @@ function PartnersSection() {
   }, []);
 
   return (
-    <section id="partners" className="bg-[#ffedd7] w-full overflow-hidden py-[43px]">
+    <section id="partners" className="bg-[#ffedd7] w-full overflow-hidden pt-[80px] pb-[43px]">
       <div className="flex border-t border-b border-black overflow-hidden mb-[-1px]">
         <div className="flex animate-marquee">
           {[...partnerLogosRow1, ...partnerLogosRow1].map((src, i) => <PartnerLogo key={i} src={src} small={small} />)}
@@ -1376,14 +1376,14 @@ function NewsletterSection() {
           </div>
 
           {/* Right: 4 article cards — sticky stacking as user scrolls */}
-          <div className="flex-1 min-w-0 flex flex-col">
+          <div className="flex-1 min-w-0">
             {NEWSLETTER_ARTICLES.map((article, i) => (
               <div
                 key={article.title}
                 style={{
                   position: "sticky",
-                  top: `calc(var(--stack-top) + ${i} * 72px)`,
-                  marginTop: i === 0 ? 0 : "16px",
+                  top: `calc(var(--stack-top) + ${i} * var(--stack-step))`,
+                  marginTop: i === 0 ? 0 : "var(--stack-gap)",
                   zIndex: i + 1,
                 }}
               >
@@ -1409,30 +1409,29 @@ function NewsletterSection() {
           </div>
         </div>
 
-        {/* Mobile: header → burst image + email → carousel */}
+        {/* Mobile: header → burst image → carousel → email field */}
         <div className="md:hidden flex flex-col gap-[28px]">
-          {/* Banner image + subscribe */}
-          <div className="flex flex-col gap-[16px]">
-            <div className="overflow-hidden relative" style={{ backgroundColor: "#fff5e9", height: "240px" }}>
-              <div style={{ position: "absolute", left: "20px", top: "16px", right: "20px", bottom: "56px" }}>
-                <img src="/newsletter-burst.svg" alt="" style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "bottom center" }} />
-              </div>
-              <div style={{ position: "absolute", bottom: "12px", left: "50%", transform: "translateX(-50%)", backgroundColor: "#fff5e9", padding: "4px 10px" }}>
-                <p style={{ ...STYLE_DISPLAY, fontSize: "32px", color: "black", letterSpacing: "-0.64px", whiteSpace: "nowrap" }}>Higher</p>
-              </div>
+          {/* Banner image */}
+          <div className="overflow-hidden relative" style={{ backgroundColor: "#fff5e9", height: "240px" }}>
+            <div style={{ position: "absolute", left: "20px", top: "16px", right: "20px", bottom: "56px" }}>
+              <img src="/newsletter-burst.svg" alt="" style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "bottom center" }} />
             </div>
-            <div className="flex flex-col gap-[10px] items-center">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
-                style={STYLE_DISPLAY}
-              />
-              <SubscribeBtn label="Subscribe to Higher" />
+            <div style={{ position: "absolute", bottom: "12px", left: "50%", transform: "translateX(-50%)", backgroundColor: "#fff5e9", padding: "4px 10px" }}>
+              <p style={{ ...STYLE_DISPLAY, fontSize: "32px", color: "black", letterSpacing: "-0.64px", whiteSpace: "nowrap" }}>Higher</p>
             </div>
           </div>
           {/* Article carousel */}
           <NewsletterCarousel articles={NEWSLETTER_ARTICLES} />
+          {/* Subscribe field */}
+          <div className="flex flex-col gap-[10px] items-center">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
+              style={STYLE_DISPLAY}
+            />
+            <SubscribeBtn label="Subscribe to Higher" />
+          </div>
         </div>
 
       </div>
