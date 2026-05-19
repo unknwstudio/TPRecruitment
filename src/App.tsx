@@ -519,7 +519,9 @@ function WhatWorkingSection() {
           </Reveal>
         </div>
         <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[73px]">
-          {WORKING_MOBILE_CARDS.map((card, idx) => (
+          {WORKING_MOBILE_CARDS.map((card, idx) => {
+            const isLast = idx === WORKING_MOBILE_CARDS.length - 1;
+            return (
             <div
               key={card.title}
               style={{
@@ -527,6 +529,8 @@ function WhatWorkingSection() {
                 top: `calc(var(--stack-top) + ${idx} * var(--stack-step))`,
                 marginTop: idx === 0 ? 0 : "var(--stack-gap)",
                 zIndex: idx + 1,
+                // Last card expands to fill the viewport so it fully covers all previous cards' body content
+                ...(isLast && { minHeight: `calc(100vh - var(--stack-top) - ${idx} * var(--stack-step))` }),
               }}
             >
               <HoverCard>
@@ -547,7 +551,8 @@ function WhatWorkingSection() {
                 </div>
               </HoverCard>
             </div>
-          ))}
+            );
+          })}
           <div style={{ height: "80px" }} />
         </div>
       </div>
@@ -1377,7 +1382,9 @@ function NewsletterSection() {
 
           {/* Right: 4 article cards — sticky stacking as user scrolls */}
           <div className="flex-1 min-w-0">
-            {NEWSLETTER_ARTICLES.map((article, i) => (
+            {NEWSLETTER_ARTICLES.map((article, i) => {
+              const isLast = i === NEWSLETTER_ARTICLES.length - 1;
+              return (
               <div
                 key={article.title}
                 style={{
@@ -1385,6 +1392,8 @@ function NewsletterSection() {
                   top: `calc(var(--stack-top) + ${i} * var(--stack-step))`,
                   marginTop: i === 0 ? 0 : "var(--stack-gap)",
                   zIndex: i + 1,
+                  // Last card fills viewport so it covers all previous cards' body content
+                  ...(isLast && { minHeight: `calc(100vh - var(--stack-top) - ${i} * var(--stack-step))` }),
                 }}
               >
                 <HoverCard>
@@ -1405,7 +1414,8 @@ function NewsletterSection() {
                   </div>
                 </HoverCard>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
