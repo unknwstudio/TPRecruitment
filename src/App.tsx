@@ -394,18 +394,18 @@ function HeroSection() {
     <section className="bg-[#ffedd7] w-full overflow-hidden">
 
       {/* ── Desktop (≥1020px): absolute positions matching Figma exactly ── */}
-      {/* Figma frame: 1440×821px (incl. nav ~86px). Section = frame minus nav = 735px */}
-      {/* Burst: w=1289px, h=730px, center-x=50%+15.5px (from frame), top=65.5px (from frame) */}
-      {/* → In section coords: top = 65.5-86 ≈ -20px (slightly above section, clipped) */}
-      {/* Content: left=30px, top=215-86=129px, w=799px */}
-      <div className="hidden lg:block relative" style={{ minHeight: "735px", overflow: "hidden" }}>
+      {/* Figma frame: 1440×821px (incl. nav ~86px). Section = frame minus nav = 735px + 120px bottom padding = 855px */}
+      {/* Burst: w=1289px, h=730px, left-edge=91px (= 50%+15.5px - 1289/2 at 1440px), top=65.5px from frame */}
+      {/* → In section coords: top = 65.5-86 ≈ -20px. Burst bottom at 710px — within 855px section. */}
+      {/* Content: left=30px, top=215-86=129px in section coords. Width=950px for 3-line heading. */}
+      <div className="hidden lg:block relative" style={{ minHeight: "855px", overflow: "hidden" }}>
 
         {/* Burst — full-width positioned, NOT inside max-w container */}
         <div
           className="absolute pointer-events-none"
           style={{
             left: "calc(50% + 15.5px)",
-            top: "272px",
+            top: "-20px",
             width: "1289px",
             height: "730px",
             transform: "translateX(-50%)",
@@ -423,11 +423,11 @@ function HeroSection() {
         </div>
 
         {/* Content — max-width constrained, sits on top of burst */}
-        <div className="max-w-[1440px] mx-auto px-[30px] relative" style={{ height: "735px" }}>
+        <div className="max-w-[1440px] mx-auto px-[30px] relative" style={{ height: "855px" }}>
           <div
             className="absolute flex flex-col gap-[40px]"
             style={{
-              left: "30px", top: "129px", width: "799px",
+              left: "30px", top: "129px", width: "950px",
               opacity: heroReady ? 1 : 0,
               transform: heroReady ? "translateY(0)" : "translateY(20px)",
               transition: heroReady ? "opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s" : "none",
