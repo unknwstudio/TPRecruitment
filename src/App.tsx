@@ -18,6 +18,7 @@ const imgImage43 = "/assets/imgImage43.png";
 const imgImage44 = "/assets/imgImage44.png";
 const imgImage45 = "/assets/imgImage45.svg";
 const imgLinkedInIcon = "/assets/imgLinkedInIcon.svg";
+const imgAKT = "/akt-logo.svg";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const FONT_DISPLAY = "'GT Canon Trial'";
@@ -197,146 +198,6 @@ function OrangeBtn({ onClick, children, className = "" }: { onClick?: () => void
       >
         {children}
       </button>
-    </div>
-  );
-}
-
-// ── Intro animation ───────────────────────────────────────────────────────────
-// Phase 0 (0ms):    Rectangle + centre dot visible; all arrows hidden
-// Phase 1 (700ms):  Arrows grow asynchronously from centre over ~2 s
-// Phase 2 (3100ms): Corner text labels appear (300 ms after last arrow)
-// Phase 3 (5200ms): Labels fade; burst slides to hero illustration (desktop)
-//                   OR whole overlay fades out (mobile)
-// onComplete (6000ms): overlay unmounts
-function IntroAnimation({ onComplete }: { onComplete: () => void }) {
-  const [phase, setPhase] = useState<0 | 1 | 2 | 3>(0);
-  const [burstTransform, setBurstTransform] = useState<string>("none");
-
-  useEffect(() => {
-    const timers = [
-      setTimeout(() => setPhase(1),  700),
-      setTimeout(() => setPhase(2), 1800),
-      setTimeout(() => setPhase(3), 5500),
-      setTimeout(onComplete,        6400),
-    ];
-    return () => timers.forEach(clearTimeout);
-  }, [onComplete]);
-
-  // At phase 3 on desktop: slide burst to hero illustration position
-  useEffect(() => {
-    if (phase !== 3) return;
-    if (window.innerWidth < 1020) return;
-    const anchor = document.getElementById("hero-illustration-anchor");
-    if (!anchor) return;
-    const rect = anchor.getBoundingClientRect();
-    const targetCX = rect.left + rect.width / 2;
-    const targetCY = rect.top + rect.height / 2;
-    const containerW = Math.min(687, window.innerWidth * 0.9);
-    const dX = targetCX - window.innerWidth / 2;
-    const dY = targetCY - window.innerHeight / 2;
-    const sc = rect.width / containerW;
-    setBurstTransform(`translate(${dX}px, ${dY}px) scale(${sc})`);
-  }, [phase]);
-
-  // clip-path grow from SVG centre (51.09% / 53.93%) — all start at 0ms, unique durations
-  const arrowStyle = (dur: number): React.CSSProperties => ({
-    clipPath: phase >= 1
-      ? "circle(200% at 51.09% 53.93%)"
-      : "circle(0%   at 51.09% 53.93%)",
-    transition: phase >= 1
-      ? `clip-path ${dur}s cubic-bezier(0, 0, 0.2, 1) 0ms`
-      : "none",
-  });
-
-  const labels = [
-    { text: "Higher",    pos: { left: "17.19%",  top: "18.13%" },                              delay: 0   },
-    { text: "Standard",  pos: { left: "58.28%",  top: "18.13%" },                              delay: 100 },
-    { text: "In hiring", pos: { left: "17.19%",  top: "84.57%" },                              delay: 200 },
-    { text: "People",    pos: { right: "14.85%", top: "84.57%", textAlign: "right" as const }, delay: 300 },
-  ];
-
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 1020;
-
-  return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 1000,
-      backgroundColor: "#ffedd7",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      opacity: phase === 3 && isMobile ? 0 : 1,
-      transition: phase === 3 ? "opacity 0.8s ease" : "none",
-      pointerEvents: phase === 3 ? "none" : "auto",
-    }}>
-      <div style={{
-        position: "relative",
-        width: "min(687px, 90vw)",
-        aspectRatio: "687 / 755.573",
-        transform: phase === 3 ? burstTransform : "none",
-        transition: phase === 3 ? "transform 0.85s cubic-bezier(0.4,0,0.2,1)" : "none",
-        transformOrigin: "center center",
-        overflow: "hidden",
-      }}>
-        {/* ── Inline SVG burst ─────────────────────────────────────────────── */}
-        <svg
-          viewBox="0 0 686.049 736.525"
-          width="100%"
-          style={{ display: "block" }}
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* Rectangle — always visible (phase 0+) */}
-          <rect
-            x="118.415" y="165.103" width="466.677" height="466.677"
-            stroke="#4D453B" strokeWidth="0.634935"
-          />
-
-          {/* ── Wave 1 — cross lines ── */}
-          <path d="M350.484 164.785L348.651 167.96H352.317L350.484 164.785ZM350.167 631.5V631.817H350.802V631.5H350.484H350.167ZM350.484 167.642H350.167V631.5H350.484H350.802V167.642H350.484Z" fill="#4D453B" style={arrowStyle(0.8)} />
-          <path d="M118.098 396.854H117.78V397.489H118.098V397.171V396.854ZM582.871 397.171V396.854H118.098V397.171V397.489H582.871V397.171Z" fill="#4D453B" style={arrowStyle(0.9)} />
-
-          {/* ── Wave 2 — upper arrows ── */}
-          <path d="M429.216 45.4173L426.734 48.115L430.312 48.9157L429.216 45.4173ZM350.175 397.102L350.105 397.412L350.725 397.551L350.794 397.241L350.484 397.171L350.175 397.102ZM428.592 48.2055L428.282 48.1362L350.175 397.102L350.484 397.171L350.794 397.241L428.902 48.2749L428.592 48.2055Z" fill="#4D453B" style={arrowStyle(1.2)} />
-          <path d="M440.645 223.498L437.555 225.471L440.809 227.16L440.645 223.498ZM350.202 397.026L350.056 397.308L350.619 397.6L350.765 397.318L350.484 397.172L350.202 397.026ZM439.329 226.033L439.047 225.887L350.202 397.026L350.484 397.172L350.765 397.318L439.61 226.18L439.329 226.033Z" fill="#4D453B" style={arrowStyle(1.4)} />
-          <path d="M393.025 150.817L390.679 153.633L394.291 154.257L393.025 150.817ZM350.172 397.117L350.118 397.43L350.744 397.538L350.798 397.226L350.485 397.172L350.172 397.117ZM392.539 153.632L392.226 153.578L350.172 397.117L350.485 397.172L350.798 397.226L392.852 153.686L392.539 153.632Z" fill="#4D453B" style={arrowStyle(1.0)} />
-
-          {/* ── Wave 3 — lower-left + right arrows ── */}
-          <path d="M271.752 736.525L274.255 733.847L270.684 733.018L271.752 736.525ZM350.793 397.243L350.865 396.934L350.246 396.791L350.174 397.1L350.484 397.172L350.793 397.243ZM272.398 733.742L272.707 733.814L350.793 397.243L350.484 397.172L350.174 397.1L272.089 733.67L272.398 733.742Z" fill="#4D453B" style={arrowStyle(1.6)} />
-          <path d="M275.559 634.14L278.264 631.666L274.769 630.56L275.559 634.14ZM350.787 397.267L350.883 396.964L350.277 396.773L350.182 397.076L350.484 397.171L350.787 397.267ZM276.421 631.416L276.724 631.511L350.787 397.267L350.484 397.171L350.182 397.076L276.118 631.32L276.421 631.416Z" fill="#4D453B" style={arrowStyle(1.5)} />
-          <path d="M591.125 480.983L588.73 478.208L587.524 481.67L591.125 480.983ZM350.588 396.872L350.288 396.768L350.079 397.367L350.379 397.472L350.484 397.172L350.588 396.872ZM588.427 480.043L588.531 479.743L350.588 396.872L350.484 397.172L350.379 397.472L588.322 480.343L588.427 480.043Z" fill="#4D453B" style={arrowStyle(1.8)} />
-
-          {/* ── Wave 4 — mid-ring arrows ── */}
-          <path d="M86.9861 348.916L89.7787 351.291L90.4391 347.685L86.9861 348.916ZM350.426 397.484L350.738 397.541L350.852 396.916L350.54 396.859L350.483 397.171L350.426 397.484ZM89.7966 349.431L89.7394 349.743L350.426 397.484L350.483 397.171L350.54 396.859L89.8538 349.119L89.7966 349.431Z" fill="#4D453B" style={arrowStyle(2.8)} />
-          <path d="M330.166 586.382L332.328 583.421L328.683 583.03L330.166 586.382ZM350.799 397.205L350.833 396.89L350.201 396.822L350.167 397.138L350.483 397.171L350.799 397.205ZM330.471 583.541L330.787 583.575L350.799 397.205L350.483 397.171L350.167 397.138L330.156 583.507L330.471 583.541Z" fill="#4D453B" style={arrowStyle(1.9)} />
-          <path d="M540.33 594.636L539.451 591.078L536.808 593.618L540.33 594.636ZM350.712 396.951L350.492 396.723L350.034 397.163L350.254 397.392L350.483 397.171L350.712 396.951ZM538.35 592.577L538.579 592.357L350.712 396.951L350.483 397.171L350.254 397.392L538.121 592.797L538.35 592.577Z" fill="#4D453B" style={arrowStyle(2.2)} />
-          <path d="M511.123 421.299L508.256 419.015L507.711 422.64L511.123 421.299ZM350.53 396.858L350.216 396.811L350.122 397.439L350.436 397.486L350.483 397.172L350.53 396.858ZM508.297 420.875L508.345 420.561L350.53 396.858L350.483 397.172L350.436 397.486L508.25 421.189L508.297 420.875Z" fill="#4D453B" style={arrowStyle(2.4)} />
-          <path d="M263.498 350.821L265.438 353.932L267.162 350.697L263.498 350.821ZM350.334 397.452L350.614 397.601L350.913 397.041L350.632 396.892L350.483 397.172L350.334 397.452ZM266.02 352.165L265.87 352.445L350.334 397.452L350.483 397.172L350.632 396.892L266.169 351.885L266.02 352.165Z" fill="#4D453B" style={arrowStyle(1.4)} />
-
-          {/* ── Wave 5 — outer / diagonal arrows ── */}
-          <path d="M222.862 594.3L226.126 592.631L223.049 590.639L222.862 594.3ZM350.751 397.343L350.924 397.077L350.391 396.732L350.218 396.998L350.485 397.171L350.751 397.343ZM224.415 591.901L224.681 592.074L350.751 397.343L350.485 397.171L350.218 396.998L224.148 591.729L224.415 591.901Z" fill="#4D453B" style={arrowStyle(2.5)} />
-          <path d="M295.882 287.326L295.646 290.984L298.932 289.36L295.882 287.326ZM480.427 607.809C480.598 607.849 480.769 607.743 480.809 607.573L481.461 604.791C481.501 604.62 481.395 604.449 481.225 604.409C481.054 604.369 480.883 604.475 480.843 604.646L480.263 607.118L477.79 606.538C477.62 606.498 477.449 606.604 477.409 606.775C477.369 606.946 477.475 607.117 477.645 607.157L480.427 607.809ZM350.488 397.806L350.203 397.946L350.21 397.96L350.218 397.973L350.488 397.806ZM297.148 289.888L296.864 290.028L350.203 397.946L350.488 397.806L350.772 397.665L297.433 289.747L297.148 289.888ZM350.488 397.806L350.218 397.973L480.23 607.667L480.5 607.5L480.769 607.333L350.757 397.638L350.488 397.806Z" fill="#4D453B" style={arrowStyle(2.8)} />
-          <path d="M212.068 189.211L212.296 192.87L215.351 190.843L212.068 189.211ZM350.221 397.981L350.396 398.246L350.925 397.895L350.75 397.63L350.485 397.806L350.221 397.981ZM213.648 191.592L213.384 191.767L350.221 397.981L350.485 397.806L350.75 397.63L213.913 191.416L213.648 191.592Z" fill="#4D453B" style={arrowStyle(3.0)} />
-          <path d="M295.883 287.326L295.646 290.984L298.933 289.36L295.883 287.326ZM476.875 712.292C477.037 712.361 477.223 712.286 477.292 712.124L478.411 709.496C478.48 709.334 478.405 709.148 478.244 709.079C478.082 709.01 477.896 709.086 477.827 709.247L476.832 711.584L474.496 710.588C474.334 710.52 474.148 710.595 474.079 710.756C474.01 710.917 474.085 711.104 474.247 711.173L476.875 712.292ZM350.488 397.806L350.783 397.687L350.778 397.676L350.773 397.665L350.488 397.806ZM297.149 289.887L296.864 290.028L350.203 397.946L350.488 397.806L350.773 397.665L297.433 289.747L297.149 289.887ZM350.488 397.806L350.194 397.924L476.705 712.119L477 712L477.294 711.881L350.783 397.687L350.488 397.806Z" fill="#4D453B" style={arrowStyle(3.1)} />
-          <path d="M0 48.592L0.955192 52.1312L3.5426 49.5344L0 48.592ZM350.895 398.666L351.12 398.89L351.568 398.441L351.343 398.216L351.119 398.441L350.895 398.666ZM2.02401 50.6087L1.79993 50.8336L350.895 398.666L351.119 398.441L351.343 398.216L2.24808 50.3838L2.02401 50.6087Z" fill="#4D453B" style={arrowStyle(2.7)} />
-          <path d="M686.048 62.8304C686.048 62.6551 685.906 62.513 685.73 62.5131L682.873 62.5142C682.698 62.5143 682.556 62.6565 682.556 62.8318C682.556 63.0071 682.698 63.1492 682.873 63.1491L685.413 63.1482L685.414 65.6879C685.414 65.8632 685.556 66.0053 685.732 66.0052C685.907 66.0052 686.049 65.863 686.049 65.6877L686.048 62.8304ZM118.276 630.276L118.051 630.5L118.5 630.949L118.725 630.725L118.5 630.5L118.276 630.276ZM685.73 62.8306L685.506 62.6062L118.276 630.276L118.5 630.5L118.725 630.725L685.955 63.055L685.73 62.8306Z" fill="#4D453B" style={arrowStyle(2.8)} />
-          <path d="M667.951 261.458L664.31 261.033L665.762 264.399L667.951 261.458ZM111.749 501.465L115.39 501.89L113.937 498.524L111.749 501.465ZM665.328 262.59L665.202 262.299L114.246 500.041L114.372 500.333L114.498 500.624L665.454 262.882L665.328 262.59Z" fill="#4D453B" style={arrowStyle(3.0)} />
-
-          {/* Centre dot — always on top */}
-          <circle cx="350.484" cy="397.171" r="4.76201" fill="#FFEDD7" stroke="#4D453B" strokeWidth="0.634935" />
-        </svg>
-
-        {/* Corner labels — appear at phase 2, fade at phase 3 */}
-        {labels.map(({ text, pos, delay }) => (
-          <p key={text} style={{
-            ...STYLE_DISPLAY,
-            fontSize: `clamp(12px, ${isMobile ? "4.5vw" : "3.7vw"}, 25.4px)`,
-            color: "black",
-            position: "absolute",
-            ...pos,
-            opacity: phase >= 2 && phase < 3 ? 1 : 0,
-            transform: phase >= 2 && phase < 3 ? "translateY(0)" : "translateY(8px)",
-            transition: `opacity 0.45s ease ${delay}ms, transform 0.45s ease ${delay}ms`,
-          }}>{text}</p>
-        ))}
-      </div>
     </div>
   );
 }
@@ -522,11 +383,13 @@ function Navbar() {
 }
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
-// Figma 513:299 — 821px total frame (incl. nav ~86px).
-// Content: left=30px, top=215px → from section top = 215-86 = 129px. w=799px h=445px.
-// Illustration: centered in 821px frame → center Y=410.5px → from section top=324.5px
-//   → illustration top = 324.5 - 595/2 = 27px. right=30px. w=541px h=595px.
 function HeroSection() {
+  const [heroReady, setHeroReady] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setHeroReady(true), 400);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <section className="bg-[#ffedd7] w-full overflow-hidden">
 
@@ -537,10 +400,15 @@ function HeroSection() {
           {/* Left content: top=129px, w=799px, gap=40px between all three elements */}
           <div
             className="absolute flex flex-col gap-[40px]"
-            style={{ left: "30px", top: "129px", width: "799px" }}
+            style={{
+              left: "30px", top: "129px", width: "799px",
+              opacity: heroReady ? 1 : 0,
+              transform: heroReady ? "translateY(0)" : "translateY(20px)",
+              transition: heroReady ? "opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s" : "none",
+            }}
           >
             <p className="text-black" style={{ ...STYLE_DISPLAY, fontSize: "60px", letterSpacing: "-3px", lineHeight: "1.1" }}>
-              The right hire changes everything that comes after it.
+              A great hire changes the trajectory. That&apos;s the Higher Standard.
             </p>
             <div style={{ ...STYLE_MONO, fontSize: "28px", lineHeight: "1.1", color: "black" }}>
               <p>I&apos;m Tiffany Philippou, founder of Higher Standard.</p>
@@ -553,26 +421,20 @@ function HeroSection() {
             </OrangeBtn>
           </div>
 
-          {/* Right illustration — anchor for the intro animation to fly into */}
-          {/* top=27px matches centering within the 821px Figma frame */}
+          {/* Right illustration — animated hero-arrows.svg */}
           <div
-            id="hero-illustration-anchor"
             className="absolute"
             style={{ right: "0px", top: "27px", width: "541px", height: "595px" }}
           >
-            {/* SVG centered inside */}
-            <div className="absolute" style={{
-              left: "50%", top: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "540px", height: "580px",
-            }}>
-              <img src="/intro-burst.svg" alt="" style={{ width: "100%", height: "100%", display: "block" }} />
-            </div>
-            {/* Corner labels — matching Figma node 513:345 positions */}
-            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "93px",  top: "109px", letterSpacing: "-0.4px" }}>Higher</p>
-            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "308px", top: "109px", letterSpacing: "-0.4px" }}>Standard</p>
-            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "93px",  top: "512px", letterSpacing: "-0.4px" }}>In hiring</p>
-            <p className="absolute text-[20px] text-black" style={{ ...STYLE_DISPLAY, left: "461px", top: "512px", letterSpacing: "-0.4px", transform: "translateX(-100%)" }}>People</p>
+            <img
+              src="/hero-arrows.svg"
+              alt=""
+              style={{
+                width: "100%", height: "100%", display: "block",
+                clipPath: heroReady ? "circle(200% at 48.5% 100%)" : "circle(0% at 48.5% 100%)",
+                transition: heroReady ? "clip-path 2.2s cubic-bezier(0,0,0.2,1)" : "none",
+              }}
+            />
           </div>
 
         </div>
@@ -583,7 +445,7 @@ function HeroSection() {
         <div className="flex flex-col gap-[40px]">
           <Reveal>
             <p style={{ ...STYLE_DISPLAY, fontSize: "clamp(36px, 10vw, 48px)", letterSpacing: "-2px", lineHeight: "1.1", color: "black" }}>
-              The right hire changes everything that comes after it.
+              A great hire changes the trajectory. That&apos;s the Higher Standard.
             </p>
           </Reveal>
           <Reveal delay={120}>
@@ -668,7 +530,7 @@ function WhatWorkingSection() {
                     {card.items.map((t) => (
                       <div key={t} className="flex gap-[14px] items-start">
                         {card.icon === "check" ? <OrangeCheckbox /> : <DarkMinusIcon />}
-                        <p className="flex-1 text-[16px] md:text-[18px] text-black" style={STYLE_MONO}>{t}</p>
+                        <p className="flex-1 min-w-0 text-[16px] md:text-[18px] text-black" style={STYLE_MONO}>{t}</p>
                       </div>
                     ))}
                   </div>
@@ -711,7 +573,7 @@ function WhatWorkingSection() {
                   {WHAT_STANDARD_ITEMS.map((t) => (
                     <div key={t} className="flex gap-[20px] items-start">
                       <OrangeCheckbox />
-                      <p className="flex-1 text-[20px] text-black" style={STYLE_MONO}>{t}</p>
+                      <p className="flex-1 min-w-0 text-[20px] text-black" style={STYLE_MONO}>{t}</p>
                     </div>
                   ))}
                 </div>
@@ -732,7 +594,7 @@ function WhatWorkingSection() {
                   {WHAT_WONT_DO_ITEMS.map((t) => (
                     <div key={t} className="flex gap-[20px] items-start">
                       <DarkMinusIcon />
-                      <p className="flex-1 text-[20px] text-black" style={STYLE_MONO}>{t}</p>
+                      <p className="flex-1 min-w-0 text-[20px] text-black" style={STYLE_MONO}>{t}</p>
                     </div>
                   ))}
                 </div>
@@ -747,7 +609,7 @@ function WhatWorkingSection() {
 }
 
 // ── Partners ──────────────────────────────────────────────────────────────────
-const partnerLogosRow1 = [imgImage30, imgImage31, imgImage32, imgImage33, imgImage36, imgImage34, imgImage35, imgImage37];
+const partnerLogosRow1 = [imgAKT, imgImage30, imgImage31, imgImage32, imgImage33, imgImage36, imgImage34, imgImage35, imgImage37];
 const partnerLogosRow2 = [imgImage38, imgImage39, imgImage40, imgImage41, imgImage42, imgImage43, imgImage44, imgImage45];
 
 function PartnerLogo({ src, small }: { src: string; small?: boolean }) {
@@ -879,12 +741,17 @@ function RoleAccordionRow({
   );
 }
 
-// ── About — "What are Higher Standard based on" ───────────────────────────────
+// ── About — "Where the Higher Standard comes from" ───────────────────────────
 const ABOUT_CARDS = [
   {
     id: "exp",
-    title: "17 years of\nexperience",
+    title: "17 years of experience",
     body: "I was employee #1 and a founding team member at Onefinestay. Spent over ten years in leadership roles inside startups, then watched the company sell in a deal worth $200 million.\nThat's the lens everything else is built on.",
+  },
+  {
+    id: "platform",
+    title: "Head of Platform, 33east",
+    body: "I work closely with portfolio founders on leadership hiring, growth challenges, and the decisions that shape a company as it moves from early traction into scale. Previously I was an analyst at the same fund.",
   },
   {
     id: "coach",
@@ -897,189 +764,80 @@ const ABOUT_CARDS = [
     body: "20+ startups advised as a strategic consultant. Covers brand, communications strategy, GTM and leadership decisions. Still actively advising alongside the hiring work.",
   },
   {
-    id: "platform",
-    title: "Head of Platform,\n33east",
-    body: "I work closely with portfolio founders on leadership hiring, growth challenges, and the decisions that shape a company as it moves from early traction into scale. Previously I was an analyst at the same fund.",
+    id: "writer",
+    title: "Writer",
+    body: "I write openly about growth, leadership and what it really takes to build inside a fast-moving company. Honest takes for both hiring leaders and the people considering their next role.",
   },
 ];
 
-// Scatter card for the About section — appears after lines animation
-function AboutCard({
-  card, style, visible, delay,
-}: {
-  card: typeof ABOUT_CARDS[0];
-  style?: React.CSSProperties;
-  visible: boolean;
-  delay: number;
-}) {
-  return (
-    <div style={{
-      ...style,
-      opacity: visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(16px)",
-      transition: `opacity 0.55s ease ${delay}ms, transform 0.55s cubic-bezier(0.4,0,0.2,1) ${delay}ms`,
-    }}>
-      <div className="bg-white p-[10px]">
-        <div style={{ marginBottom: "-1.372px" }}>
-          <div className="border-[1.372px] border-black p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-            <p className="text-[28px] xl:text-[32px] text-black whitespace-pre-line"
-               style={{ ...STYLE_DISPLAY, lineHeight: 1.08 }}>{card.title}</p>
-          </div>
-        </div>
-        <div className="border-[1.372px] border-black border-t-0 p-[20px] rounded-bl-[8px] rounded-br-[8px]">
-          <p className="text-[16px] xl:text-[18px] text-black whitespace-pre-line"
-             style={{ ...STYLE_MONO, lineHeight: 1.1 }}>{card.body}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// About section animation phases:
-// Phase A (0):     rect + photo already visible on mount after section enters viewport
-// Phase B (400ms): lines grow from center (simultaneous, different speeds)
-// Phase C (2800ms): cards appear staggered
 function AboutSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [triggered, setTriggered] = useState(false);
-  const [linesPhase, setLinesPhase]   = useState(false);
-  const [cardsPhase, setCardsPhase]   = useState(false);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !triggered) {
-          setTriggered(true);
-          setTimeout(() => setLinesPhase(true),  400);
-          setTimeout(() => setCardsPhase(true),  2800);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [triggered]);
-
-  // arrowStyle for the about section — same simultaneous-burst approach
-  const aStyle = (dur: number): React.CSSProperties => ({
-    clipPath: linesPhase ? "circle(200% at 50.27% 47.82%)" : "circle(0% at 50.27% 47.82%)",
-    transition: linesPhase ? `clip-path ${dur}s cubic-bezier(0.25,0.1,0.25,1) 0ms` : "none",
-  });
-
-
   return (
-    <section ref={sectionRef} id="about" className="bg-[#ffedd7] w-full py-[103px]">
+    <section id="about" className="bg-[#ffedd7] w-full py-[103px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
-        {/* Section title */}
+        {/* Title */}
         <Reveal>
-          <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]"
-             style={STYLE_DISPLAY}>
-            What are Higher Standard based on
+          <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
+            Where the Higher Standard comes from
           </p>
         </Reveal>
 
-        {/* ── Desktop xl+: 3-column layout ── */}
-        <div className="hidden xl:flex items-start justify-between gap-[16px]">
-          {/* Left cards: exp + consult */}
-          <div className="flex flex-col gap-[16px]" style={{ width: "clamp(240px, 24vw, 340px)" }}>
-            <AboutCard card={ABOUT_CARDS[0]} visible={cardsPhase} delay={0} />
-            <AboutCard card={ABOUT_CARDS[2]} visible={cardsPhase} delay={300} />
-          </div>
-
-          {/* Center: lines SVG + Tiffany photo */}
-          <div style={{
-            flex: "0 0 clamp(360px, 36vw, 540px)",
-            position: "relative",
-            aspectRatio: "593.263 / 709.912",
-            opacity: triggered ? 1 : 0,
-            transition: "opacity 0.4s ease",
-          }}>
-            <svg viewBox="0 0 593.263 709.912" width="100%" style={{ display: "block" }} fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="66.4154" y="107.694" width="466.677" height="466.677" stroke="#4D453B" strokeWidth="0.634935"/>
-              <path d="M298.484 107.376L296.651 110.551H300.317L298.484 107.376ZM298.484 695.591L300.317 692.416H296.651L298.484 695.591ZM298.484 110.233H298.167V692.734H298.484H298.802V110.233H298.484Z" fill="#4D453B" style={aStyle(0.8)}/>
-              <path d="M379 126.591L376.164 128.913L379.593 130.208L379 126.591ZM298.187 339.65L298.075 339.947L298.669 340.171L298.781 339.874L298.484 339.762L298.187 339.65ZM377.99 129.264L377.693 129.152L298.187 339.65L298.484 339.762L298.781 339.874L378.287 129.376L377.99 129.264Z" fill="#4D453B" style={aStyle(1.2)}/>
-              <path d="M441.143 193.738L437.539 195.75L440.762 197.488L441.143 193.738ZM298.196 339.527L298.055 339.813L298.614 340.109L298.756 339.822L298.484 339.681L298.196 339.527ZM439.898 196.235L439.61 196.08L298.196 339.527L298.484 339.681L298.756 339.822L440.186 196.389L439.898 196.235Z" fill="#4D453B" style={aStyle(1.4)}/>
-              <path d="M242.188 107.376L239.875 110.202L243.484 110.695L242.188 107.376ZM298.457 339.756L298.379 340.065L298.995 340.22L299.073 339.911L298.765 339.834L298.457 339.756ZM243.031 109.993L242.723 109.915L298.457 339.756L298.765 339.834L299.073 339.911L299.339 110.07L243.031 109.993Z" fill="#4D453B" style={aStyle(1.0)}/>
-              <path d="M156.416 289.651L159.856 291.098L159.702 287.485L156.416 289.651ZM298.779 339.554L298.939 339.272L298.378 338.951L298.217 339.233L298.484 339.393L298.779 339.554ZM158.726 289.059L158.465 289.219L298.484 339.393L298.779 339.554L299.04 339.714L158.988 288.899L158.726 289.059Z" fill="#4D453B" style={aStyle(2.0)}/>
-              <path d="M66.0977 282.651L69.1826 284.731L69.7676 281.158L66.0977 282.651ZM298.722 339.6L298.856 339.314L298.278 339.044L298.143 339.33L298.412 339.462L298.722 339.6ZM68.4014 283.393L68.1328 283.525L298.412 339.462L298.722 339.6L299.006 339.738L68.6719 283.261L68.4014 283.393Z" fill="#4D453B" style={aStyle(2.5)}/>
-              <path d="M66.0977 505.887L69.7676 507.38L69.1826 503.807L66.0977 505.887ZM298.412 339.075L298.143 339.207L298.278 339.493L298.856 339.223L298.722 338.937L298.412 339.075ZM68.1328 505.012L68.4014 505.144L298.722 338.937L298.412 339.075L298.143 339.207L67.8623 505.012H68.1328Z" fill="#4D453B" style={aStyle(2.8)}/>
-              <path d="M535.483 107.376L533.17 110.202L536.779 110.695L535.483 107.376ZM298.457 339.756L298.223 340.065L298.839 340.22L299.073 339.911L298.765 339.834L298.457 339.756ZM534.326 109.993L534.018 109.915L298.457 339.756L298.765 339.834L299.073 339.911L535.341 110.07L534.326 109.993Z" fill="#4D453B" style={aStyle(0.9)}/>
-              <path d="M593.263 0L590.073 2.13281L593.263 4.38281V0ZM298.484 339.393L298.221 339.634L298.484 339.876L298.748 339.634L298.484 339.393ZM591.162 2.62891L590.898 2.87109L298.748 339.634L298.484 339.876L298.221 340.118L591.426 2.87109L591.162 2.62891Z" fill="#4D453B" style={aStyle(3.0)}/>
-              <path d="M156.416 498.887L159.702 501.053L159.856 497.44L156.416 498.887ZM298.217 339.394L298.378 339.111L298.217 339.07L298.484 339.231L298.779 339.392L298.779 339.392ZM158.465 499.318L158.726 499.478L298.484 339.231L298.217 339.07L297.95 339.231L158.204 499.158L158.465 499.318Z" fill="#4D453B" style={aStyle(1.9)}/>
-              <path d="M441.143 494.8L440.762 491.05L437.539 492.788L441.143 494.8ZM298.756 338.919L298.614 338.631L298.055 338.927L298.196 339.213L298.484 339.069L298.756 338.919ZM439.61 492.658L439.898 492.503L298.484 339.069L298.196 339.213L297.908 339.357L439.322 492.813L439.61 492.658Z" fill="#4D453B" style={aStyle(2.2)}/>
-              <path d="M535.483 0L533.17 2.82617L536.779 3.31934L535.483 0ZM298.457 339.393L298.457 339.756L298.765 339.834L299.073 339.393L298.765 338.952L298.457 339.393ZM534.326 2.61719L534.018 2.61719V339.393L298.457 339.393L298.765 339.393L535.341 2.61719H534.326Z" fill="#4D453B" style={aStyle(2.7)}/>
-              <path d="M593.263 709.912L593.263 705.524L590.073 707.779L593.263 709.912ZM298.484 339.876L298.221 339.634L298.484 339.393L298.748 339.634L298.484 339.876ZM591.162 707.271L590.898 707.029L298.748 339.634L298.484 339.876L298.221 340.118L590.898 707.541L591.162 707.271Z" fill="#4D453B" style={aStyle(3.1)}/>
-              <path d="M0 0L0 4.38281L3.19043 2.13281L0 0ZM298.484 339.393L298.748 339.634L298.484 339.876L298.221 339.634L298.484 339.393ZM1.91016 2.62891L2.17383 2.87109L298.221 339.634L298.484 339.876L298.748 340.118L2.4375 2.87109L1.91016 2.62891Z" fill="#4D453B" style={aStyle(3.2)}/>
-              <path d="M0 709.912L3.19043 707.779L0 705.524V709.912ZM298.221 339.634L298.484 339.393L298.748 339.634L298.484 339.876L298.221 339.634ZM2.17383 707.541L1.91016 707.271L298.221 339.634L298.484 339.876L298.748 340.118L2.4375 707.541H2.17383Z" fill="#4D453B" style={aStyle(2.9)}/>
-              <circle cx="298.484" cy="339.762" r="4.76201" fill="#FFEDD7" stroke="#4D453B" strokeWidth="0.634935"/>
-            </svg>
-
-            {/* Tiffany photo — centered on the SVG's center dot */}
-            <div style={{
-              position: "absolute",
-              left: "50%", top: "47.86%",
-              transform: "translate(-50%, -50%)",
-              width: "clamp(160px, 16vw, 240px)",
-              aspectRatio: "1",
-              overflow: "hidden",
-              border: "0.635px solid #4D453B",
-              opacity: triggered ? 1 : 0,
-              transition: "opacity 0.5s ease 0ms",
-            }}>
-              <img src="/tiffany.png" alt="Tiffany Philippou"
-                   style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
+        {/* Desktop xl+: two-column — left photo, right cards */}
+        <div className="hidden xl:flex gap-[60px] items-start">
+          {/* Left: photo with decorative union shape */}
+          <div className="shrink-0 relative" style={{ width: "340px" }}>
+            {/* Decorative wing shape behind photo */}
+            <div style={{ position: "absolute", left: "-140px", top: "60px", width: "480px", opacity: 0.18, pointerEvents: "none" }}>
+              <img src="/about-union.svg" alt="" style={{ width: "100%", height: "auto" }} />
             </div>
-
-            {/* Name labels flanking photo */}
-            <p style={{
-              ...STYLE_DISPLAY, fontSize: "clamp(16px, 1.8vw, 26px)", color: "black",
-              position: "absolute", left: "4%", top: "44%",
-              opacity: triggered ? 1 : 0, transition: "opacity 0.5s ease 200ms",
-            }}>Tiffany</p>
-            <p style={{
-              ...STYLE_DISPLAY, fontSize: "clamp(16px, 1.8vw, 26px)", color: "black",
-              position: "absolute", right: "4%", top: "44%", textAlign: "right",
-              opacity: triggered ? 1 : 0, transition: "opacity 0.5s ease 200ms",
-            }}>Philippou</p>
+            <Reveal>
+              <div style={{ width: "280px", aspectRatio: "1", overflow: "hidden", border: "0.635px solid #4D453B", position: "relative" }}>
+                <img src="/tiffany.png" alt="Tiffany Philippou" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
+              </div>
+              <p style={{ ...STYLE_DISPLAY, fontSize: 24, color: "black", letterSpacing: "-1.2px", marginTop: "16px" }}>Tiffany Philippou</p>
+            </Reveal>
           </div>
 
-          {/* Right cards: coach + platform */}
-          <div className="flex flex-col gap-[16px]" style={{ width: "clamp(240px, 24vw, 340px)" }}>
-            <AboutCard card={ABOUT_CARDS[1]} visible={cardsPhase} delay={150} />
-            <AboutCard card={ABOUT_CARDS[3]} visible={cardsPhase} delay={450} />
+          {/* Right: 5 stacked cards */}
+          <div className="flex-1 min-w-0 flex flex-col gap-[20px]">
+            {ABOUT_CARDS.map((card, i) => (
+              <Reveal key={card.id} delay={i * 80}>
+                <div className="bg-white p-[10px]">
+                  <div style={{ marginBottom: "-1.372px" }}>
+                    <div className="border-[1.372px] border-black p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
+                      <p className="text-[28px] xl:text-[32px] text-black" style={{ ...STYLE_DISPLAY, lineHeight: 1.08 }}>{card.title}</p>
+                    </div>
+                  </div>
+                  <div className="border-[1.372px] border-black border-t-0 p-[20px] rounded-bl-[8px] rounded-br-[8px]">
+                    <p className="text-[18px] xl:text-[20px] text-black whitespace-pre-line" style={{ ...STYLE_MONO, lineHeight: 1.1 }}>{card.body}</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
           </div>
         </div>
 
-        {/* ── Mobile/tablet: stack ── */}
+        {/* Mobile/tablet: stack */}
         <div className="xl:hidden flex flex-col gap-[32px]">
-          {/* Photo + name */}
           <Reveal>
             <div className="flex flex-col items-center gap-[12px]">
               <div style={{ width: "min(260px, 70vw)", aspectRatio: "1", overflow: "hidden", border: "0.635px solid #4D453B" }}>
-                <img src="/tiffany.png" alt="Tiffany Philippou"
-                     style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
+                <img src="/tiffany.png" alt="Tiffany Philippou" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
               </div>
               <p style={{ ...STYLE_DISPLAY, fontSize: 24, color: "black", letterSpacing: "-1.2px" }}>Tiffany Philippou</p>
             </div>
           </Reveal>
-          {/* Cards 2-col on md */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
             {ABOUT_CARDS.map((card, i) => (
               <Reveal key={card.id} delay={i * 80}>
                 <div className="bg-white p-[10px]">
                   <div style={{ marginBottom: "-1.372px" }}>
                     <div className="border-[1.372px] border-black p-[16px] md:p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                      <p className="text-[22px] md:text-[26px] text-black whitespace-pre-line"
-                         style={{ ...STYLE_DISPLAY, lineHeight: 1.08 }}>{card.title}</p>
+                      <p className="text-[22px] md:text-[26px] text-black" style={{ ...STYLE_DISPLAY, lineHeight: 1.08 }}>{card.title}</p>
                     </div>
                   </div>
                   <div className="border-[1.372px] border-black border-t-0 p-[16px] md:p-[20px] rounded-bl-[8px] rounded-br-[8px]">
-                    <p className="text-[15px] md:text-[16px] text-black whitespace-pre-line"
-                       style={{ ...STYLE_MONO, lineHeight: 1.1 }}>{card.body}</p>
+                    <p className="text-[15px] md:text-[16px] text-black whitespace-pre-line" style={{ ...STYLE_MONO, lineHeight: 1.1 }}>{card.body}</p>
                   </div>
                 </div>
               </Reveal>
@@ -1154,10 +912,10 @@ const TESTIMONIALS = [
     ],
   },
   {
-    name: "Maria Monks", title: "IQ Capital",
+    name: "Maria Monks", title: "Fractional CMO",
     photo: "/photo_maria.jpeg" as string | null, bg: "#efd7ba",
     text: [
-      "Tiffany has been instrumental in helping me with marketing leadership hires across the IQ Capital portfolio. I have enjoyed working with her for years —her passion and professionalism is outstanding.",
+      "Tiffany has been instrumental in helping me with marketing leadership hires across multiple startups. I have enjoyed working with her for years — her passion and professionalism is outstanding.",
       "She also offers a great personalised service to both individual companies, and me, and I often seek her advice on everything recruitment, and building teams, related.",
     ],
   },
@@ -1169,19 +927,18 @@ const TESTIMONIALS = [
     ],
   },
   {
-    name: "Gastón Tourn", title: "Chief Growth Officer, Oddbox",
+    name: "Gastón Tourn", title: "Chief Growth Officer at Oddbox",
     photo: "/photo_gaston.jpeg" as string | null, bg: "#c1c497",
     text: [
-      "Tiffany's took the time to understand my interests and introduced the opportunity when she saw it was a perfect match.",
-      "This refreshing approach builds trust and confidence. I was considering other opportunities at the time, but I chose the role at Curio partly because of the assurance Tiffany provided during the hiring process.",
-      "I highly recommend Tiffany for her exceptional ability to identify and engage top talent. If you're looking for a dedicated ambassador for your startup, she is the professional you need.",
+      "Tiffany is an outstanding talent professional with a thoughtful, personal approach. She spends significant time understanding candidates and ensuring opportunities align perfectly with their goals.",
+      "I highly recommend Tiffany for her exceptional ability to identify and engage top talent. If you're looking for a dedicated ambassador for your startup, she is the professional you need. Tiffany excels at finding candidates who may not be actively seeking a change and persuading them to consider new, exciting opportunities.",
     ],
   },
   {
     name: "Govind Balakrishnan", title: "Co-founder, Gibran",
     photo: "/photo_govind.jpeg" as string | null, bg: "#ffffff",
     text: [
-      "We've loved working with Tiffany over several years on multiple senior hires at Curio. Our requirements are often atypical, and she takes a very hands-on and considered approach.",
+      "We've loved working with Tiffany over several years on multiple senior hires. Our requirements are often atypical, and she takes a very hands-on and considered approach.",
       "Thanks to our collaboration, we have a phenomenal tight-knit team, investment from tier 1 Silicon Valley investors and partnerships with top media outlets. We trust her fully and will work with her again.",
     ],
   },
@@ -1259,7 +1016,7 @@ const TESTIMONIALS_SCATTER = [
   { idx: 1, left: "354px", top: "66px", width: "330px", rotate: -1.96  },
   { idx: 2, left: "663px", top: "50px", width: "330px", rotate: 0      },
   { idx: 3, left: "980px", top: "48px", width: "380px", rotate: -1.67  },
-  { idx: 4, left: "81px",  top: "380px", width: "380px", rotate: -1.67  },
+  { idx: 4, left: "56px",  top: "380px", width: "360px", rotate: -1.67  },
   { idx: 5, left: "425px", top: "420px", width: "330px", rotate: -1.67  },
   { idx: 6, left: "662px", top: "300px", width: "400px", rotate: 2      },
   { idx: 7, left: "949px", top: "400px", width: "380px", rotate: 0      },
@@ -1456,7 +1213,7 @@ function TestimonialsSection() {
 
 // ── Newsletter ────────────────────────────────────────────────────────────────
 // Subscribe button: explicitly 50px tall (matches the email input height)
-function SubscribeBtn() {
+function SubscribeBtn({ label = "Subscribe" }: { label?: string }) {
   const [hov, setHov] = useState(false);
   return (
     <div
@@ -1469,7 +1226,7 @@ function SubscribeBtn() {
         className="border border-black flex flex-1 items-center px-[14px] rounded-[4px] cursor-pointer"
         style={{ backgroundColor: "transparent" }}
       >
-        <p className="text-[18px] md:text-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>Subscribe</p>
+        <p className="text-[18px] md:text-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>{label}</p>
       </button>
     </div>
   );
@@ -1482,12 +1239,30 @@ const NEWSLETTER_ARTICLES = [
   },
   {
     title: "Good people leave quietly",
-    excerpt: "On the hire that breaks startups and the kind of leader that holds them together",
+    excerpt: "On the hire that breaks startups and the kind of leader that holds them together.",
   },
   {
-    title: "Mindset is\nnon-negotiable",
-    excerpt: "Why the unobvious hire usually wins",
+    title: "Mindset is non-negotiable",
+    excerpt: "Why the unobvious hire usually wins.",
   },
+  {
+    title: "The reps nobody sees",
+    excerpt: "The years that don't make the deck.",
+  },
+];
+
+const NEWSLETTER_TAGS = [
+  { label: "Founders",        color: "#90b0bb", left: "74px",    top: "360px" },
+  { label: "Strategy",        color: "#c1c497", left: "187px",   top: "90px"  },
+  { label: "Results",         color: "#c1c497", left: "249px",   top: "379px" },
+  { label: "Leadership",      color: "#ff9a6a", left: "443px",   top: "330px" },
+  { label: "Analytics",       color: "#90b0bb", left: "552px",   top: "392px" },
+  { label: "Conversion",      color: "#90b0bb", left: "281px",   top: "267px" },
+  { label: "Business",        color: "#ff9a6a", left: "130px",   top: "217px" },
+  { label: "Community",       color: "#c1c497", left: "479px",   top: "158px" },
+  { label: "Growth",          color: "#ff9a6a", left: "369px",   top: "398px" },
+  { label: "Startups",        color: "#ff9a6a", left: "402px",   top: "71px"  },
+  { label: "Entrepreneurship",color: "#c1c497", left: "603px",   top: "258px" },
 ];
 
 function NewsletterCarousel({ articles }: { articles: typeof NEWSLETTER_ARTICLES }) {
@@ -1547,64 +1322,89 @@ function NewsletterSection() {
     <section className="bg-[#ffedd7] w-full py-[103px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
-        {/* Centred header */}
-        <Reveal className="flex flex-col items-center gap-[32px] md:gap-[40px] mb-[52px] md:mb-[60px]">
-          <p className="text-[36px] md:text-[52px] text-black text-center" style={STYLE_DISPLAY}>
-            Newsletter Higher
+        {/* Header — left aligned */}
+        <Reveal className="mb-[52px] md:mb-[60px]">
+          <p className="text-[36px] md:text-[52px] text-black" style={STYLE_DISPLAY}>
+            Higher Newsletter
           </p>
-          <p className="text-[18px] md:text-[24px] text-black text-center" style={STYLE_MONO}>
-            Honest writing about growth, leadership and building<br />inside fast-moving companies.
+          <p className="text-[18px] md:text-[24px] text-black mt-[16px] md:mt-[20px]" style={STYLE_MONO}>
+            Honest writing about growth, leadership and building inside fast-moving companies.
           </p>
         </Reveal>
 
-        {/* Subscribe row — desktop/tablet only (shown above articles) */}
-        <Reveal delay={60} className="hidden sm:flex flex-row gap-[10px] items-center justify-center mb-[68px] md:mb-[78px]">
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full sm:w-[403px] text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
-            style={STYLE_DISPLAY}
-          />
-          <SubscribeBtn />
-        </Reveal>
+        {/* Desktop md+: two-column layout */}
+        <div className="hidden md:flex gap-[30px] items-start">
+          {/* Left: banner + subscribe */}
+          <div className="shrink-0 flex flex-col gap-[30px]" style={{ width: "min(808px, 55%)" }}>
+            {/* Banner box */}
+            <div className="overflow-hidden relative" style={{ backgroundColor: "#fff5e9", height: "560px" }}>
+              {/* Arrow burst SVG */}
+              <div style={{ position: "absolute", left: "30px", top: "30px", right: "30px", bottom: "80px" }}>
+                <img src="/newsletter-burst.svg" alt="" style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "bottom center" }} />
+              </div>
+              {/* Keyword tags */}
+              {NEWSLETTER_TAGS.map((tag) => (
+                <div key={tag.label} style={{ position: "absolute", left: tag.left, top: tag.top, backgroundColor: tag.color, padding: "4px 8px" }}>
+                  <p style={{ ...STYLE_MONO, fontSize: "16px", color: "black", whiteSpace: "nowrap" }}>{tag.label}</p>
+                </div>
+              ))}
+              {/* "Higher" wordmark at bottom */}
+              <div style={{ position: "absolute", bottom: "20px", left: "50%", transform: "translateX(-50%)", backgroundColor: "#fff5e9", padding: "6px 12px" }}>
+                <p style={{ ...STYLE_DISPLAY, fontSize: "43px", color: "black", letterSpacing: "-0.86px", whiteSpace: "nowrap" }}>Higher</p>
+              </div>
+            </div>
+            {/* Subscribe row */}
+            <div className="flex gap-[10px] items-center">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] flex-1 text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
+                style={STYLE_DISPLAY}
+              />
+              <SubscribeBtn label="Subscribe to Higher" />
+            </div>
+          </div>
 
-        {/* Mobile carousel — shown before subscribe on small screens */}
-        <NewsletterCarousel articles={NEWSLETTER_ARTICLES} />
-
-        {/* Subscribe row — mobile only (shown after carousel) */}
-        <div className="flex sm:hidden flex-col gap-[10px] items-center justify-center mt-[24px] mb-[68px]">
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
-            style={STYLE_DISPLAY}
-          />
-          <SubscribeBtn />
+          {/* Right: 4 article cards */}
+          <div className="flex-1 min-w-0 flex flex-col gap-[20px]">
+            {NEWSLETTER_ARTICLES.map((article, i) => (
+              <Reveal key={article.title} delay={i * 80}>
+                <HoverCard>
+                  <div className="bg-white flex flex-col p-[10px]">
+                    <div style={{ marginBottom: "-1.372px" }}>
+                      <div className="border-[1.372px] border-black p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
+                        <p className="text-[22px] md:text-[24px] text-black" style={STYLE_DISPLAY}>{article.title}</p>
+                      </div>
+                    </div>
+                    <div className="border-[1.372px] border-black border-t-0 p-[20px] rounded-bl-[8px] rounded-br-[8px] flex flex-col gap-[24px]">
+                      <p className="text-[18px] md:text-[20px] text-black" style={STYLE_MONO}>{article.excerpt}</p>
+                      <div className="bg-[#ffedd7] p-[4px] self-start">
+                        <button className="border border-black rounded-[4px] px-[12px] py-[10px] bg-[#ffedd7] cursor-pointer hover:bg-[#f0e4cf] transition-colors duration-150">
+                          <p className="text-[16px] md:text-[18px] text-black whitespace-nowrap" style={STYLE_MONO}>read now</p>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </HoverCard>
+              </Reveal>
+            ))}
+          </div>
         </div>
 
-        {/* Desktop/tablet grid (md+) */}
-        <div className="hidden md:grid grid-cols-3 gap-[30px]">
-          {NEWSLETTER_ARTICLES.map((article, i) => (
-            <Reveal key={article.title} delay={i * 80}>
-              <HoverCard className="h-full">
-                <div className="bg-white flex flex-col p-[10px] h-full">
-                  <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
-                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                      <p className="text-[20px] md:text-[24px] text-black whitespace-pre-line" style={STYLE_DISPLAY}>{article.title}</p>
-                    </div>
-                  </div>
-                  <div className="border-[1.372px] border-black flex flex-1 flex-col justify-between p-[20px] rounded-bl-[8px] rounded-br-[8px] gap-[20px]">
-                    <p className="text-[16px] md:text-[20px] text-black" style={STYLE_MONO}>{article.excerpt}</p>
-                    <div className="bg-[#ffedd7] p-[4px] self-start">
-                      <button className="border border-black rounded-[4px] px-[12px] py-[10px] bg-[#ffedd7] cursor-pointer hover:bg-[#f0e4cf] transition-colors duration-150">
-                        <p className="text-[16px] md:text-[18px] text-black whitespace-nowrap" style={STYLE_MONO}>read now</p>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </HoverCard>
-            </Reveal>
-          ))}
+        {/* Mobile: stacked */}
+        <div className="md:hidden flex flex-col gap-[24px]">
+          {/* Newsletter carousel */}
+          <NewsletterCarousel articles={NEWSLETTER_ARTICLES} />
+          {/* Subscribe */}
+          <div className="flex flex-col gap-[10px] items-center">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
+              style={STYLE_DISPLAY}
+            />
+            <SubscribeBtn label="Subscribe to Higher" />
+          </div>
         </div>
 
       </div>
@@ -1761,32 +1561,18 @@ function Footer() {
 
 // ── App ───────────────────────────────────────────────────────────────────────
 export default function App() {
-  const [introComplete, setIntroComplete] = useState(false);
-
-  // Prevent body scroll while intro overlay is active
-  useEffect(() => {
-    document.body.style.overflow = introComplete ? "" : "hidden";
-    return () => { document.body.style.overflow = ""; };
-  }, [introComplete]);
-
   return (
-    <>
-      {!introComplete && (
-        <IntroAnimation onComplete={() => setIntroComplete(true)} />
-      )}
-      {/* Page is always rendered (opacity 1) — intro overlay sits on top */}
-      <div className="flex flex-col w-full">
-        <Navbar />
-        <HeroSection />
-        <PartnersSection />
-        <WhatWorkingSection />
-        <AboutSection />
-        <RolesSection />
-        <TestimonialsSection />
-        <NewsletterSection />
-        <CTASection />
-        <Footer />
-      </div>
-    </>
+    <div className="flex flex-col w-full">
+      <Navbar />
+      <HeroSection />
+      <PartnersSection />
+      <WhatWorkingSection />
+      <AboutSection />
+      <RolesSection />
+      <TestimonialsSection />
+      <NewsletterSection />
+      <CTASection />
+      <Footer />
+    </div>
   );
 }
