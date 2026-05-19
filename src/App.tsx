@@ -382,6 +382,48 @@ function Navbar() {
   );
 }
 
+// ── Hero arrows — 3-speed SVG clip animation ──────────────────────────────
+function HeroArrowsSVG({ ready }: { ready: boolean }) {
+  const cx = 627.879, cy = 729.637, r = ready ? 2000 : 0;
+  return (
+    <svg width="100%" height="100%" overflow="visible" viewBox="0 0 1289.02 729.95"
+         fill="black" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
+      <defs>
+        {/* Short arrows grow fast */}
+        <clipPath id="hclip-fast">
+          <circle cx={cx} cy={cy} r={r} style={{ transition: ready ? "r 2s cubic-bezier(0.25,0,0.2,1)" : "none" }} />
+        </clipPath>
+        {/* Medium arrows — mid speed */}
+        <clipPath id="hclip-mid">
+          <circle cx={cx} cy={cy} r={r} style={{ transition: ready ? "r 3.8s cubic-bezier(0.25,0,0.2,1)" : "none" }} />
+        </clipPath>
+        {/* Long arrows grow slow */}
+        <clipPath id="hclip-slow">
+          <circle cx={cx} cy={cy} r={r} style={{ transition: ready ? "r 5.5s cubic-bezier(0.1,0,0.15,1)" : "none" }} />
+        </clipPath>
+      </defs>
+
+      {/* Center dot — always visible */}
+      <path d="M627.879 729.637L627.859 729.948L627.882 729.95L627.905 729.948L627.879 729.637Z" />
+
+      {/* Fast group: arrows 6 (~218px), 4 (~279px), 1 (~316px) */}
+      <g clipPath="url(#hclip-fast)">
+        <path d="M627.879 729.637L628.191 729.626L620.926 513.795L620.614 513.805L620.302 513.816L627.567 729.647L627.879 729.637ZM620.52 511L618.825 514.178L622.424 514.056L620.52 511ZM627.879 729.637L628.165 729.513L517.422 473.951L517.136 474.075L516.85 474.199L627.593 729.761L627.879 729.637ZM516.02 471.5L515.608 475.078L518.912 473.646L516.02 471.5ZM627.879 729.637L628.115 729.432L421.595 491.416L421.359 491.62L421.124 491.824L627.643 729.841L627.879 729.637ZM419.52 489.5L420.204 493.036L422.924 490.676L419.52 489.5Z" />
+      </g>
+
+      {/* Medium group: arrows 2 (~365px), 13 (~390px), 9 (~495px), 8 (~536px) */}
+      <g clipPath="url(#hclip-mid)">
+        <path d="M627.879 729.637L628.057 729.381L329.088 520.783L328.91 521.039L328.731 521.295L627.701 729.893L627.879 729.637ZM326.608 519.433L328.135 522.694L330.196 519.741L326.608 519.433ZM627.879 729.637L627.936 729.33L245.336 658.206L245.279 658.513L245.222 658.82L627.822 729.944L627.879 729.637ZM242.52 658L245.257 660.34L245.915 656.8L242.52 658ZM627.879 729.637L628.016 729.917L1072.64 512.513L1072.5 512.233L1072.36 511.953L627.742 729.357L627.879 729.637ZM1075.02 511L1071.43 510.752L1073.01 513.988L1075.02 511ZM627.879 729.637L628.116 729.839L975.935 322.337L975.697 322.135L975.46 321.932L627.642 729.434L627.879 729.637ZM977.52 320L974.125 321.203L976.864 323.541L977.52 320Z" />
+      </g>
+
+      {/* Slow group: arrows 3 (~588px), 11 (~589px), 14 (~629px), 7 (~655px), 12 (~660px), 5 (~763px), 10 (~806px) */}
+      <g clipPath="url(#hclip-slow)">
+        <path d="M627.879 729.637L627.985 729.344L75.7653 529.661L75.6593 529.954L75.5532 530.248L627.773 729.93L627.879 729.637ZM73.0196 529L75.3402 531.754L76.5648 528.367L73.0196 529ZM627.879 729.637L627.963 729.937L1195.4 572.053L1195.32 571.752L1195.23 571.452L627.795 729.336L627.879 729.637ZM1198.02 571L1194.53 570.101L1195.5 573.571L1198.02 571ZM627.879 729.637L627.899 729.326L0.0392992 689.689L0.0196496 690L0 690.311L627.859 729.948L627.879 729.637ZM627.879 729.637L628.154 729.784L937.468 153.121L937.193 152.974L936.918 152.826L627.604 729.49L627.879 729.637ZM938.52 150.5L935.459 152.397L938.632 154.099L938.52 150.5ZM627.879 729.637L627.905 729.948L1286.25 674.546L1286.22 674.235L1286.2 673.925L627.853 729.326L627.879 729.637ZM1289.02 674L1285.76 672.467L1286.06 676.056L1289.02 674ZM627.879 729.637L628.177 729.729L852.988 2.77372L852.69 2.68158L852.392 2.58943L627.581 729.545L627.879 729.637ZM853.52 0L850.878 2.44755L854.318 3.51151L853.52 0ZM627.879 729.637L628.077 729.878L1251.05 218.522L1250.85 218.281L1250.65 218.04L627.681 729.396L627.879 729.637ZM1253.02 216.5L1249.47 217.087L1251.75 219.871L1253.02 216.5Z" />
+      </g>
+    </svg>
+  );
+}
+
 // ── Hero ──────────────────────────────────────────────────────────────────────
 function HeroSection() {
   const [heroReady, setHeroReady] = useState(false);
@@ -411,15 +453,7 @@ function HeroSection() {
             transform: "translateX(-50%)",
           }}
         >
-          <img
-            src="/hero-arrows.svg"
-            alt=""
-            style={{
-              width: "100%", height: "100%", display: "block",
-              clipPath: heroReady ? "circle(200% at 48.5% 100%)" : "circle(0% at 48.5% 100%)",
-              transition: heroReady ? "clip-path 3.5s cubic-bezier(0,0,0.2,1)" : "none",
-            }}
-          />
+          <HeroArrowsSVG ready={heroReady} />
         </div>
 
         {/* Content — max-width constrained, sits on top of burst */}
@@ -427,14 +461,14 @@ function HeroSection() {
           <div
             className="absolute flex flex-col gap-[40px]"
             style={{
-              left: "30px", top: "129px", width: "950px",
+              left: "30px", top: "103px", width: "950px",
               opacity: heroReady ? 1 : 0,
               transform: heroReady ? "translateY(0)" : "translateY(20px)",
               transition: heroReady ? "opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s" : "none",
             }}
           >
             <p className="text-black" style={{ ...STYLE_DISPLAY, fontSize: "60px", letterSpacing: "-3px", lineHeight: "1.1" }}>
-              A great hire changes the trajectory. That&apos;s the Higher Standard.
+              A great hire changes<br/>the trajectory. That&apos;s<br/>the Higher Standard.
             </p>
             <div style={{ ...STYLE_MONO, fontSize: "28px", lineHeight: "1.1", color: "black" }}>
               <p>I&apos;m Tiffany Philippou, founder of Higher Standard.</p>
@@ -513,7 +547,8 @@ function WhatWorkingSection() {
         <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[103px] pb-[51px]">
           <Reveal>
             <div className="text-[40px] md:text-[44px] text-black" style={STYLE_DISPLAY}>
-              <p>What Higher Standard</p>
+              <p>What</p>
+              <p>Higher Standard</p>
               <p>means in practice</p>
             </div>
           </Reveal>
@@ -793,7 +828,7 @@ function AboutSection() {
         {/* Title */}
         <Reveal>
           <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
-            Where the Higher Standard comes from
+            Where the Higher Standard<br/>comes from
           </p>
         </Reveal>
 
@@ -1350,7 +1385,7 @@ function NewsletterSection() {
         {/* Desktop md+: two-column layout */}
         <div className="hidden md:flex gap-[30px] items-start">
           {/* Left: banner + subscribe */}
-          <div className="shrink-0 flex flex-col gap-[30px]" style={{ width: "min(808px, 55%)" }}>
+          <div className="shrink-0 flex flex-col gap-[30px]" style={{ width: "min(808px, 55%)", position: "sticky", top: "var(--stack-top)", alignSelf: "flex-start" }}>
             {/* Banner box */}
             <div className="overflow-hidden relative" style={{ backgroundColor: "#fff5e9", height: "560px" }}>
               {/* Arrow burst SVG */}
