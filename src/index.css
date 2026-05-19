@@ -32,17 +32,22 @@
     --color-orange: #fb8349;
     --color-dark: #4d453b;
     --color-gray-light: #eaeae5;
-    /* Sticky stacking: top offset per breakpoint */
+    /* Sticky stacking — step = visible card-header height so next card peeks properly */
     --stack-top: 72px;
-    --stack-step: 10px;
-    --stack-gap: 20px;
+    --stack-step: 60px;   /* mobile: title p-[16px] + ~28px text */
+    --stack-gap: 16px;
+  }
+
+  @media (min-width: 768px) {
+    :root {
+      --stack-step: 70px;   /* md: title p-[20px] + ~30px text */
+      --stack-gap: 20px;
+    }
   }
 
   @media (min-width: 1020px) {
     :root {
-      --stack-top: 96px;
-      --stack-step: 16px;
-      --stack-gap: 52px;
+      --stack-top: 96px;    /* taller sticky nav at desktop */
     }
   }
 
