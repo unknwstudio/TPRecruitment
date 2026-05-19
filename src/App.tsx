@@ -394,10 +394,36 @@ function HeroSection() {
     <section className="bg-[#ffedd7] w-full overflow-hidden">
 
       {/* ── Desktop (≥1020px): absolute positions matching Figma exactly ── */}
-      <div className="hidden lg:block relative" style={{ minHeight: "735px" }}>
-        <div className="max-w-[1440px] mx-auto px-[30px] relative" style={{ height: "735px" }}>
+      {/* Figma frame: 1440×821px (incl. nav ~86px). Section = frame minus nav = 735px */}
+      {/* Burst: w=1289px, h=730px, center-x=50%+15.5px (from frame), top=65.5px (from frame) */}
+      {/* → In section coords: top = 65.5-86 ≈ -20px (slightly above section, clipped) */}
+      {/* Content: left=30px, top=215-86=129px, w=799px */}
+      <div className="hidden lg:block relative" style={{ minHeight: "735px", overflow: "hidden" }}>
 
-          {/* Left content: top=129px, w=799px, gap=40px between all three elements */}
+        {/* Burst — full-width positioned, NOT inside max-w container */}
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            left: "calc(50% + 15.5px)",
+            top: "-20px",
+            width: "1289px",
+            height: "730px",
+            transform: "translateX(-50%)",
+          }}
+        >
+          <img
+            src="/hero-arrows.svg"
+            alt=""
+            style={{
+              width: "100%", height: "100%", display: "block",
+              clipPath: heroReady ? "circle(200% at 48.5% 100%)" : "circle(0% at 48.5% 100%)",
+              transition: heroReady ? "clip-path 2.2s cubic-bezier(0,0,0.2,1)" : "none",
+            }}
+          />
+        </div>
+
+        {/* Content — max-width constrained, sits on top of burst */}
+        <div className="max-w-[1440px] mx-auto px-[30px] relative" style={{ height: "735px" }}>
           <div
             className="absolute flex flex-col gap-[40px]"
             style={{
@@ -420,24 +446,8 @@ function HeroSection() {
               </p>
             </OrangeBtn>
           </div>
-
-          {/* Right illustration — animated hero-arrows.svg */}
-          <div
-            className="absolute"
-            style={{ right: "0px", top: "27px", width: "541px", height: "595px" }}
-          >
-            <img
-              src="/hero-arrows.svg"
-              alt=""
-              style={{
-                width: "100%", height: "100%", display: "block",
-                clipPath: heroReady ? "circle(200% at 48.5% 100%)" : "circle(0% at 48.5% 100%)",
-                transition: heroReady ? "clip-path 2.2s cubic-bezier(0,0,0.2,1)" : "none",
-              }}
-            />
-          </div>
-
         </div>
+
       </div>
 
       {/* ── Mobile (<1020px): stacked ── */}
@@ -1365,10 +1375,18 @@ function NewsletterSection() {
             </div>
           </div>
 
-          {/* Right: 4 article cards */}
-          <div className="flex-1 min-w-0 flex flex-col gap-[20px]">
+          {/* Right: 4 article cards — sticky stacking as user scrolls */}
+          <div className="flex-1 min-w-0 flex flex-col">
             {NEWSLETTER_ARTICLES.map((article, i) => (
-              <Reveal key={article.title} delay={i * 80}>
+              <div
+                key={article.title}
+                style={{
+                  position: "sticky",
+                  top: `calc(var(--stack-top) + ${i} * 72px)`,
+                  marginTop: i === 0 ? 0 : "16px",
+                  zIndex: i + 1,
+                }}
+              >
                 <HoverCard>
                   <div className="bg-white flex flex-col p-[10px]">
                     <div style={{ marginBottom: "-1.372px" }}>
@@ -1386,25 +1404,35 @@ function NewsletterSection() {
                     </div>
                   </div>
                 </HoverCard>
-              </Reveal>
+              </div>
             ))}
           </div>
         </div>
 
-        {/* Mobile: stacked */}
-        <div className="md:hidden flex flex-col gap-[24px]">
-          {/* Newsletter carousel */}
-          <NewsletterCarousel articles={NEWSLETTER_ARTICLES} />
-          {/* Subscribe */}
-          <div className="flex flex-col gap-[10px] items-center">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
-              style={STYLE_DISPLAY}
-            />
-            <SubscribeBtn label="Subscribe to Higher" />
+        {/* Mobile: header → burst image + email → carousel */}
+        <div className="md:hidden flex flex-col gap-[28px]">
+          {/* Banner image + subscribe */}
+          <div className="flex flex-col gap-[16px]">
+            <div className="overflow-hidden relative" style={{ backgroundColor: "#fff5e9", height: "240px" }}>
+              <div style={{ position: "absolute", left: "20px", top: "16px", right: "20px", bottom: "56px" }}>
+                <img src="/newsletter-burst.svg" alt="" style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "bottom center" }} />
+              </div>
+              <div style={{ position: "absolute", bottom: "12px", left: "50%", transform: "translateX(-50%)", backgroundColor: "#fff5e9", padding: "4px 10px" }}>
+                <p style={{ ...STYLE_DISPLAY, fontSize: "32px", color: "black", letterSpacing: "-0.64px", whiteSpace: "nowrap" }}>Higher</p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-[10px] items-center">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
+                style={STYLE_DISPLAY}
+              />
+              <SubscribeBtn label="Subscribe to Higher" />
+            </div>
           </div>
+          {/* Article carousel */}
+          <NewsletterCarousel articles={NEWSLETTER_ARTICLES} />
         </div>
 
       </div>
