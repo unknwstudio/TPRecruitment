@@ -132,19 +132,27 @@ function DarkMinusIcon() {
   );
 }
 
-// Orange arrow button (for Roles rows)
-function ArrowBtn({ onClick }: { onClick?: () => void }) {
+// Shared arrow SVG — orange rect + border + horizontal arrow (points right by default).
+// Pass size (default 24) and any extra SVG props (e.g. style for rotation/flip).
+function ArrowSVG({ size = 24, style }: { size?: number; style?: React.CSSProperties }) {
   return (
-    <div
-      onClick={onClick}
-      style={{ backgroundColor: "#fb8349", width: 24, height: 24, flexShrink: 0, position: "relative", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+    <svg
+      width={size} height={size} viewBox="0 0 24 24" fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ flexShrink: 0, display: "block", ...style }}
     >
-      <div style={{ position: "absolute", inset: 0, border: "0.4px solid black", borderRadius: "4px" }} />
-      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ position: "relative" }}>
-        <path d="M2 5H8M6 3L8 5L6 7" stroke="black" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    </div>
+      <rect width="24" height="24" fill="#FB8349"/>
+      <path d="M15.4375 12.3125L7.31251 12.3125" stroke="black" strokeWidth="1.2511" strokeLinejoin="round"/>
+      <path d="M12.3125 8.5625C13.777 10.027 14.598 10.848 16.0625 12.3125L12.3125 16.0625" stroke="black" strokeWidth="1.2511" strokeLinejoin="round"/>
+      <rect x="1.2" y="1.2" width="21.6" height="21.6" rx="3.8" stroke="black" strokeWidth="0.4"/>
+    </svg>
   );
+}
+
+// Orange arrow button (for Roles rows) — kept for potential standalone use
+function ArrowBtn({ onClick }: { onClick?: () => void }) {
+  return <ArrowSVG size={24} style={{ cursor: "pointer" }} />;
+  void onClick; // suppress unused-var lint
 }
 
 function CheckItem({ text, icon = "check" }: { text: string; icon?: "check" | "cross" }) {
@@ -767,17 +775,10 @@ function RoleAccordionRow({
           {role.name}
         </p>
         {/* Arrow rotates 90° when open */}
-        <div style={{
-          backgroundColor: "#fb8349", width: 24, height: 24, flexShrink: 0,
-          position: "relative", display: "flex", alignItems: "center", justifyContent: "center",
+        <ArrowSVG size={24} style={{
           transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
           transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}>
-          <div style={{ position: "absolute", inset: 0, border: "0.4px solid black", borderRadius: "4px" }} />
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ position: "relative" }}>
-            <path d="M2 5H8M6 3L8 5L6 7" stroke="black" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
+        }} />
       </div>
 
       {/* Sub-row — grid 0fr → 1fr slide */}
@@ -1375,15 +1376,11 @@ function TestimonialsCarousel({ testimonials }: { testimonials: typeof TESTIMONI
           {idx + 1} / {total}
         </p>
         <div className="flex gap-[10px]">
-          <button onClick={prev} className="border border-black rounded-[4px] p-[10px] cursor-pointer hover:bg-black/5 transition-colors" aria-label="Previous">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M11 3L5 9L11 15" stroke="black" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          <button onClick={prev} className="cursor-pointer hover:opacity-75 transition-opacity duration-150" aria-label="Previous">
+            <ArrowSVG size={38} style={{ transform: "scaleX(-1)" }} />
           </button>
-          <button onClick={next} className="border border-black rounded-[4px] p-[10px] cursor-pointer hover:bg-black/5 transition-colors" aria-label="Next">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M7 3L13 9L7 15" stroke="black" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          <button onClick={next} className="cursor-pointer hover:opacity-75 transition-opacity duration-150" aria-label="Next">
+            <ArrowSVG size={38} />
           </button>
         </div>
       </div>
@@ -1546,15 +1543,11 @@ function NewsletterCarousel({ articles }: { articles: typeof NEWSLETTER_ARTICLES
       <div className="flex items-center justify-between mt-[16px]">
         <p style={{ ...STYLE_MONO, fontSize: "14px", color: "black" }}>{idx + 1} / {total}</p>
         <div className="flex gap-[10px]">
-          <button onClick={prev} className="border border-black rounded-[4px] p-[10px] cursor-pointer hover:bg-black/5 transition-colors" aria-label="Previous">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M11 3L5 9L11 15" stroke="black" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          <button onClick={prev} className="cursor-pointer hover:opacity-75 transition-opacity duration-150" aria-label="Previous">
+            <ArrowSVG size={38} style={{ transform: "scaleX(-1)" }} />
           </button>
-          <button onClick={next} className="border border-black rounded-[4px] p-[10px] cursor-pointer hover:bg-black/5 transition-colors" aria-label="Next">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M7 3L13 9L7 15" stroke="black" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          <button onClick={next} className="cursor-pointer hover:opacity-75 transition-opacity duration-150" aria-label="Next">
+            <ArrowSVG size={38} />
           </button>
         </div>
       </div>
