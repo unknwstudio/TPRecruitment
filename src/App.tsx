@@ -747,7 +747,7 @@ function RoleAccordionRow({
         marginTop: isFirst ? 0 : "-1.372px",
         zIndex: isOpen ? 10 : (ROLE_ACCORDION_DATA.length - index),
         backgroundColor: bg,
-        transition: "background-color 0.25s ease",
+        transition: "background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
       }}
       onMouseEnter={onOpen}
       onMouseLeave={onClose}
@@ -771,7 +771,7 @@ function RoleAccordionRow({
           backgroundColor: "#fb8349", width: 24, height: 24, flexShrink: 0,
           position: "relative", display: "flex", alignItems: "center", justifyContent: "center",
           transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
-          transition: "transform 0.25s ease",
+          transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
         }}>
           <div style={{ position: "absolute", inset: 0, border: "0.4px solid black", borderRadius: "4px" }} />
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ position: "relative" }}>
@@ -784,13 +784,18 @@ function RoleAccordionRow({
       <div style={{
         display: "grid",
         gridTemplateRows: isOpen ? "1fr" : "0fr",
-        transition: "grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        transition: "grid-template-rows 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
       }}>
-        <div style={{ overflow: "hidden", backgroundColor: bg }}>
+        <div style={{
+          overflow: "hidden",
+          backgroundColor: bg,
+          transition: "background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+        }}>
           <div className="p-[24px] md:p-[30px]" style={{
             border: "1.372px solid black", borderTop: "none",
             borderRadius: isLast ? "0 0 8px 8px" : "0",
             backgroundColor: bg,
+            transition: "background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
           }}>
             <p className="text-[20px] md:text-[24px] text-black" style={STYLE_MONO}>
               {role.items}
