@@ -36,6 +36,9 @@
     --stack-top: 72px;
     --stack-step: 60px;   /* mobile: title p-[16px] + ~28px text */
     --stack-gap: 16px;
+    /* WhatWorking section — 60% bigger peek gap than global */
+    --whatworking-stack-step: 96px;   /* 60px * 1.6 */
+    --whatworking-stack-gap: 26px;    /* 16px * 1.6 */
     /* About section mobile/tablet — connector left offset per Figma (402px vs 744px frame) */
     --about-connector-left: -299px;
   }
@@ -44,6 +47,8 @@
     :root {
       --stack-step: 70px;   /* md: title p-[20px] + ~30px text */
       --stack-gap: 20px;
+      --whatworking-stack-step: 112px;  /* 70px * 1.6 */
+      --whatworking-stack-gap: 32px;    /* 20px * 1.6 */
       --about-connector-left: -141px;   /* tablet: connector shifts right to stay under photo */
     }
   }

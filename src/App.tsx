@@ -554,27 +554,19 @@ function WhatWorkingSection() {
   return (
     <section id="working" className="bg-[#ffedd7] w-full">
 
-      {/* ── Mobile / tablet (up to xl) ── */}
+      {/* ── Mobile / tablet (up to xl) — sequential layout (no sticky stacking; cards are
+           too tall with many items for sticky-stack to work without overflow bleed) ── */}
       <div className="xl:hidden">
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[103px] pb-[51px]">
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[103px] pb-[24px]">
           <Reveal>
             <p className="text-[40px] md:text-[52px] text-black leading-[1.1]" style={{ ...STYLE_DISPLAY, letterSpacing: "-3px" }}>
               What Higher Standard means in practice
             </p>
           </Reveal>
         </div>
-        {/* No pb on this container — pb causes float-away on sticky release */}
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] flex flex-col gap-[20px] pb-[103px]">
           {WORKING_MOBILE_CARDS.map((card, idx) => (
-            <div
-              key={card.title}
-              style={{
-                position: "sticky",
-                top: `calc(var(--stack-top) + ${idx} * var(--stack-step))`,
-                marginTop: idx === 0 ? 0 : "var(--stack-gap)",
-                zIndex: idx + 1,
-              }}
-            >
+            <Reveal key={card.title} delay={idx * 80}>
               <HoverCard>
                 <div className="bg-white flex flex-col p-[10px]">
                   <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
@@ -592,13 +584,9 @@ function WhatWorkingSection() {
                   </div>
                 </div>
               </HoverCard>
-            </div>
+            </Reveal>
           ))}
-          {/* Tiny spacer for brief hold — must be < sticky_top of last card to avoid float-away */}
-          <div style={{ height: "60px" }} />
         </div>
-        {/* Section bottom spacing — outside sticky container so it doesn't affect release */}
-        <div style={{ height: "73px" }} />
       </div>
 
       {/* ── Desktop xl+: title left, two cards right ── */}
@@ -846,6 +834,7 @@ const ABOUT_CARDS = [
 function AboutSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
+  const [aboutScale, setAboutScale] = useState(1);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -858,13 +847,32 @@ function AboutSection() {
     return () => io.disconnect();
   }, []);
 
+  /* Scale the 1440px absolute desktop layout down to fit any viewport ≥ 1000px.
+     Use the section's actual offsetWidth (excludes scrollbar) for accuracy. */
+  useEffect(() => {
+    const el = sectionRef.current;
+    const update = () => setAboutScale(Math.min(1, (el?.offsetWidth ?? window.innerWidth) / 1440));
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   return (
     <section ref={sectionRef} id="about" className="bg-[#ffedd7] w-full pb-[103px] md:pb-[120px]">
 
-      {/* ── Desktop xl+: Figma 607-831 absolute layout ─────────────────────── */}
+      {/* ── Desktop ≥1000px: Figma 607-831 absolute layout, scaled to fit viewport ─ */}
       {/* Layer order: bg photo (DOM 1st) → connector SVG (DOM 2nd) → fg photo (DOM 3rd) → cards */}
       {/* Animation: connector clips L→R (1.5s), bg photo fades (delay 0.7s), fg photo (delay 1.1s), cards stagger (delay 1.5+) */}
-      <div className="hidden min-[1440px]:block">
+      {/* overflowX clips the connector SVG's negative-left bleed without hiding vertical content.
+          marginBottom on the scale div collapses the dead layout space caused by transform not
+          affecting flow, so section pb-[120px] appears right below the visual content. */}
+      <div className="hidden min-[1000px]:block" style={{ overflowX: "hidden" }}>
+        <div style={{
+          width: "1440px",
+          transform: `scale(${aboutScale})`,
+          transformOrigin: "top left",
+          marginBottom: `${-Math.round((1 - aboutScale) * 1350)}px`,
+        }}>
         <div className="max-w-[1440px] mx-auto relative" style={{ minHeight: "1350px" }}>
 
           {/* Title */}
@@ -968,16 +976,52 @@ function AboutSection() {
           </div>
 
         </div>
+        </div>{/* end scale wrapper */}
       </div>
 
-      {/* ── Mobile / tablet (up to xl): Figma 651-197 layout ── */}
-      <div className="min-[1440px]:hidden pt-[103px]">
+      {/* ── Mobile / tablet (<1000px): title + photo + stacking cards ── */}
+      <div className="min-[1000px]:hidden pt-[103px]">
 
         {/* Title */}
         <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[32px]">
           <p className="text-[36px] md:text-[44px] text-black" style={STYLE_DISPLAY}>
             Where the Higher Standard<br/>comes from
           </p>
+        </div>
+
+        {/* Photo — bg + fg layered, centred */}
+        <div className="flex justify-center pb-[40px]" style={{
+          opacity: inView ? 1 : 0,
+          transition: inView ? "opacity 0.8s ease 0.2s" : "none",
+        }}>
+          <div style={{ position: "relative", width: "min(293px, 80vw)", height: "min(293px, 80vw)" }}>
+            {/* Background layer */}
+            <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+              <img
+                src="/tiffany-bg.png"
+                alt=""
+                style={{
+                  position: "absolute", width: "133%", height: "150%",
+                  objectFit: "cover", objectPosition: "center top",
+                  left: "50%", top: "50%",
+                  transform: "translate(-50%, calc(-50% + 4%))",
+                }}
+              />
+            </div>
+            {/* Foreground cutout layer */}
+            <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+              <img
+                src="/tiffany-fg.png"
+                alt="Tiffany Philippou"
+                style={{
+                  position: "absolute", width: "133%", height: "150%",
+                  objectFit: "cover", objectPosition: "center top",
+                  left: "50%", top: "50%",
+                  transform: "translate(-50%, calc(-50% + 4%))",
+                }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Sticky-stacking cards */}
@@ -1372,7 +1416,7 @@ function TestimonialsSection() {
   return (
     <section ref={sectionRef} id="testimonials" className="bg-[#ffedd7] w-full pt-[103px] pb-[61px] overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
-        <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[41px] md:mb-[61px]" style={STYLE_DISPLAY}>
+        <p className="text-[28px] md:text-[44px] lg:text-[52px] text-black mb-[41px] md:mb-[61px]" style={STYLE_DISPLAY}>
           Testimonials
         </p>
 
@@ -1674,8 +1718,8 @@ function CTASection() {
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
         {/* TOP ROW: Headline (left) + Subtitle (right, bottom-aligned on desktop) */}
-        <div className="flex flex-col lg:flex-row lg:items-end gap-[24px] lg:gap-[35px] mb-[52px] lg:mb-[80px]">
-          <Reveal className="lg:shrink-0 lg:w-[655px]">
+        <div className="flex flex-col lg:flex-row lg:items-end gap-[35px] mb-[52px] lg:mb-[80px]">
+          <Reveal className="lg:flex-1 lg:max-w-[655px]">
             <div className="text-[48px] md:text-[52px] lg:text-[60px] text-black" style={STYLE_DISPLAY}>
               Let&apos;s talk
             </div>
@@ -1689,7 +1733,7 @@ function CTASection() {
         </div>
 
         {/* BOTTOM ROW: Contacts (left) + Form (right) */}
-        <div className="flex flex-col lg:flex-row lg:items-start gap-[60px] lg:gap-[35px]">
+        <div className="flex flex-col lg:flex-row lg:items-start gap-[35px]">
 
           {/* Left: contact info */}
           <Reveal className="lg:flex-1 lg:max-w-[655px] flex flex-col gap-[24px] lg:gap-[30px] text-[16px] text-black">
