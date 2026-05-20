@@ -843,7 +843,7 @@ function AboutSection() {
       {/* Layer order: bg photo (DOM 1st) → connector SVG (DOM 2nd) → fg photo (DOM 3rd) → cards */}
       {/* Animation: connector clips L→R (1.5s), bg photo fades (delay 0.7s), fg photo (delay 1.1s), cards stagger (delay 1.5+) */}
       <div className="hidden min-[1440px]:block">
-        <div className="max-w-[1440px] mx-auto relative" style={{ minHeight: "2400px" }}>
+        <div className="max-w-[1440px] mx-auto relative" style={{ minHeight: "1350px" }}>
 
           {/* Title */}
           <div style={{
@@ -885,7 +885,7 @@ function AboutSection() {
               width: "903px", height: "898px",
               pointerEvents: "none",
               clipPath: inView ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)",
-              transition: inView ? "clip-path 1.65s cubic-bezier(0.4, 0, 0.2, 1) 0.4s" : "none",
+              transition: inView ? "clip-path 1.0s cubic-bezier(0.4, 0, 0.2, 1) 0.3s" : "none",
             }}
           >
             <img src="/about-connector.svg" alt="" style={{ width: "100%", height: "100%", display: "block" }} />
@@ -923,7 +923,7 @@ function AboutSection() {
                   opacity: inView ? 1 : 0,
                   transform: inView ? "translateY(0)" : "translateY(24px)",
                   transition: inView
-                    ? `opacity 0.6s ease ${1.5 + i * 0.2}s, transform 0.6s cubic-bezier(0.4,0,0.2,1) ${1.5 + i * 0.2}s`
+                    ? `opacity 0.6s ease ${0.9 + i * 0.12}s, transform 0.6s cubic-bezier(0.4,0,0.2,1) ${0.9 + i * 0.12}s`
                     : "none",
                 }}
               >
@@ -987,7 +987,7 @@ function AboutSection() {
             />
           </div>
 
-          {/* Connector / Union SVG — clips L→R, extends below photo into cards area */}
+          {/* Connector / Union SVG — 2-phase reveal: sweeps L→R then grows down from centre */}
           <div
             aria-hidden="true"
             style={{
@@ -996,8 +996,9 @@ function AboutSection() {
               width: "965px", height: "399px",
               pointerEvents: "none",
               zIndex: 2,
-              clipPath: inView ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)",
-              transition: inView ? "clip-path 1.65s cubic-bezier(0.4, 0, 0.2, 1) 0.4s" : "none",
+              /* When not yet in view, keep fully hidden. Once triggered, the keyframe takes over. */
+              clipPath: inView ? undefined : "inset(0 100% 0 0)",
+              animation: inView ? "mobileConnectorReveal 2.0s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both" : "none",
             }}
           >
             <img src="/about-union.svg" alt="" style={{ width: "100%", height: "100%", display: "block" }} />
@@ -1643,7 +1644,7 @@ function NewsletterSection() {
         <div className="hidden lg:block" style={{ height: "90px" }} />
 
         {/* Tablet md→lg: photo + subscribe + 2×2 card grid */}
-        <div className="hidden md:flex lg:hidden flex-col gap-[28px]">
+        <div className="hidden md:max-lg:flex flex-col gap-[28px]">
           {/* Banner image */}
           <img
             src="/Higher_Photo.png"
