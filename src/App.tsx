@@ -843,7 +843,7 @@ function AboutSection() {
       {/* Layer order: bg photo (DOM 1st) → connector SVG (DOM 2nd) → fg photo (DOM 3rd) → cards */}
       {/* Animation: connector clips L→R (1.5s), bg photo fades (delay 0.7s), fg photo (delay 1.1s), cards stagger (delay 1.5+) */}
       <div className="hidden min-[1440px]:block">
-        <div className="max-w-[1440px] mx-auto relative" style={{ minHeight: "1300px" }}>
+        <div className="max-w-[1440px] mx-auto relative" style={{ minHeight: "2400px" }}>
 
           {/* Title */}
           <div style={{
@@ -958,16 +958,19 @@ function AboutSection() {
           </p>
         </div>
 
-        {/* Photo + connector illustration — Figma 651-197 measurements (402px frame) */}
-        <div style={{ position: "relative", height: "461px", overflow: "hidden" }}>
+        {/* Photo + connector — Figma 651-197 (402px frame).
+            clip-path clips L/R edges but allows connector to overflow DOWN into cards area.
+            inset(top right bottom left): bottom=-1000px means no vertical clip below. */}
+        <div style={{ position: "relative", height: "461px", clipPath: "inset(0 0 -1000px 0)" }}>
 
-          {/* Photo — background layer (fades in first) */}
+          {/* Photo — background layer */}
           <div style={{
             position: "absolute",
             left: "50%", top: "113px",
             width: "293px", height: "293px",
             transform: "translateX(-50%)",
             overflow: "hidden",
+            zIndex: 1,
             opacity: inView ? 1 : 0,
             transition: inView ? "opacity 0.88s ease 0.7s" : "none",
           }}>
@@ -984,7 +987,7 @@ function AboutSection() {
             />
           </div>
 
-          {/* Connector / Union SVG — clips L→R (same animation as desktop) */}
+          {/* Connector / Union SVG — clips L→R, extends below photo into cards area */}
           <div
             aria-hidden="true"
             style={{
@@ -992,6 +995,7 @@ function AboutSection() {
               left: "-299px", top: "304px",
               width: "965px", height: "399px",
               pointerEvents: "none",
+              zIndex: 2,
               clipPath: inView ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)",
               transition: inView ? "clip-path 1.65s cubic-bezier(0.4, 0, 0.2, 1) 0.4s" : "none",
             }}
@@ -999,13 +1003,14 @@ function AboutSection() {
             <img src="/about-union.svg" alt="" style={{ width: "100%", height: "100%", display: "block" }} />
           </div>
 
-          {/* Photo — foreground layer (above connector, fades in after it draws) */}
+          {/* Photo — foreground layer, above connector */}
           <div style={{
             position: "absolute",
             left: "50%", top: "113px",
             width: "293px", height: "293px",
             transform: "translateX(-50%)",
             overflow: "hidden",
+            zIndex: 3,
             opacity: inView ? 1 : 0,
             transition: inView ? "opacity 0.88s ease 1.1s" : "none",
           }}>
@@ -1024,8 +1029,8 @@ function AboutSection() {
 
         </div>
 
-        {/* Sticky-stacking cards with staggered entrance animation */}
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
+        {/* Sticky-stacking cards — z-index:1 sits above the connector SVG's overflow */}
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]" style={{ position: "relative", zIndex: 1 }}>
           {ABOUT_CARDS.map((card, idx) => (
             <div
               key={card.id}
@@ -1637,8 +1642,55 @@ function NewsletterSection() {
         {/* Extra 90px below the columns (+30% hold before section exits) */}
         <div className="hidden lg:block" style={{ height: "90px" }} />
 
-        {/* Mobile: header → photo → field+button → carousel */}
-        <div className="lg:hidden flex flex-col gap-[28px]">
+        {/* Tablet md→lg: photo + subscribe + 2×2 card grid */}
+        <div className="hidden md:flex lg:hidden flex-col gap-[28px]">
+          {/* Banner image */}
+          <img
+            src="/Higher_Photo.png"
+            alt=""
+            style={{ width: "100%", height: "360px", objectFit: "cover", display: "block" }}
+          />
+          {/* Subscribe row */}
+          <div className="flex flex-row items-center" style={{ gap: "12px" }}>
+            <input
+              type="email"
+              placeholder="Email"
+              className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] flex-1 min-w-0 text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
+              style={STYLE_DISPLAY}
+            />
+            <SubscribeBtn label="Subscribe to Higher" />
+          </div>
+          {/* 2×2 article card grid */}
+          <div className="grid grid-cols-2 gap-[16px]">
+            {NEWSLETTER_ARTICLES.map((article) => (
+              <HoverCard key={article.title} style={{ height: "100%" }}>
+                <div className="bg-white flex flex-col p-[10px] h-full">
+                  <div style={{ marginBottom: "-1.372px" }}>
+                    <div className="border-[1.372px] border-black p-[16px] rounded-tl-[8px] rounded-tr-[8px]">
+                      <p className="text-[18px] text-black" style={STYLE_DISPLAY}>{article.title}</p>
+                    </div>
+                  </div>
+                  <div className="border-[1.372px] border-black border-t-0 p-[16px] rounded-bl-[8px] rounded-br-[8px] flex flex-col gap-[16px] flex-1">
+                    <p className="text-[14px] text-black flex-1" style={STYLE_MONO}>{article.excerpt}</p>
+                    <div className="bg-[#ffedd7] p-[4px] self-start">
+                      <a
+                        href={article.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="border border-black rounded-[4px] px-[10px] py-[8px] bg-[#ffedd7] hover:bg-[#f0e4cf] transition-colors duration-150 inline-block"
+                      >
+                        <p className="text-[14px] text-black whitespace-nowrap" style={STYLE_MONO}>read now</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </HoverCard>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile <md: photo → subscribe row → carousel */}
+        <div className="md:hidden flex flex-col gap-[28px]">
           {/* Banner image */}
           <img
             src="/Higher_Photo.png"
@@ -1649,7 +1701,7 @@ function NewsletterSection() {
           <div className="flex flex-row items-center" style={{ gap: "12px" }}>
             <input
               type="email"
-              placeholder="Enter your email"
+              placeholder="Email"
               className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] flex-1 min-w-0 text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
               style={STYLE_DISPLAY}
             />
