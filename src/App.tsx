@@ -554,27 +554,19 @@ function WhatWorkingSection() {
   return (
     <section id="working" className="bg-[#ffedd7] w-full">
 
-      {/* ── Mobile / tablet (up to xl) ── */}
+      {/* ── Mobile / tablet (up to xl) — sequential layout (no sticky stacking; cards are
+           too tall with many items for sticky-stack to work without overflow bleed) ── */}
       <div className="xl:hidden">
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[103px] pb-[51px]">
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[103px] pb-[24px]">
           <Reveal>
             <p className="text-[40px] md:text-[52px] text-black leading-[1.1]" style={{ ...STYLE_DISPLAY, letterSpacing: "-3px" }}>
               What Higher Standard means in practice
             </p>
           </Reveal>
         </div>
-        {/* No pb on this container — pb causes float-away on sticky release */}
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] flex flex-col gap-[20px] pb-[103px]">
           {WORKING_MOBILE_CARDS.map((card, idx) => (
-            <div
-              key={card.title}
-              style={{
-                position: "sticky",
-                top: `calc(var(--stack-top) + ${idx} * var(--whatworking-stack-step))`,
-                marginTop: idx === 0 ? 0 : "var(--whatworking-stack-gap)",
-                zIndex: idx + 1,
-              }}
-            >
+            <Reveal key={card.title} delay={idx * 80}>
               <HoverCard>
                 <div className="bg-white flex flex-col p-[10px]">
                   <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
@@ -592,13 +584,9 @@ function WhatWorkingSection() {
                   </div>
                 </div>
               </HoverCard>
-            </div>
+            </Reveal>
           ))}
-          {/* Tiny spacer for brief hold — must be < sticky_top of last card to avoid float-away */}
-          <div style={{ height: "60px" }} />
         </div>
-        {/* Section bottom spacing — outside sticky container so it doesn't affect release */}
-        <div style={{ height: "73px" }} />
       </div>
 
       {/* ── Desktop xl+: title left, two cards right ── */}
@@ -846,6 +834,7 @@ const ABOUT_CARDS = [
 function AboutSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
+  const [aboutScale, setAboutScale] = useState(1);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -858,13 +847,23 @@ function AboutSection() {
     return () => io.disconnect();
   }, []);
 
+  /* Scale the 1440px absolute desktop layout down to fit any viewport ≥ 1000px */
+  useEffect(() => {
+    const update = () => setAboutScale(Math.min(1, window.innerWidth / 1440));
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   return (
     <section ref={sectionRef} id="about" className="bg-[#ffedd7] w-full pb-[103px] md:pb-[120px]">
 
-      {/* ── Desktop xl+: Figma 607-831 absolute layout ─────────────────────── */}
+      {/* ── Desktop ≥1000px: Figma 607-831 absolute layout, scaled to fit viewport ─ */}
       {/* Layer order: bg photo (DOM 1st) → connector SVG (DOM 2nd) → fg photo (DOM 3rd) → cards */}
       {/* Animation: connector clips L→R (1.5s), bg photo fades (delay 0.7s), fg photo (delay 1.1s), cards stagger (delay 1.5+) */}
-      <div className="hidden min-[1440px]:block">
+      <div className="hidden min-[1000px]:block overflow-hidden"
+           style={{ minHeight: `${Math.round(1350 * aboutScale)}px` }}>
+        <div style={{ width: "1440px", transform: `scale(${aboutScale})`, transformOrigin: "top left" }}>
         <div className="max-w-[1440px] mx-auto relative" style={{ minHeight: "1350px" }}>
 
           {/* Title */}
@@ -968,10 +967,11 @@ function AboutSection() {
           </div>
 
         </div>
+        </div>{/* end scale wrapper */}
       </div>
 
-      {/* ── Mobile / tablet (up to xl): Figma 651-197 layout ── */}
-      <div className="min-[1440px]:hidden pt-[103px]">
+      {/* ── Mobile / tablet (<1000px): title + photo + stacking cards ── */}
+      <div className="min-[1000px]:hidden pt-[103px]">
 
         {/* Title */}
         <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[32px]">
