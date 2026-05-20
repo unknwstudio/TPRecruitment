@@ -104,3 +104,10 @@
 .animate-burst-grow {
   animation: burst-grow 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+/* Mobile About connector: sweeps L→R across top half, then grows down */
+@keyframes mobileConnectorReveal {
+  0%   { clip-path: inset(0 100% 50% 0); }   /* fully hidden */
+  40%  { clip-path: inset(0 0%   50% 0); }   /* L→R sweep done, bottom half still hidden */
+  100% { clip-path: inset(0 0%   0%  0); }   /* grows down — fully visible */
+}
