@@ -570,8 +570,8 @@ function WhatWorkingSection() {
               key={card.title}
               style={{
                 position: "sticky",
-                top: `calc(var(--stack-top) + ${idx} * var(--stack-step))`,
-                marginTop: idx === 0 ? 0 : "var(--stack-gap)",
+                top: `calc(var(--stack-top) + ${idx} * var(--whatworking-stack-step))`,
+                marginTop: idx === 0 ? 0 : "var(--whatworking-stack-gap)",
                 zIndex: idx + 1,
               }}
             >
@@ -980,6 +980,41 @@ function AboutSection() {
           </p>
         </div>
 
+        {/* Photo — bg + fg layered, centred */}
+        <div className="flex justify-center pb-[40px]" style={{
+          opacity: inView ? 1 : 0,
+          transition: inView ? "opacity 0.8s ease 0.2s" : "none",
+        }}>
+          <div style={{ position: "relative", width: "min(293px, 80vw)", height: "min(293px, 80vw)" }}>
+            {/* Background layer */}
+            <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+              <img
+                src="/tiffany-bg.png"
+                alt=""
+                style={{
+                  position: "absolute", width: "133%", height: "150%",
+                  objectFit: "cover", objectPosition: "center top",
+                  left: "50%", top: "50%",
+                  transform: "translate(-50%, calc(-50% + 4%))",
+                }}
+              />
+            </div>
+            {/* Foreground cutout layer */}
+            <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+              <img
+                src="/tiffany-fg.png"
+                alt="Tiffany Philippou"
+                style={{
+                  position: "absolute", width: "133%", height: "150%",
+                  objectFit: "cover", objectPosition: "center top",
+                  left: "50%", top: "50%",
+                  transform: "translate(-50%, calc(-50% + 4%))",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Sticky-stacking cards */}
         <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
           {ABOUT_CARDS.map((card, idx) => (
@@ -1372,7 +1407,7 @@ function TestimonialsSection() {
   return (
     <section ref={sectionRef} id="testimonials" className="bg-[#ffedd7] w-full pt-[103px] pb-[61px] overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
-        <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[41px] md:mb-[61px]" style={STYLE_DISPLAY}>
+        <p className="text-[28px] md:text-[44px] lg:text-[52px] text-black mb-[41px] md:mb-[61px]" style={STYLE_DISPLAY}>
           Testimonials
         </p>
 
