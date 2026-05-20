@@ -391,15 +391,15 @@ function HeroArrowsSVG({ ready }: { ready: boolean }) {
       <defs>
         {/* Short arrows grow fast */}
         <clipPath id="hclip-fast">
-          <circle cx={cx} cy={cy} r={r} style={{ transition: ready ? "r 2s cubic-bezier(0.25,0,0.2,1)" : "none" }} />
+          <circle cx={cx} cy={cy} r={r} style={{ transition: ready ? "r 2.4s cubic-bezier(0.25,0,0.2,1)" : "none" }} />
         </clipPath>
         {/* Medium arrows — mid speed */}
         <clipPath id="hclip-mid">
-          <circle cx={cx} cy={cy} r={r} style={{ transition: ready ? "r 3.8s cubic-bezier(0.25,0,0.2,1)" : "none" }} />
+          <circle cx={cx} cy={cy} r={r} style={{ transition: ready ? "r 4.56s cubic-bezier(0.25,0,0.2,1)" : "none" }} />
         </clipPath>
         {/* Long arrows grow slow */}
         <clipPath id="hclip-slow">
-          <circle cx={cx} cy={cy} r={r} style={{ transition: ready ? "r 5.5s cubic-bezier(0.1,0,0.15,1)" : "none" }} />
+          <circle cx={cx} cy={cy} r={r} style={{ transition: ready ? "r 6.6s cubic-bezier(0.1,0,0.15,1)" : "none" }} />
         </clipPath>
       </defs>
 
@@ -447,7 +447,7 @@ function HeroSection() {
           className="absolute pointer-events-none"
           style={{
             left: "calc(50% + 15.5px)",
-            top: "-20px",
+            top: "0",
             width: "1289px",
             height: "730px",
             transform: "translateX(-50%)",
@@ -467,8 +467,8 @@ function HeroSection() {
               transition: heroReady ? "opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s" : "none",
             }}
           >
-            <p className="text-black" style={{ ...STYLE_DISPLAY, fontSize: "60px", letterSpacing: "-3px", lineHeight: "1.1" }}>
-              A great hire changes<br/>the trajectory. That&apos;s<br/>the Higher Standard.
+            <p className="text-black" style={{ ...STYLE_DISPLAY, fontSize: "60px", letterSpacing: "-5.5px", lineHeight: "1.1" }}>
+              A great hire changes the trajectory. That&apos;s the Higher Standard.
             </p>
             <div style={{ ...STYLE_MONO, fontSize: "28px", lineHeight: "1.1", color: "black" }}>
               <p>I&apos;m Tiffany Philippou, founder of Higher Standard.</p>
@@ -488,7 +488,7 @@ function HeroSection() {
       <div className="lg:hidden px-[16px] md:px-[30px] pt-[46px] pb-[61px]">
         <div className="flex flex-col gap-[40px]">
           <Reveal>
-            <p style={{ ...STYLE_DISPLAY, fontSize: "clamp(36px, 10vw, 48px)", letterSpacing: "-2px", lineHeight: "1.1", color: "black" }}>
+            <p style={{ ...STYLE_DISPLAY, fontSize: "clamp(36px, 10vw, 48px)", letterSpacing: "-3px", lineHeight: "1.1", color: "black" }}>
               A great hire changes the trajectory. That&apos;s the Higher Standard.
             </p>
           </Reveal>
@@ -546,7 +546,7 @@ function WhatWorkingSection() {
       <div className="xl:hidden">
         <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[103px] pb-[51px]">
           <Reveal>
-            <div className="text-[40px] md:text-[44px] text-black" style={STYLE_DISPLAY}>
+            <div className="text-[40px] md:text-[44px] text-black" style={{ ...STYLE_DISPLAY, letterSpacing: "-3.5px" }}>
               <p>What</p>
               <p>Higher Standard</p>
               <p>means in practice</p>
@@ -588,7 +588,8 @@ function WhatWorkingSection() {
             </div>
             );
           })}
-          <div style={{ height: "80px" }} />
+          {/* Spacer = last-card minHeight so the stack stays stable until it fully exits */}
+          <div style={{ height: "calc(100vh - var(--stack-top) - 1 * var(--stack-step))" }} />
         </div>
       </div>
 
@@ -600,7 +601,7 @@ function WhatWorkingSection() {
         {/* Left: sticky title — 675px (matches right card width exactly) */}
         <div style={{ width: "675px", maxWidth: "675px", flexShrink: 0, position: "sticky", top: "var(--stack-top)" }}>
           <Reveal>
-            <div className="text-[52px] text-black" style={STYLE_DISPLAY}>
+            <div className="text-[52px] text-black" style={{ ...STYLE_DISPLAY, letterSpacing: "-3.5px" }}>
               <p>What</p>
               <p>Higher Standard</p>
               <p>means in practice</p>
@@ -821,81 +822,188 @@ const ABOUT_CARDS = [
 ];
 
 function AboutSection() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); io.disconnect(); } },
+      { threshold: 0.2 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <section id="about" className="bg-[#ffedd7] w-full py-[103px]">
-      <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
+    <section ref={sectionRef} id="about" className="bg-[#ffedd7] w-full pb-[103px] md:pb-[120px]">
 
-        {/* Title */}
-        <Reveal>
-          <p className="text-[36px] md:text-[44px] lg:text-[52px] text-black mb-[48px] md:mb-[72px]" style={STYLE_DISPLAY}>
-            Where the Higher Standard<br/>comes from
-          </p>
-        </Reveal>
+      {/* ── Desktop xl+: Figma 607-831 absolute layout ─────────────────────── */}
+      {/* Layer order: bg photo (DOM 1st) → connector SVG (DOM 2nd) → fg photo (DOM 3rd) → cards */}
+      {/* Animation: connector clips L→R (1.5s), bg photo fades (delay 0.7s), fg photo (delay 1.1s), cards stagger (delay 1.5+) */}
+      <div className="hidden xl:block">
+        <div className="max-w-[1440px] mx-auto relative" style={{ minHeight: "1300px" }}>
 
-        {/* Desktop xl+: two-column — left photo, right cards */}
-        <div className="hidden xl:flex gap-[60px] items-start">
-          {/* Left: photo with decorative union shape */}
-          <div className="shrink-0 relative" style={{ width: "340px" }}>
-            {/* Decorative wing shape behind photo */}
-            <div style={{ position: "absolute", left: "-140px", top: "60px", width: "480px", opacity: 0.18, pointerEvents: "none" }}>
-              <img src="/about-union.svg" alt="" style={{ width: "100%", height: "auto" }} />
-            </div>
-            <Reveal>
-              <div style={{ width: "280px", aspectRatio: "1", overflow: "hidden", border: "0.635px solid #4D453B", position: "relative" }}>
-                <img src="/tiffany.png" alt="Tiffany Philippou" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
-              </div>
-              <p style={{ ...STYLE_DISPLAY, fontSize: 24, color: "black", letterSpacing: "-1.2px", marginTop: "16px" }}>Tiffany Philippou</p>
-            </Reveal>
+          {/* Title */}
+          <div style={{
+            position: "absolute", left: "30px", top: "50px",
+            opacity: inView ? 1 : 0,
+            transform: inView ? "translateY(0)" : "translateY(20px)",
+            transition: inView ? "opacity 0.66s ease 0.22s, transform 0.66s ease 0.22s" : "none",
+          }}>
+            <p className="text-[52px] text-black" style={STYLE_DISPLAY}>
+              Where the Higher Standard<br/>comes from
+            </p>
           </div>
 
-          {/* Right: 5 stacked cards */}
-          <div className="flex-1 min-w-0 flex flex-col gap-[20px]">
+          {/* Photo — background layer (peach bg, below connector) */}
+          <div style={{
+            position: "absolute", left: "111px", top: "605px",
+            width: "293px", height: "293px", overflow: "hidden",
+            opacity: inView ? 1 : 0,
+            transition: inView ? "opacity 0.88s ease 0.77s" : "none",
+          }}>
+            <img
+              src="/tiffany-bg.png"
+              alt=""
+              style={{
+                position: "absolute",
+                width: "390px", height: "439px",
+                objectFit: "cover", objectPosition: "center top",
+                left: "50%", top: "50%",
+                transform: "translate(-50%, calc(-50% + 13px))",
+              }}
+            />
+          </div>
+
+          {/* Connector SVG — clips left-to-right over 1.5s (middle layer, over bg photo) */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute", left: "-233px", top: "290px",
+              width: "903px", height: "898px",
+              pointerEvents: "none",
+              clipPath: inView ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)",
+              transition: inView ? "clip-path 1.65s cubic-bezier(0.4, 0, 0.2, 1) 0.33s" : "none",
+            }}
+          >
+            <img src="/about-connector.svg" alt="" style={{ width: "100%", height: "100%", display: "block" }} />
+          </div>
+
+          {/* Photo — foreground layer (cutout, no bg, above connector) */}
+          <div style={{
+            position: "absolute", left: "111px", top: "605px",
+            width: "293px", height: "293px", overflow: "hidden",
+            opacity: inView ? 1 : 0,
+            transition: inView ? "opacity 0.88s ease 1.21s" : "none",
+          }}>
+            <img
+              src="/tiffany-fg.png"
+              alt="Tiffany Philippou"
+              style={{
+                position: "absolute",
+                width: "390px", height: "439px",
+                objectFit: "cover", objectPosition: "center top",
+                left: "50%", top: "50%",
+                transform: "translate(-50%, calc(-50% + 13px))",
+              }}
+            />
+          </div>
+
+          {/* Cards column — stagger in from top as connector animation completes */}
+          <div style={{
+            position: "absolute", left: "670px", top: "168px",
+            width: "740px", display: "flex", flexDirection: "column", gap: "30px",
+          }}>
             {ABOUT_CARDS.map((card, i) => (
-              <Reveal key={card.id} delay={i * 80}>
+              <div
+                key={card.id}
+                style={{
+                  opacity: inView ? 1 : 0,
+                  transform: inView ? "translateY(0)" : "translateY(24px)",
+                  transition: inView
+                    ? `opacity 0.6s ease ${1.65 + i * 0.2}s, transform 0.6s cubic-bezier(0.4,0,0.2,1) ${1.65 + i * 0.2}s`
+                    : "none",
+                }}
+              >
                 <div className="bg-white p-[10px]">
                   <div style={{ marginBottom: "-1.372px" }}>
                     <div className="border-[1.372px] border-black p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                      <p className="text-[28px] xl:text-[32px] text-black" style={{ ...STYLE_DISPLAY, lineHeight: 1.08 }}>{card.title}</p>
+                      <p className="text-[32px] text-black" style={{ ...STYLE_DISPLAY, letterSpacing: "-0.96px" }}>
+                        {card.title}
+                      </p>
                     </div>
                   </div>
                   <div className="border-[1.372px] border-black border-t-0 p-[20px] rounded-bl-[8px] rounded-br-[8px]">
-                    <p className="text-[18px] xl:text-[20px] text-black whitespace-pre-line" style={{ ...STYLE_MONO, lineHeight: 1.1 }}>{card.body}</p>
+                    <p className="text-[20px] text-black whitespace-pre-line" style={STYLE_MONO}>
+                      {card.body}
+                    </p>
                   </div>
                 </div>
-              </Reveal>
+              </div>
             ))}
           </div>
-        </div>
 
-        {/* Mobile/tablet: stack */}
-        <div className="xl:hidden flex flex-col gap-[32px]">
+        </div>
+      </div>
+
+      {/* ── Mobile / tablet (up to xl): title + photo + sticky-stacking cards ── */}
+      <div className="xl:hidden pt-[103px]">
+
+        {/* Title + photo — scroll normally */}
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[48px]">
+          <Reveal>
+            <p className="text-[36px] md:text-[44px] text-black mb-[48px] md:mb-[56px]" style={STYLE_DISPLAY}>
+              Where the Higher Standard<br/>comes from
+            </p>
+          </Reveal>
           <Reveal>
             <div className="flex flex-col items-center gap-[12px]">
               <div style={{ width: "min(260px, 70vw)", aspectRatio: "1", overflow: "hidden", border: "0.635px solid #4D453B" }}>
-                <img src="/tiffany.png" alt="Tiffany Philippou" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
+                <img src="/tiffany-bg.png" alt="Tiffany Philippou" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
               </div>
               <p style={{ ...STYLE_DISPLAY, fontSize: 24, color: "black", letterSpacing: "-1.2px" }}>Tiffany Philippou</p>
             </div>
           </Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
-            {ABOUT_CARDS.map((card, i) => (
-              <Reveal key={card.id} delay={i * 80}>
-                <div className="bg-white p-[10px]">
-                  <div style={{ marginBottom: "-1.372px" }}>
-                    <div className="border-[1.372px] border-black p-[16px] md:p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                      <p className="text-[22px] md:text-[26px] text-black" style={{ ...STYLE_DISPLAY, lineHeight: 1.08 }}>{card.title}</p>
+        </div>
+
+        {/* Sticky-stacking cards */}
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[73px]">
+          {ABOUT_CARDS.map((card, idx) => {
+            const isLast = idx === ABOUT_CARDS.length - 1;
+            return (
+              <div
+                key={card.id}
+                style={{
+                  position: "sticky",
+                  top: `calc(var(--stack-top) + ${idx} * var(--stack-step))`,
+                  marginTop: idx === 0 ? 0 : "var(--stack-gap)",
+                  zIndex: idx + 1,
+                  ...(isLast && { minHeight: `calc(100vh - var(--stack-top) - ${idx} * var(--stack-step))` }),
+                }}
+              >
+                <HoverCard>
+                  <div className="bg-white flex flex-col p-[10px]">
+                    <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
+                      <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] md:p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
+                        <p className="text-[20px] md:text-[24px] text-black" style={STYLE_DISPLAY}>{card.title}</p>
+                      </div>
+                    </div>
+                    <div className="border-[1.372px] border-black p-[16px] md:p-[20px] rounded-bl-[8px] rounded-br-[8px]">
+                      <p className="text-[15px] md:text-[16px] text-black whitespace-pre-line" style={{ ...STYLE_MONO, lineHeight: 1.1 }}>{card.body}</p>
                     </div>
                   </div>
-                  <div className="border-[1.372px] border-black border-t-0 p-[16px] md:p-[20px] rounded-bl-[8px] rounded-br-[8px]">
-                    <p className="text-[15px] md:text-[16px] text-black whitespace-pre-line" style={{ ...STYLE_MONO, lineHeight: 1.1 }}>{card.body}</p>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
+                </HoverCard>
+              </div>
+            );
+          })}
+          {/* Spacer = last-card minHeight so stack stays stable until it fully exits */}
+          <div style={{ height: "calc(100vh - var(--stack-top) - 4 * var(--stack-step))" }} />
         </div>
 
       </div>
+
     </section>
   );
 }
@@ -912,9 +1020,11 @@ function RolesSection() {
           </p>
         </Reveal>
 
-        <div className="flex flex-col xl:flex-row gap-[30px] items-start">
-          {/* Left: accordion role list */}
-          <Reveal className="xl:w-[671px] xl:shrink-0 w-full xl:order-1 order-2">
+        {/* xl desktop: row with stretch — left accordion, right column justified */}
+        <div className="flex flex-col xl:flex-row xl:gap-[30px] xl:items-stretch gap-[30px] items-start">
+
+          {/* Left: accordion */}
+          <Reveal className="xl:w-[671px] xl:shrink-0 w-full xl:order-1 order-1">
             <div className="bg-white p-[10px]">
               {ROLE_ACCORDION_DATA.map((role, i) => (
                 <RoleAccordionRow
@@ -932,19 +1042,34 @@ function RolesSection() {
             </div>
           </Reveal>
 
-          {/* Right: description + CTA */}
-          <Reveal delay={100} className="flex-1 flex flex-col gap-[30px] md:gap-[40px] xl:order-2 order-1">
+          {/* Right: description text (mobile order 2, xl order 2 with justify-between) */}
+          <Reveal
+            delay={100}
+            className="flex-1 xl:order-2 order-2 xl:flex xl:flex-col xl:justify-between"
+          >
             <p className="text-[18px] md:text-[24px] xl:text-[28px] text-black" style={STYLE_MONO}>
               {ROLES_DESCRIPTION}
             </p>
+            {/* Desktop button — bottom of right column, justified */}
+            <div className="hidden xl:block mt-[40px]">
+              <OrangeBtn onClick={scrollToContact}>
+                <p className="text-[18px] md:text-[20px] xl:text-[24px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
+                  Start working together
+                </p>
+              </OrangeBtn>
+            </div>
+          </Reveal>
+
+          {/* Mobile-only button — after accordion (order 3) */}
+          <div className="xl:hidden order-3 w-full">
             <OrangeBtn onClick={scrollToContact}>
-              <p className="text-[18px] md:text-[20px] xl:text-[24px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
+              <p className="text-[18px] md:text-[20px] leading-[20px] text-black whitespace-nowrap" style={STYLE_MONO}>
                 Start working together
               </p>
             </OrangeBtn>
-          </Reveal>
-        </div>
+          </div>
 
+        </div>
       </div>
     </section>
   );
@@ -1398,9 +1523,9 @@ function NewsletterSection() {
                   <p style={{ ...STYLE_MONO, fontSize: "16px", color: "black", whiteSpace: "nowrap" }}>{tag.label}</p>
                 </div>
               ))}
-              {/* "Higher" wordmark at bottom */}
+              {/* "Higher" wordmark at bottom — image */}
               <div style={{ position: "absolute", bottom: "20px", left: "50%", transform: "translateX(-50%)", backgroundColor: "#fff5e9", padding: "6px 12px" }}>
-                <p style={{ ...STYLE_DISPLAY, fontSize: "43px", color: "black", letterSpacing: "-0.86px", whiteSpace: "nowrap" }}>Higher</p>
+                <img src="/nav-logo-sm.svg" alt="Higher" style={{ height: "43px", width: "auto", display: "block" }} />
               </div>
             </div>
             {/* Subscribe row */}
@@ -1451,6 +1576,8 @@ function NewsletterSection() {
               </div>
               );
             })}
+            {/* Spacer = last-card minHeight so stack stays stable until it fully exits */}
+            <div style={{ height: "calc(100vh - var(--stack-top) - 3 * var(--stack-step))" }} />
           </div>
         </div>
 
@@ -1462,7 +1589,7 @@ function NewsletterSection() {
               <img src="/newsletter-burst.svg" alt="" style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "bottom center" }} />
             </div>
             <div style={{ position: "absolute", bottom: "12px", left: "50%", transform: "translateX(-50%)", backgroundColor: "#fff5e9", padding: "4px 10px" }}>
-              <p style={{ ...STYLE_DISPLAY, fontSize: "32px", color: "black", letterSpacing: "-0.64px", whiteSpace: "nowrap" }}>Higher</p>
+              <img src="/nav-logo-sm.svg" alt="Higher" style={{ height: "32px", width: "auto", display: "block" }} />
             </div>
           </div>
           {/* Article carousel */}
