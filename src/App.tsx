@@ -847,9 +847,11 @@ function AboutSection() {
     return () => io.disconnect();
   }, []);
 
-  /* Scale the 1440px absolute desktop layout down to fit any viewport ≥ 1000px */
+  /* Scale the 1440px absolute desktop layout down to fit any viewport ≥ 1000px.
+     Use the section's actual offsetWidth (excludes scrollbar) for accuracy. */
   useEffect(() => {
-    const update = () => setAboutScale(Math.min(1, window.innerWidth / 1440));
+    const el = sectionRef.current;
+    const update = () => setAboutScale(Math.min(1, (el?.offsetWidth ?? window.innerWidth) / 1440));
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
@@ -861,9 +863,16 @@ function AboutSection() {
       {/* ── Desktop ≥1000px: Figma 607-831 absolute layout, scaled to fit viewport ─ */}
       {/* Layer order: bg photo (DOM 1st) → connector SVG (DOM 2nd) → fg photo (DOM 3rd) → cards */}
       {/* Animation: connector clips L→R (1.5s), bg photo fades (delay 0.7s), fg photo (delay 1.1s), cards stagger (delay 1.5+) */}
-      <div className="hidden min-[1000px]:block overflow-hidden"
-           style={{ minHeight: `${Math.round(1350 * aboutScale)}px` }}>
-        <div style={{ width: "1440px", transform: `scale(${aboutScale})`, transformOrigin: "top left" }}>
+      {/* overflowX clips the connector SVG's negative-left bleed without hiding vertical content.
+          marginBottom on the scale div collapses the dead layout space caused by transform not
+          affecting flow, so section pb-[120px] appears right below the visual content. */}
+      <div className="hidden min-[1000px]:block" style={{ overflowX: "hidden" }}>
+        <div style={{
+          width: "1440px",
+          transform: `scale(${aboutScale})`,
+          transformOrigin: "top left",
+          marginBottom: `${-Math.round((1 - aboutScale) * 1350)}px`,
+        }}>
         <div className="max-w-[1440px] mx-auto relative" style={{ minHeight: "1350px" }}>
 
           {/* Title */}
