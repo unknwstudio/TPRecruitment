@@ -36,12 +36,15 @@
     --stack-top: 72px;
     --stack-step: 60px;   /* mobile: title p-[16px] + ~28px text */
     --stack-gap: 16px;
+    /* About section mobile/tablet — connector left offset per Figma (402px vs 744px frame) */
+    --about-connector-left: -299px;
   }
 
   @media (min-width: 768px) {
     :root {
       --stack-step: 70px;   /* md: title p-[20px] + ~30px text */
       --stack-gap: 20px;
+      --about-connector-left: -141px;   /* tablet: connector shifts right to stay under photo */
     }
   }
 

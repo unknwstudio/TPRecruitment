@@ -464,6 +464,8 @@ function HeroSection() {
             className="absolute flex flex-col gap-[40px]"
             style={{
               left: "30px", top: "103px", width: "950px",
+              backgroundColor: "rgba(255, 237, 215, 0.75)",
+              padding: "20px 0 28px 0",
               opacity: heroReady ? 1 : 0,
               transform: heroReady ? "translateY(0)" : "translateY(20px)",
               transition: heroReady ? "opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s" : "none",
@@ -548,11 +550,9 @@ function WhatWorkingSection() {
       <div className="xl:hidden">
         <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pt-[103px] pb-[51px]">
           <Reveal>
-            <div className="text-[40px] md:text-[44px] text-black" style={{ ...STYLE_DISPLAY, letterSpacing: "-3.5px" }}>
-              <p>What</p>
-              <p>Higher Standard</p>
-              <p>means in practice</p>
-            </div>
+            <p className="text-[40px] md:text-[52px] text-black leading-[1.1]" style={{ ...STYLE_DISPLAY, letterSpacing: "-3px" }}>
+              What Higher Standard means in practice
+            </p>
           </Reveal>
         </div>
         {/* No pb on this container — pb causes float-away on sticky release */}
@@ -987,12 +987,13 @@ function AboutSection() {
             />
           </div>
 
-          {/* Connector / Union SVG — 2-phase reveal: sweeps L→R then grows down from centre */}
+          {/* Connector / Union SVG — 2-phase reveal: sweeps L→R then grows down from centre.
+              Left offset uses CSS var: -299px mobile, -141px tablet (md+) — matches Figma 651-197 vs 665-739 */}
           <div
             aria-hidden="true"
             style={{
               position: "absolute",
-              left: "-299px", top: "304px",
+              left: "var(--about-connector-left)", top: "304px",
               width: "965px", height: "399px",
               pointerEvents: "none",
               zIndex: 2,
@@ -1568,25 +1569,25 @@ function NewsletterSection() {
     <section id="newsletter" className="bg-[#ffedd7] w-full py-[103px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
-        {/* Header — left aligned */}
-        <Reveal className="mb-[52px] md:mb-[60px]">
-          <p className="text-[36px] md:text-[52px] text-black" style={STYLE_DISPLAY}>
+        {/* Header — scales to desktop size from 720px+ */}
+        <Reveal className="mb-[52px] min-[720px]:mb-[60px]">
+          <p className="text-[36px] min-[720px]:text-[52px] text-black" style={STYLE_DISPLAY}>
             Higher Newsletter
           </p>
-          <p className="text-[18px] md:text-[24px] text-black mt-[16px] md:mt-[20px]" style={STYLE_MONO}>
+          <p className="text-[18px] min-[720px]:text-[24px] text-black mt-[16px] min-[720px]:mt-[20px]" style={STYLE_MONO}>
             Honest writing about growth, leadership and building inside fast-moving companies.
           </p>
         </Reveal>
 
-        {/* Desktop md+: two-column layout */}
-        <div className="hidden lg:flex gap-[30px] items-start">
+        {/* Desktop 1180px+: two-column layout */}
+        <div className="hidden min-[1180px]:flex gap-[30px] items-start">
           {/* Left: banner + subscribe */}
           <div className="shrink-0 flex flex-col gap-[30px]" style={{ width: "min(808px, 55%)", position: "sticky", top: "var(--stack-top)", alignSelf: "flex-start" }}>
-            {/* Banner image */}
+            {/* Banner image — full image, no crop */}
             <img
               src="/Higher_Photo.png"
               alt=""
-              style={{ width: "100%", height: "560px", objectFit: "cover", display: "block" }}
+              style={{ width: "100%", height: "auto", display: "block" }}
             />
             {/* Subscribe row */}
             <div className="flex gap-[10px] items-center">
@@ -1640,16 +1641,16 @@ function NewsletterSection() {
             <div style={{ height: "300px" }} />
           </div>
         </div>
-        {/* Extra 90px below the columns (+30% hold before section exits) */}
-        <div className="hidden lg:block" style={{ height: "90px" }} />
+        {/* Extra 90px below the desktop columns */}
+        <div className="hidden min-[1180px]:block" style={{ height: "90px" }} />
 
-        {/* Tablet md→lg: photo + subscribe + 2×2 card grid */}
-        <div className="hidden md:max-lg:flex flex-col gap-[28px]">
-          {/* Banner image */}
+        {/* Tablet 720px→1179px: photo + subscribe + 2×2 card grid */}
+        <div className="hidden min-[720px]:flex min-[1180px]:hidden flex-col gap-[28px]">
+          {/* Banner image — full image, no crop */}
           <img
             src="/Higher_Photo.png"
             alt=""
-            style={{ width: "100%", height: "360px", objectFit: "cover", display: "block" }}
+            style={{ width: "100%", height: "auto", display: "block" }}
           />
           {/* Subscribe row */}
           <div className="flex flex-row items-center" style={{ gap: "12px" }}>
@@ -1690,8 +1691,8 @@ function NewsletterSection() {
           </div>
         </div>
 
-        {/* Mobile <md: photo → subscribe row → carousel */}
-        <div className="md:hidden flex flex-col gap-[28px]">
+        {/* Mobile <720px: photo → subscribe row → carousel */}
+        <div className="min-[720px]:hidden flex flex-col gap-[28px]">
           {/* Banner image */}
           <img
             src="/Higher_Photo.png"
