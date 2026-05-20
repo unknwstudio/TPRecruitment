@@ -226,11 +226,11 @@ function NavLogo() {
 
 // ── Navbar ────────────────────────────────────────────────────────────────────
 const NAV_LINKS = [
-  { label: "Higher Standard", href: "about" },
   { label: "How I work",      href: "working" },
+  { label: "Higher Standard", href: "about" },
   { label: "Roles",           href: "roles" },
-  { label: "Newsletter",      href: "newsletter" },
   { label: "Testimonials",    href: "testimonials" },
+  { label: "Newsletter",      href: "newsletter" },
   { label: "Contact",         href: "contact" },
 ];
 
@@ -842,7 +842,7 @@ function AboutSection() {
       {/* ── Desktop xl+: Figma 607-831 absolute layout ─────────────────────── */}
       {/* Layer order: bg photo (DOM 1st) → connector SVG (DOM 2nd) → fg photo (DOM 3rd) → cards */}
       {/* Animation: connector clips L→R (1.5s), bg photo fades (delay 0.7s), fg photo (delay 1.1s), cards stagger (delay 1.5+) */}
-      <div className="hidden xl:block">
+      <div className="hidden min-[1440px]:block">
         <div className="max-w-[1440px] mx-auto relative" style={{ minHeight: "1300px" }}>
 
           {/* Title */}
@@ -850,7 +850,7 @@ function AboutSection() {
             position: "absolute", left: "30px", top: "50px",
             opacity: inView ? 1 : 0,
             transform: inView ? "translateY(0)" : "translateY(20px)",
-            transition: inView ? "opacity 0.66s ease 5.22s, transform 0.66s ease 5.22s" : "none",
+            transition: inView ? "opacity 0.66s ease 0.3s, transform 0.66s ease 0.3s" : "none",
           }}>
             <p className="text-[52px] text-black" style={STYLE_DISPLAY}>
               Where the Higher Standard<br/>comes from
@@ -862,7 +862,7 @@ function AboutSection() {
             position: "absolute", left: "111px", top: "605px",
             width: "293px", height: "293px", overflow: "hidden",
             opacity: inView ? 1 : 0,
-            transition: inView ? "opacity 0.88s ease 5.77s" : "none",
+            transition: inView ? "opacity 0.88s ease 0.7s" : "none",
           }}>
             <img
               src="/tiffany-bg.png"
@@ -885,7 +885,7 @@ function AboutSection() {
               width: "903px", height: "898px",
               pointerEvents: "none",
               clipPath: inView ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)",
-              transition: inView ? "clip-path 1.65s cubic-bezier(0.4, 0, 0.2, 1) 5.33s" : "none",
+              transition: inView ? "clip-path 1.65s cubic-bezier(0.4, 0, 0.2, 1) 0.4s" : "none",
             }}
           >
             <img src="/about-connector.svg" alt="" style={{ width: "100%", height: "100%", display: "block" }} />
@@ -896,7 +896,7 @@ function AboutSection() {
             position: "absolute", left: "111px", top: "605px",
             width: "293px", height: "293px", overflow: "hidden",
             opacity: inView ? 1 : 0,
-            transition: inView ? "opacity 0.88s ease 6.21s" : "none",
+            transition: inView ? "opacity 0.88s ease 1.1s" : "none",
           }}>
             <img
               src="/tiffany-fg.png"
@@ -923,7 +923,7 @@ function AboutSection() {
                   opacity: inView ? 1 : 0,
                   transform: inView ? "translateY(0)" : "translateY(24px)",
                   transition: inView
-                    ? `opacity 0.6s ease ${6.65 + i * 0.2}s, transform 0.6s cubic-bezier(0.4,0,0.2,1) ${6.65 + i * 0.2}s`
+                    ? `opacity 0.6s ease ${1.5 + i * 0.2}s, transform 0.6s cubic-bezier(0.4,0,0.2,1) ${1.5 + i * 0.2}s`
                     : "none",
                 }}
               >
@@ -948,27 +948,83 @@ function AboutSection() {
         </div>
       </div>
 
-      {/* ── Mobile / tablet (up to xl): title + photo + sticky-stacking cards ── */}
-      <div className="xl:hidden pt-[103px]">
+      {/* ── Mobile / tablet (up to xl): Figma 651-197 layout ── */}
+      <div className="min-[1440px]:hidden pt-[103px]">
 
-        {/* Title + photo — scroll normally */}
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[48px]">
-          <Reveal>
-            <p className="text-[36px] md:text-[44px] text-black mb-[48px] md:mb-[56px]" style={STYLE_DISPLAY}>
-              Where the Higher Standard<br/>comes from
-            </p>
-          </Reveal>
-          <Reveal>
-            <div className="flex flex-col items-center gap-[12px]">
-              <div style={{ width: "min(260px, 70vw)", aspectRatio: "1", overflow: "hidden", border: "0.635px solid #4D453B" }}>
-                <img src="/tiffany-bg.png" alt="Tiffany Philippou" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
-              </div>
-              <p style={{ ...STYLE_DISPLAY, fontSize: 24, color: "black", letterSpacing: "-1.2px" }}>Tiffany Philippou</p>
-            </div>
-          </Reveal>
+        {/* Title */}
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[32px]">
+          <p className="text-[36px] md:text-[44px] text-black" style={STYLE_DISPLAY}>
+            Where the Higher Standard<br/>comes from
+          </p>
         </div>
 
-        {/* Sticky-stacking cards — no pb on container to prevent float-away on sticky release */}
+        {/* Photo + connector illustration — Figma 651-197 measurements (402px frame) */}
+        <div style={{ position: "relative", height: "461px", overflow: "hidden" }}>
+
+          {/* Photo — background layer (fades in first) */}
+          <div style={{
+            position: "absolute",
+            left: "50%", top: "113px",
+            width: "293px", height: "293px",
+            transform: "translateX(-50%)",
+            overflow: "hidden",
+            opacity: inView ? 1 : 0,
+            transition: inView ? "opacity 0.88s ease 0.7s" : "none",
+          }}>
+            <img
+              src="/tiffany-bg.png"
+              alt=""
+              style={{
+                position: "absolute",
+                width: "390px", height: "439px",
+                objectFit: "cover", objectPosition: "center top",
+                left: "50%", top: "50%",
+                transform: "translate(-50%, calc(-50% + 13px))",
+              }}
+            />
+          </div>
+
+          {/* Connector / Union SVG — clips L→R (same animation as desktop) */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              left: "-299px", top: "304px",
+              width: "965px", height: "399px",
+              pointerEvents: "none",
+              clipPath: inView ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)",
+              transition: inView ? "clip-path 1.65s cubic-bezier(0.4, 0, 0.2, 1) 0.4s" : "none",
+            }}
+          >
+            <img src="/about-union.svg" alt="" style={{ width: "100%", height: "100%", display: "block" }} />
+          </div>
+
+          {/* Photo — foreground layer (above connector, fades in after it draws) */}
+          <div style={{
+            position: "absolute",
+            left: "50%", top: "113px",
+            width: "293px", height: "293px",
+            transform: "translateX(-50%)",
+            overflow: "hidden",
+            opacity: inView ? 1 : 0,
+            transition: inView ? "opacity 0.88s ease 1.1s" : "none",
+          }}>
+            <img
+              src="/tiffany-fg.png"
+              alt="Tiffany Philippou"
+              style={{
+                position: "absolute",
+                width: "390px", height: "439px",
+                objectFit: "cover", objectPosition: "center top",
+                left: "50%", top: "50%",
+                transform: "translate(-50%, calc(-50% + 13px))",
+              }}
+            />
+          </div>
+
+        </div>
+
+        {/* Sticky-stacking cards with staggered entrance animation */}
         <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
           {ABOUT_CARDS.map((card, idx) => (
             <div
@@ -978,6 +1034,11 @@ function AboutSection() {
                 top: `calc(var(--stack-top) + ${idx} * var(--stack-step))`,
                 marginTop: idx === 0 ? 0 : "var(--stack-gap)",
                 zIndex: idx + 1,
+                opacity: inView ? 1 : 0,
+                transform: inView ? "translateY(0)" : "translateY(20px)",
+                transition: inView
+                  ? `opacity 0.6s ease ${1.5 + idx * 0.15}s, transform 0.6s cubic-bezier(0.4,0,0.2,1) ${1.5 + idx * 0.15}s`
+                  : "none",
               }}
             >
               <HoverCard>
@@ -994,7 +1055,6 @@ function AboutSection() {
               </HoverCard>
             </div>
           ))}
-          {/* 120px spacer (60% smaller than previous 300px) */}
           <div style={{ height: "120px" }} />
         </div>
 
@@ -1513,7 +1573,7 @@ function NewsletterSection() {
         </Reveal>
 
         {/* Desktop md+: two-column layout */}
-        <div className="hidden md:flex gap-[30px] items-start">
+        <div className="hidden lg:flex gap-[30px] items-start">
           {/* Left: banner + subscribe */}
           <div className="shrink-0 flex flex-col gap-[30px]" style={{ width: "min(808px, 55%)", position: "sticky", top: "var(--stack-top)", alignSelf: "flex-start" }}>
             {/* Banner image */}
@@ -1575,10 +1635,10 @@ function NewsletterSection() {
           </div>
         </div>
         {/* Extra 90px below the columns (+30% hold before section exits) */}
-        <div className="hidden md:block" style={{ height: "90px" }} />
+        <div className="hidden lg:block" style={{ height: "90px" }} />
 
         {/* Mobile: header → photo → field+button → carousel */}
-        <div className="md:hidden flex flex-col gap-[28px]">
+        <div className="lg:hidden flex flex-col gap-[28px]">
           {/* Banner image */}
           <img
             src="/Higher_Photo.png"
