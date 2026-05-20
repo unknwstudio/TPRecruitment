@@ -464,17 +464,25 @@ function HeroSection() {
             className="absolute flex flex-col gap-[40px]"
             style={{
               left: "30px", top: "103px", width: "950px",
-              backgroundColor: "rgba(255, 237, 215, 0.75)",
-              padding: "20px 0 28px 0",
               opacity: heroReady ? 1 : 0,
               transform: heroReady ? "translateY(0)" : "translateY(20px)",
               transition: heroReady ? "opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s" : "none",
             }}
           >
-            <p className="text-black" style={{ ...STYLE_DISPLAY, fontSize: "60px", letterSpacing: "-5.5px", lineHeight: "1.1" }}>
+            {/* Heading — own semi-transparent bg so arrows show through the gap */}
+            <p className="text-black" style={{
+              ...STYLE_DISPLAY, fontSize: "60px", letterSpacing: "-5.5px", lineHeight: "1.1",
+              backgroundColor: "rgba(255, 237, 215, 0.75)",
+              padding: "12px 0 16px 0",
+            }}>
               A great hire changes the trajectory. That&apos;s the Higher Standard.
             </p>
-            <div style={{ ...STYLE_MONO, fontSize: "28px", lineHeight: "1.1", color: "black" }}>
+            {/* Body — own semi-transparent bg */}
+            <div style={{
+              ...STYLE_MONO, fontSize: "28px", lineHeight: "1.1", color: "black",
+              backgroundColor: "rgba(255, 237, 215, 0.75)",
+              padding: "12px 0 14px 0",
+            }}>
               <p>I&apos;m Tiffany Philippou, founder of Higher Standard.</p>
               <p>I find the people who raise the bar for your whole company and shape the outcome, then I stay long after the offer is signed.</p>
             </div>
@@ -598,8 +606,8 @@ function WhatWorkingSection() {
         className="hidden xl:flex max-w-[1440px] mx-auto"
         style={{ gap: "30px", padding: "103px 30px", alignItems: "flex-start" }}
       >
-        {/* Left: sticky title — 675px (matches right card width exactly) */}
-        <div style={{ width: "675px", maxWidth: "675px", flexShrink: 0, position: "sticky", top: "var(--stack-top)" }}>
+        {/* Left: sticky title — scales with right cards column */}
+        <div style={{ flex: 1, minWidth: 0, position: "sticky", top: "var(--stack-top)" }}>
           <Reveal>
             <div className="text-[52px] text-black" style={{ ...STYLE_DISPLAY, letterSpacing: "-3.5px" }}>
               <p>What</p>
@@ -663,16 +671,30 @@ function WhatWorkingSection() {
 const partnerLogosRow1 = [imgAKT, imgImage30, imgImage31, imgImage32, imgImage33, imgImage36, imgImage34, imgImage35, imgImage37];
 const partnerLogosRow2 = [imgImage38, imgImage39, imgImage40, imgImage41, imgImage42, imgImage43, imgImage44, imgImage45];
 
+// Per-logo mask overrides — identified by visual inspection:
+//   imgImage39 = curio        → fills container edge-to-edge, scale down
+//   imgImage38 = IQ Capital   → content sits above vertical centre of PNG, shift down
+//   imgImage41 = hertility    → wordmark biased left inside PNG bounds, shrink for balance
+//   imgImage45 = Onefinestay  → SVG fixed (preserveAspectRatio → xMidYMid meet)
+const LOGO_CONFIG: Record<string, { maskSize?: string; maskPosition?: string }> = {
+  [imgImage39]: { maskSize: "62%"                },  // curio: too large
+  [imgImage38]: { maskSize: "80%", maskPosition: "center 60%" }, // IQ Capital: not centred (content floats high)
+  [imgImage41]: { maskSize: "78%"                },  // hertility: not centred — extra space on right from icon
+};
+
 function PartnerLogo({ src, small }: { src: string; small?: boolean }) {
   const w = small ? 140 : 220;
   const h = small ? 80  : 120;
+  const cfg = LOGO_CONFIG[src] ?? {};
+  const mSize = cfg.maskSize ?? "contain";
+  const mPos  = cfg.maskPosition ?? "center";
   return (
     <div className="border-r border-black flex items-center justify-center shrink-0 p-[14px] md:p-[20px] transition-opacity duration-200 hover:opacity-50"
          style={{ width: w, height: h }}>
       <div className="w-full h-full" style={{
         backgroundColor: "#4d453b",
-        maskImage: `url('${src}')`, maskRepeat:"no-repeat", maskSize:"contain", maskPosition:"center",
-        WebkitMaskImage: `url('${src}')`, WebkitMaskRepeat:"no-repeat", WebkitMaskSize:"contain", WebkitMaskPosition:"center",
+        maskImage: `url('${src}')`, maskRepeat:"no-repeat", maskSize: mSize, maskPosition: mPos,
+        WebkitMaskImage: `url('${src}')`, WebkitMaskRepeat:"no-repeat", WebkitMaskSize: mSize, WebkitMaskPosition: mPos,
       }} />
     </div>
   );
@@ -958,81 +980,8 @@ function AboutSection() {
           </p>
         </div>
 
-        {/* Photo + connector — Figma 651-197 (402px frame).
-            clip-path clips L/R edges but allows connector to overflow DOWN into cards area.
-            inset(top right bottom left): bottom=-1000px means no vertical clip below. */}
-        <div style={{ position: "relative", height: "461px", clipPath: "inset(0 0 -1000px 0)" }}>
-
-          {/* Photo — background layer */}
-          <div style={{
-            position: "absolute",
-            left: "50%", top: "113px",
-            width: "293px", height: "293px",
-            transform: "translateX(-50%)",
-            overflow: "hidden",
-            zIndex: 1,
-            opacity: inView ? 1 : 0,
-            transition: inView ? "opacity 0.88s ease 0.7s" : "none",
-          }}>
-            <img
-              src="/tiffany-bg.png"
-              alt=""
-              style={{
-                position: "absolute",
-                width: "390px", height: "439px",
-                objectFit: "cover", objectPosition: "center top",
-                left: "50%", top: "50%",
-                transform: "translate(-50%, calc(-50% + 13px))",
-              }}
-            />
-          </div>
-
-          {/* Connector / Union SVG — 2-phase reveal: sweeps L→R then grows down from centre.
-              Left offset uses CSS var: -299px mobile, -141px tablet (md+) — matches Figma 651-197 vs 665-739 */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              left: "var(--about-connector-left)", top: "304px",
-              width: "965px", height: "399px",
-              pointerEvents: "none",
-              zIndex: 2,
-              /* When not yet in view, keep fully hidden. Once triggered, the keyframe takes over. */
-              clipPath: inView ? undefined : "inset(0 100% 0 0)",
-              animation: inView ? "mobileConnectorReveal 2.0s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both" : "none",
-            }}
-          >
-            <img src="/about-union.svg" alt="" style={{ width: "100%", height: "100%", display: "block" }} />
-          </div>
-
-          {/* Photo — foreground layer, above connector */}
-          <div style={{
-            position: "absolute",
-            left: "50%", top: "113px",
-            width: "293px", height: "293px",
-            transform: "translateX(-50%)",
-            overflow: "hidden",
-            zIndex: 3,
-            opacity: inView ? 1 : 0,
-            transition: inView ? "opacity 0.88s ease 1.1s" : "none",
-          }}>
-            <img
-              src="/tiffany-fg.png"
-              alt="Tiffany Philippou"
-              style={{
-                position: "absolute",
-                width: "390px", height: "439px",
-                objectFit: "cover", objectPosition: "center top",
-                left: "50%", top: "50%",
-                transform: "translate(-50%, calc(-50% + 13px))",
-              }}
-            />
-          </div>
-
-        </div>
-
-        {/* Sticky-stacking cards — z-index:1 sits above the connector SVG's overflow */}
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]" style={{ position: "relative", zIndex: 1 }}>
+        {/* Sticky-stacking cards */}
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
           {ABOUT_CARDS.map((card, idx) => (
             <div
               key={card.id}
@@ -1044,7 +993,7 @@ function AboutSection() {
                 opacity: inView ? 1 : 0,
                 transform: inView ? "translateY(0)" : "translateY(20px)",
                 transition: inView
-                  ? `opacity 0.6s ease ${1.5 + idx * 0.15}s, transform 0.6s cubic-bezier(0.4,0,0.2,1) ${1.5 + idx * 0.15}s`
+                  ? `opacity 0.6s ease ${idx * 0.12}s, transform 0.6s cubic-bezier(0.4,0,0.2,1) ${idx * 0.12}s`
                   : "none",
               }}
             >
@@ -1740,10 +1689,10 @@ function CTASection() {
         </div>
 
         {/* BOTTOM ROW: Contacts (left) + Form (right) */}
-        <div className="flex flex-col lg:flex-row lg:items-start gap-[120px] lg:gap-[35px]">
+        <div className="flex flex-col lg:flex-row lg:items-start gap-[60px] lg:gap-[35px]">
 
           {/* Left: contact info */}
-          <Reveal className="lg:shrink-0 lg:w-[655px] flex flex-col gap-[24px] lg:gap-[30px] text-[16px] text-black">
+          <Reveal className="lg:flex-1 lg:max-w-[655px] flex flex-col gap-[24px] lg:gap-[30px] text-[16px] text-black">
             <div className="flex flex-col gap-[16px]">
               <p style={STYLE_DISPLAY}>Contacts</p>
               <div className="flex flex-col gap-[10px]" style={STYLE_MONO}>
