@@ -1411,18 +1411,22 @@ const NEWSLETTER_ARTICLES = [
   {
     title: "Why great hires fail after six months",
     excerpt: "The VP Product who left, the questions worth asking first, and this week's classifieds.",
+    href: "https://higher.beehiiv.com/p/why-startup-hires-fail",
   },
   {
     title: "Good people leave quietly",
     excerpt: "On the hire that breaks startups and the kind of leader that holds them together.",
+    href: "https://higher.beehiiv.com/p/good-people-leave-quietly",
   },
   {
     title: "Mindset is non-negotiable",
     excerpt: "Why the unobvious hire usually wins.",
+    href: "https://higher.beehiiv.com/p/mindset-is-non-negotiable",
   },
   {
     title: "The reps nobody sees",
     excerpt: "The years that don't make the deck.",
+    href: "https://higher.beehiiv.com/p/the-reps-nobody-sees",
   },
 ];
 
@@ -1462,9 +1466,14 @@ function NewsletterCarousel({ articles }: { articles: typeof NEWSLETTER_ARTICLES
                 <div className="border-[1.372px] border-black flex flex-1 flex-col justify-between p-[20px] rounded-bl-[8px] rounded-br-[8px] gap-[20px]">
                   <p className="text-[16px] text-black" style={STYLE_MONO}>{article.excerpt}</p>
                   <div className="bg-[#ffedd7] p-[4px] self-start">
-                    <button className="border border-black rounded-[4px] px-[12px] py-[10px] bg-[#ffedd7] cursor-pointer hover:bg-[#f0e4cf] transition-colors duration-150">
+                    <a
+                      href={article.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="border border-black rounded-[4px] px-[12px] py-[10px] bg-[#ffedd7] hover:bg-[#f0e4cf] transition-colors duration-150 inline-block"
+                    >
                       <p className="text-[16px] text-black whitespace-nowrap" style={STYLE_MONO}>read now</p>
-                    </button>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -1542,9 +1551,7 @@ function NewsletterSection() {
 
           {/* Right: 4 article cards — sticky stacking as user scrolls */}
           <div className="flex-1 min-w-0">
-            {NEWSLETTER_ARTICLES.map((article, i) => {
-              const isLast = i === NEWSLETTER_ARTICLES.length - 1;
-              return (
+            {NEWSLETTER_ARTICLES.map((article, i) => (
               <div
                 key={article.title}
                 style={{
@@ -1552,8 +1559,6 @@ function NewsletterSection() {
                   top: `calc(var(--stack-top) + ${i} * var(--stack-step))`,
                   marginTop: i === 0 ? 0 : "var(--stack-gap)",
                   zIndex: i + 1,
-                  // Last card fills viewport so it covers all previous cards' body content
-                  ...(isLast && { minHeight: `calc(100vh - var(--stack-top) - ${i} * var(--stack-step))` }),
                 }}
               >
                 <HoverCard>
@@ -1566,18 +1571,22 @@ function NewsletterSection() {
                     <div className="border-[1.372px] border-black border-t-0 p-[20px] rounded-bl-[8px] rounded-br-[8px] flex flex-col gap-[24px]">
                       <p className="text-[18px] md:text-[20px] text-black" style={STYLE_MONO}>{article.excerpt}</p>
                       <div className="bg-[#ffedd7] p-[4px] self-start">
-                        <button className="border border-black rounded-[4px] px-[12px] py-[10px] bg-[#ffedd7] cursor-pointer hover:bg-[#f0e4cf] transition-colors duration-150">
+                        <a
+                          href={article.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="border border-black rounded-[4px] px-[12px] py-[10px] bg-[#ffedd7] hover:bg-[#f0e4cf] transition-colors duration-150 inline-block"
+                        >
                           <p className="text-[16px] md:text-[18px] text-black whitespace-nowrap" style={STYLE_MONO}>read now</p>
-                        </button>
+                        </a>
                       </div>
                     </div>
                   </div>
                 </HoverCard>
               </div>
-              );
-            })}
-            {/* Spacer = last-card minHeight so stack stays stable until it fully exits */}
-            <div style={{ height: "calc(100vh - var(--stack-top) - 3 * var(--stack-step))" }} />
+            ))}
+            {/* Spacer to hold the stack in place before the section exits */}
+            <div style={{ height: "300px" }} />
           </div>
         </div>
 
