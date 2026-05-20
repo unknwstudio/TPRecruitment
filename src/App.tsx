@@ -1709,8 +1709,8 @@ function CTASection() {
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
         {/* TOP ROW: Headline (left) + Subtitle (right, bottom-aligned on desktop) */}
-        <div className="flex flex-col lg:flex-row lg:items-end gap-[24px] lg:gap-[35px] mb-[52px] lg:mb-[80px]">
-          <Reveal className="lg:shrink-0 lg:w-[655px]">
+        <div className="flex flex-col lg:flex-row lg:items-end gap-[35px] mb-[52px] lg:mb-[80px]">
+          <Reveal className="lg:flex-1 lg:max-w-[655px]">
             <div className="text-[48px] md:text-[52px] lg:text-[60px] text-black" style={STYLE_DISPLAY}>
               Let&apos;s talk
             </div>
@@ -1724,7 +1724,7 @@ function CTASection() {
         </div>
 
         {/* BOTTOM ROW: Contacts (left) + Form (right) */}
-        <div className="flex flex-col lg:flex-row lg:items-start gap-[60px] lg:gap-[35px]">
+        <div className="flex flex-col lg:flex-row lg:items-start gap-[35px]">
 
           {/* Left: contact info */}
           <Reveal className="lg:flex-1 lg:max-w-[655px] flex flex-col gap-[24px] lg:gap-[30px] text-[16px] text-black">
