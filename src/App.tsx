@@ -226,8 +226,10 @@ function NavLogo() {
 
 // ── Navbar ────────────────────────────────────────────────────────────────────
 const NAV_LINKS = [
+  { label: "About",        href: "about" },
   { label: "How I work",   href: "working" },
   { label: "Roles",        href: "roles" },
+  { label: "Newsletter",   href: "newsletter" },
   { label: "Testimonials", href: "testimonials" },
   { label: "Contact",      href: "contact" },
 ];
@@ -554,9 +556,7 @@ function WhatWorkingSection() {
           </Reveal>
         </div>
         <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[73px]">
-          {WORKING_MOBILE_CARDS.map((card, idx) => {
-            const isLast = idx === WORKING_MOBILE_CARDS.length - 1;
-            return (
+          {WORKING_MOBILE_CARDS.map((card, idx) => (
             <div
               key={card.title}
               style={{
@@ -564,8 +564,6 @@ function WhatWorkingSection() {
                 top: `calc(var(--stack-top) + ${idx} * var(--stack-step))`,
                 marginTop: idx === 0 ? 0 : "var(--stack-gap)",
                 zIndex: idx + 1,
-                // Last card expands to fill the viewport so it fully covers all previous cards' body content
-                ...(isLast && { minHeight: `calc(100vh - var(--stack-top) - ${idx} * var(--stack-step))` }),
               }}
             >
               <HoverCard>
@@ -586,10 +584,9 @@ function WhatWorkingSection() {
                 </div>
               </HoverCard>
             </div>
-            );
-          })}
-          {/* Spacer = last-card minHeight so the stack stays stable until it fully exits */}
-          <div style={{ height: "calc(100vh - var(--stack-top) - 1 * var(--stack-step))" }} />
+          ))}
+          {/* Spacer to hold stack in place before section exits */}
+          <div style={{ height: "300px" }} />
         </div>
       </div>
 
@@ -970,36 +967,32 @@ function AboutSection() {
 
         {/* Sticky-stacking cards */}
         <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[73px]">
-          {ABOUT_CARDS.map((card, idx) => {
-            const isLast = idx === ABOUT_CARDS.length - 1;
-            return (
-              <div
-                key={card.id}
-                style={{
-                  position: "sticky",
-                  top: `calc(var(--stack-top) + ${idx} * var(--stack-step))`,
-                  marginTop: idx === 0 ? 0 : "var(--stack-gap)",
-                  zIndex: idx + 1,
-                  ...(isLast && { minHeight: `calc(100vh - var(--stack-top) - ${idx} * var(--stack-step))` }),
-                }}
-              >
-                <HoverCard>
-                  <div className="bg-white flex flex-col p-[10px]">
-                    <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
-                      <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] md:p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
-                        <p className="text-[20px] md:text-[24px] text-black" style={STYLE_DISPLAY}>{card.title}</p>
-                      </div>
-                    </div>
-                    <div className="border-[1.372px] border-black p-[16px] md:p-[20px] rounded-bl-[8px] rounded-br-[8px]">
-                      <p className="text-[15px] md:text-[16px] text-black whitespace-pre-line" style={{ ...STYLE_MONO, lineHeight: 1.1 }}>{card.body}</p>
+          {ABOUT_CARDS.map((card, idx) => (
+            <div
+              key={card.id}
+              style={{
+                position: "sticky",
+                top: `calc(var(--stack-top) + ${idx} * var(--stack-step))`,
+                marginTop: idx === 0 ? 0 : "var(--stack-gap)",
+                zIndex: idx + 1,
+              }}
+            >
+              <HoverCard>
+                <div className="bg-white flex flex-col p-[10px]">
+                  <div className="flex items-start" style={{ marginBottom: "-1.372px" }}>
+                    <div className="border-[1.372px] border-black flex flex-1 items-start p-[16px] md:p-[20px] rounded-tl-[8px] rounded-tr-[8px]">
+                      <p className="text-[20px] md:text-[24px] text-black" style={STYLE_DISPLAY}>{card.title}</p>
                     </div>
                   </div>
-                </HoverCard>
-              </div>
-            );
-          })}
-          {/* Spacer = last-card minHeight so stack stays stable until it fully exits */}
-          <div style={{ height: "calc(100vh - var(--stack-top) - 4 * var(--stack-step))" }} />
+                  <div className="border-[1.372px] border-black p-[16px] md:p-[20px] rounded-bl-[8px] rounded-br-[8px]">
+                    <p className="text-[15px] md:text-[16px] text-black whitespace-pre-line" style={{ ...STYLE_MONO, lineHeight: 1.1 }}>{card.body}</p>
+                  </div>
+                </div>
+              </HoverCard>
+            </div>
+          ))}
+          {/* Spacer to hold stack in place before section exits */}
+          <div style={{ height: "300px" }} />
         </div>
 
       </div>
@@ -1411,18 +1404,22 @@ const NEWSLETTER_ARTICLES = [
   {
     title: "Why great hires fail after six months",
     excerpt: "The VP Product who left, the questions worth asking first, and this week's classifieds.",
+    href: "https://higher.beehiiv.com/p/why-startup-hires-fail",
   },
   {
     title: "Good people leave quietly",
     excerpt: "On the hire that breaks startups and the kind of leader that holds them together.",
+    href: "https://higher.beehiiv.com/p/good-people-leave-quietly",
   },
   {
     title: "Mindset is non-negotiable",
     excerpt: "Why the unobvious hire usually wins.",
+    href: "https://higher.beehiiv.com/p/mindset-is-non-negotiable",
   },
   {
     title: "The reps nobody sees",
     excerpt: "The years that don't make the deck.",
+    href: "https://higher.beehiiv.com/p/the-reps-nobody-sees",
   },
 ];
 
@@ -1462,9 +1459,14 @@ function NewsletterCarousel({ articles }: { articles: typeof NEWSLETTER_ARTICLES
                 <div className="border-[1.372px] border-black flex flex-1 flex-col justify-between p-[20px] rounded-bl-[8px] rounded-br-[8px] gap-[20px]">
                   <p className="text-[16px] text-black" style={STYLE_MONO}>{article.excerpt}</p>
                   <div className="bg-[#ffedd7] p-[4px] self-start">
-                    <button className="border border-black rounded-[4px] px-[12px] py-[10px] bg-[#ffedd7] cursor-pointer hover:bg-[#f0e4cf] transition-colors duration-150">
+                    <a
+                      href={article.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="border border-black rounded-[4px] px-[12px] py-[10px] bg-[#ffedd7] hover:bg-[#f0e4cf] transition-colors duration-150 inline-block"
+                    >
                       <p className="text-[16px] text-black whitespace-nowrap" style={STYLE_MONO}>read now</p>
-                    </button>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -1494,7 +1496,7 @@ function NewsletterCarousel({ articles }: { articles: typeof NEWSLETTER_ARTICLES
 
 function NewsletterSection() {
   return (
-    <section className="bg-[#ffedd7] w-full py-[103px]">
+    <section id="newsletter" className="bg-[#ffedd7] w-full py-[103px]">
       <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
 
         {/* Header — left aligned */}
@@ -1511,23 +1513,12 @@ function NewsletterSection() {
         <div className="hidden md:flex gap-[30px] items-start">
           {/* Left: banner + subscribe */}
           <div className="shrink-0 flex flex-col gap-[30px]" style={{ width: "min(808px, 55%)", position: "sticky", top: "var(--stack-top)", alignSelf: "flex-start" }}>
-            {/* Banner box */}
-            <div className="overflow-hidden relative" style={{ backgroundColor: "#fff5e9", height: "560px" }}>
-              {/* Arrow burst SVG */}
-              <div style={{ position: "absolute", left: "30px", top: "30px", right: "30px", bottom: "80px" }}>
-                <img src="/newsletter-burst.svg" alt="" style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "bottom center" }} />
-              </div>
-              {/* Keyword tags */}
-              {NEWSLETTER_TAGS.map((tag) => (
-                <div key={tag.label} style={{ position: "absolute", left: tag.left, top: tag.top, backgroundColor: tag.color, padding: "4px 8px" }}>
-                  <p style={{ ...STYLE_MONO, fontSize: "16px", color: "black", whiteSpace: "nowrap" }}>{tag.label}</p>
-                </div>
-              ))}
-              {/* "Higher" wordmark at bottom — image */}
-              <div style={{ position: "absolute", bottom: "20px", left: "50%", transform: "translateX(-50%)", backgroundColor: "#fff5e9", padding: "6px 12px" }}>
-                <img src="/nav-logo-sm.svg" alt="Higher" style={{ height: "43px", width: "auto", display: "block" }} />
-              </div>
-            </div>
+            {/* Banner image */}
+            <img
+              src="/newsletter-burst.svg"
+              alt=""
+              style={{ width: "100%", height: "560px", objectFit: "cover", display: "block" }}
+            />
             {/* Subscribe row */}
             <div className="flex gap-[10px] items-center">
               <input
@@ -1542,9 +1533,7 @@ function NewsletterSection() {
 
           {/* Right: 4 article cards — sticky stacking as user scrolls */}
           <div className="flex-1 min-w-0">
-            {NEWSLETTER_ARTICLES.map((article, i) => {
-              const isLast = i === NEWSLETTER_ARTICLES.length - 1;
-              return (
+            {NEWSLETTER_ARTICLES.map((article, i) => (
               <div
                 key={article.title}
                 style={{
@@ -1552,8 +1541,6 @@ function NewsletterSection() {
                   top: `calc(var(--stack-top) + ${i} * var(--stack-step))`,
                   marginTop: i === 0 ? 0 : "var(--stack-gap)",
                   zIndex: i + 1,
-                  // Last card fills viewport so it covers all previous cards' body content
-                  ...(isLast && { minHeight: `calc(100vh - var(--stack-top) - ${i} * var(--stack-step))` }),
                 }}
               >
                 <HoverCard>
@@ -1566,32 +1553,33 @@ function NewsletterSection() {
                     <div className="border-[1.372px] border-black border-t-0 p-[20px] rounded-bl-[8px] rounded-br-[8px] flex flex-col gap-[24px]">
                       <p className="text-[18px] md:text-[20px] text-black" style={STYLE_MONO}>{article.excerpt}</p>
                       <div className="bg-[#ffedd7] p-[4px] self-start">
-                        <button className="border border-black rounded-[4px] px-[12px] py-[10px] bg-[#ffedd7] cursor-pointer hover:bg-[#f0e4cf] transition-colors duration-150">
+                        <a
+                          href={article.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="border border-black rounded-[4px] px-[12px] py-[10px] bg-[#ffedd7] hover:bg-[#f0e4cf] transition-colors duration-150 inline-block"
+                        >
                           <p className="text-[16px] md:text-[18px] text-black whitespace-nowrap" style={STYLE_MONO}>read now</p>
-                        </button>
+                        </a>
                       </div>
                     </div>
                   </div>
                 </HoverCard>
               </div>
-              );
-            })}
-            {/* Spacer = last-card minHeight so stack stays stable until it fully exits */}
-            <div style={{ height: "calc(100vh - var(--stack-top) - 3 * var(--stack-step))" }} />
+            ))}
+            {/* Spacer to hold the stack in place before the section exits */}
+            <div style={{ height: "300px" }} />
           </div>
         </div>
 
         {/* Mobile: header → burst image → carousel → email field */}
         <div className="md:hidden flex flex-col gap-[28px]">
           {/* Banner image */}
-          <div className="overflow-hidden relative" style={{ backgroundColor: "#fff5e9", height: "240px" }}>
-            <div style={{ position: "absolute", left: "20px", top: "16px", right: "20px", bottom: "56px" }}>
-              <img src="/newsletter-burst.svg" alt="" style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "bottom center" }} />
-            </div>
-            <div style={{ position: "absolute", bottom: "12px", left: "50%", transform: "translateX(-50%)", backgroundColor: "#fff5e9", padding: "4px 10px" }}>
-              <img src="/nav-logo-sm.svg" alt="Higher" style={{ height: "32px", width: "auto", display: "block" }} />
-            </div>
-          </div>
+          <img
+            src="/newsletter-burst.svg"
+            alt=""
+            style={{ width: "100%", height: "240px", objectFit: "cover", display: "block" }}
+          />
           {/* Article carousel */}
           <NewsletterCarousel articles={NEWSLETTER_ARTICLES} />
           {/* Subscribe field */}
