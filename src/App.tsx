@@ -226,12 +226,12 @@ function NavLogo() {
 
 // ── Navbar ────────────────────────────────────────────────────────────────────
 const NAV_LINKS = [
-  { label: "About",        href: "about" },
-  { label: "How I work",   href: "working" },
-  { label: "Roles",        href: "roles" },
-  { label: "Newsletter",   href: "newsletter" },
-  { label: "Testimonials", href: "testimonials" },
-  { label: "Contact",      href: "contact" },
+  { label: "Higher Standard", href: "about" },
+  { label: "How I work",      href: "working" },
+  { label: "Roles",           href: "roles" },
+  { label: "Newsletter",      href: "newsletter" },
+  { label: "Testimonials",    href: "testimonials" },
+  { label: "Contact",         href: "contact" },
 ];
 
 function Navbar() {
@@ -555,7 +555,8 @@ function WhatWorkingSection() {
             </div>
           </Reveal>
         </div>
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[73px]">
+        {/* No pb on this container — pb causes float-away on sticky release */}
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
           {WORKING_MOBILE_CARDS.map((card, idx) => (
             <div
               key={card.title}
@@ -585,9 +586,11 @@ function WhatWorkingSection() {
               </HoverCard>
             </div>
           ))}
-          {/* Spacer to hold stack in place before section exits */}
-          <div style={{ height: "300px" }} />
+          {/* Tiny spacer for brief hold — must be < sticky_top of last card to avoid float-away */}
+          <div style={{ height: "60px" }} />
         </div>
+        {/* Section bottom spacing — outside sticky container so it doesn't affect release */}
+        <div style={{ height: "73px" }} />
       </div>
 
       {/* ── Desktop xl+: title left, two cards right ── */}
@@ -847,7 +850,7 @@ function AboutSection() {
             position: "absolute", left: "30px", top: "50px",
             opacity: inView ? 1 : 0,
             transform: inView ? "translateY(0)" : "translateY(20px)",
-            transition: inView ? "opacity 0.66s ease 0.22s, transform 0.66s ease 0.22s" : "none",
+            transition: inView ? "opacity 0.66s ease 5.22s, transform 0.66s ease 5.22s" : "none",
           }}>
             <p className="text-[52px] text-black" style={STYLE_DISPLAY}>
               Where the Higher Standard<br/>comes from
@@ -859,7 +862,7 @@ function AboutSection() {
             position: "absolute", left: "111px", top: "605px",
             width: "293px", height: "293px", overflow: "hidden",
             opacity: inView ? 1 : 0,
-            transition: inView ? "opacity 0.88s ease 0.77s" : "none",
+            transition: inView ? "opacity 0.88s ease 5.77s" : "none",
           }}>
             <img
               src="/tiffany-bg.png"
@@ -882,7 +885,7 @@ function AboutSection() {
               width: "903px", height: "898px",
               pointerEvents: "none",
               clipPath: inView ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)",
-              transition: inView ? "clip-path 1.65s cubic-bezier(0.4, 0, 0.2, 1) 0.33s" : "none",
+              transition: inView ? "clip-path 1.65s cubic-bezier(0.4, 0, 0.2, 1) 5.33s" : "none",
             }}
           >
             <img src="/about-connector.svg" alt="" style={{ width: "100%", height: "100%", display: "block" }} />
@@ -893,7 +896,7 @@ function AboutSection() {
             position: "absolute", left: "111px", top: "605px",
             width: "293px", height: "293px", overflow: "hidden",
             opacity: inView ? 1 : 0,
-            transition: inView ? "opacity 0.88s ease 1.21s" : "none",
+            transition: inView ? "opacity 0.88s ease 6.21s" : "none",
           }}>
             <img
               src="/tiffany-fg.png"
@@ -920,7 +923,7 @@ function AboutSection() {
                   opacity: inView ? 1 : 0,
                   transform: inView ? "translateY(0)" : "translateY(24px)",
                   transition: inView
-                    ? `opacity 0.6s ease ${1.65 + i * 0.2}s, transform 0.6s cubic-bezier(0.4,0,0.2,1) ${1.65 + i * 0.2}s`
+                    ? `opacity 0.6s ease ${6.65 + i * 0.2}s, transform 0.6s cubic-bezier(0.4,0,0.2,1) ${6.65 + i * 0.2}s`
                     : "none",
                 }}
               >
@@ -965,8 +968,8 @@ function AboutSection() {
           </Reveal>
         </div>
 
-        {/* Sticky-stacking cards */}
-        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px] pb-[73px]">
+        {/* Sticky-stacking cards — no pb on container to prevent float-away on sticky release */}
+        <div className="max-w-[1440px] mx-auto px-[16px] md:px-[30px]">
           {ABOUT_CARDS.map((card, idx) => (
             <div
               key={card.id}
@@ -991,8 +994,8 @@ function AboutSection() {
               </HoverCard>
             </div>
           ))}
-          {/* Spacer to hold stack in place before section exits */}
-          <div style={{ height: "300px" }} />
+          {/* 120px spacer (60% smaller than previous 300px) */}
+          <div style={{ height: "120px" }} />
         </div>
 
       </div>
@@ -1515,7 +1518,7 @@ function NewsletterSection() {
           <div className="shrink-0 flex flex-col gap-[30px]" style={{ width: "min(808px, 55%)", position: "sticky", top: "var(--stack-top)", alignSelf: "flex-start" }}>
             {/* Banner image */}
             <img
-              src="/newsletter-burst.svg"
+              src="/Higher_Photo.png"
               alt=""
               style={{ width: "100%", height: "560px", objectFit: "cover", display: "block" }}
             />
@@ -1567,31 +1570,33 @@ function NewsletterSection() {
                 </HoverCard>
               </div>
             ))}
-            {/* Spacer to hold the stack in place before the section exits */}
+            {/* Spacer — must stay ≤ sticky_top of last card (306px) to avoid float-away */}
             <div style={{ height: "300px" }} />
           </div>
         </div>
+        {/* Extra 90px below the columns (+30% hold before section exits) */}
+        <div className="hidden md:block" style={{ height: "90px" }} />
 
-        {/* Mobile: header → burst image → carousel → email field */}
+        {/* Mobile: header → photo → field+button → carousel */}
         <div className="md:hidden flex flex-col gap-[28px]">
           {/* Banner image */}
           <img
-            src="/newsletter-burst.svg"
+            src="/Higher_Photo.png"
             alt=""
             style={{ width: "100%", height: "240px", objectFit: "cover", display: "block" }}
           />
-          {/* Article carousel */}
-          <NewsletterCarousel articles={NEWSLETTER_ARTICLES} />
-          {/* Subscribe field */}
-          <div className="flex flex-col gap-[10px] items-center">
+          {/* Subscribe row: field + button on one line, 12px gap */}
+          <div className="flex flex-row items-center" style={{ gap: "12px" }}>
             <input
               type="email"
               placeholder="Enter your email"
-              className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] w-full text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
+              className="border border-[#949494] rounded-[4px] h-[50px] px-[20px] flex-1 min-w-0 text-[16px] text-black bg-transparent outline-none hover:border-black/60 focus:border-[#fb8349] transition-colors duration-200 placeholder:text-[#767676]"
               style={STYLE_DISPLAY}
             />
-            <SubscribeBtn label="Subscribe to Higher" />
+            <SubscribeBtn label="Subscribe" />
           </div>
+          {/* Article carousel */}
+          <NewsletterCarousel articles={NEWSLETTER_ARTICLES} />
         </div>
 
       </div>
